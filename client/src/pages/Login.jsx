@@ -8,24 +8,31 @@ import FloatingDecorations from '../components/FloatingDecorations';
 import AuthMascotOrbit from '../components/AuthMascotOrbit';
 import studyGirlWelcome from '../assets/characters/study-girl-welcome.png';
 
+import { useAuth } from '../context/AuthContext';
+
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
       toast.error('Please fill in all fields');
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await login(email, password);
       toast.success('Welcome back, Student! 🌱');
       navigate('/dashboard');
-    }, 700);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

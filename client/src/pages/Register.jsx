@@ -8,15 +8,18 @@ import FloatingDecorations from '../components/FloatingDecorations';
 import AuthMascotOrbit from '../components/AuthMascotOrbit';
 import studyGirlReading from '../assets/characters/study-girl-reading.png';
 
+import { useAuth } from '../context/AuthContext';
+
 const Register = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !password || !confirmPassword) {
       toast.error('Please fill in all fields');
@@ -27,11 +30,15 @@ const Register = () => {
       return;
     }
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await register(name, email, password);
       toast.success('Registration successful! Welcome aboard! 🌱');
       navigate('/dashboard');
-    }, 700);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Registration failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

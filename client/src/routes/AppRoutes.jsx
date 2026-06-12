@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 // Layouts
 import PublicLayout from '../layouts/PublicLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 // Public Pages
 import Landing from '../pages/Landing';
@@ -45,45 +46,47 @@ const AppRoutes = () => {
       </Route>
 
       {/* Student Layout and Routes */}
-      <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/subjects" element={<Subjects />} />
-        
-        {/* Support both sidebar and standard routes */}
-        <Route path="/smart-notes" element={<SmartNotes />} />
-        <Route path="/notes" element={<SmartNotes />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/subjects" element={<Subjects />} />
+          
+          {/* Support both sidebar and standard routes */}
+          <Route path="/smart-notes" element={<SmartNotes />} />
+          <Route path="/notes" element={<SmartNotes />} />
 
-        <Route path="/upload-pdf" element={<UploadPDF />} />
+          <Route path="/upload-pdf" element={<UploadPDF />} />
 
-        <Route path="/ai-study-plan" element={<AIStudyPlan />} />
-        <Route path="/study-plan" element={<AIStudyPlan />} />
+          <Route path="/ai-study-plan" element={<AIStudyPlan />} />
+          <Route path="/study-plan" element={<AIStudyPlan />} />
 
-        <Route path="/quiz-generator" element={<QuizGenerator />} />
-        <Route path="/quizzes" element={<QuizGenerator />} />
+          <Route path="/quiz-generator" element={<QuizGenerator />} />
+          <Route path="/quizzes" element={<QuizGenerator />} />
 
-        <Route path="/flashcards" element={<Flashcards />} />
+          <Route path="/flashcards" element={<Flashcards />} />
 
-        <Route path="/focus-timer" element={<FocusTimer />} />
-        <Route path="/focus" element={<FocusTimer />} />
+          <Route path="/focus-timer" element={<FocusTimer />} />
+          <Route path="/focus" element={<FocusTimer />} />
 
-        <Route path="/focus-analytics" element={<FocusAnalytics />} />
-        <Route path="/academic-records" element={<AcademicRecords />} />
-        <Route path="/risk-prediction" element={<RiskPrediction />} />
-        <Route path="/risk-timeline" element={<RiskTimeline />} />
-        <Route path="/study-garden" element={<StudyGarden />} />
-        <Route path="/study-quests" element={<StudyQuests />} />
+          <Route path="/focus-analytics" element={<FocusAnalytics />} />
+          <Route path="/academic-records" element={<AcademicRecords />} />
+          <Route path="/risk-prediction" element={<RiskPrediction />} />
+          <Route path="/risk-timeline" element={<RiskTimeline />} />
+          <Route path="/study-garden" element={<StudyGarden />} />
+          <Route path="/study-quests" element={<StudyQuests />} />
 
-        <Route path="/flower-collection" element={<FlowerCollection />} />
-        <Route path="/flowers" element={<FlowerCollection />} />
+          <Route path="/flower-collection" element={<FlowerCollection />} />
+          <Route path="/flowers" element={<FlowerCollection />} />
 
-        <Route path="/weak-topic-radar" element={<WeakTopicRadar />} />
-        <Route path="/weak-topics" element={<WeakTopicRadar />} />
+          <Route path="/weak-topic-radar" element={<WeakTopicRadar />} />
+          <Route path="/weak-topics" element={<WeakTopicRadar />} />
 
-        <Route path="/subject-health" element={<SubjectHealth />} />
-        <Route path="/mood-checkin" element={<MoodCheckIn />} />
-        <Route path="/burnout-warning" element={<BurnoutWarning />} />
-        <Route path="/revision-reminders" element={<RevisionReminders />} />
-        <Route path="/profile" element={<Profile />} />
+          <Route path="/subject-health" element={<SubjectHealth />} />
+          <Route path="/mood-checkin" element={<MoodCheckIn />} />
+          <Route path="/burnout-warning" element={<BurnoutWarning />} />
+          <Route path="/revision-reminders" element={<RevisionReminders />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Route>
     </Routes>
   );
