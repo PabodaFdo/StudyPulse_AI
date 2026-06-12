@@ -1,21 +1,76 @@
+import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BarChart3, Clock, Flame, Calendar, Award } from 'lucide-react';
+import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
 import Badge from '../components/Badge';
-
-const weeklyFocusData = [
-  { day: 'Mon', minutes: 150 },
-  { day: 'Tue', minutes: 220 },
-  { day: 'Wed', minutes: 90 },
-  { day: 'Thu', minutes: 250 },
-  { day: 'Fri', minutes: 180 },
-  { day: 'Sat', minutes: 330 },
-  { day: 'Sun', minutes: 240 },
-];
+import LoadingSpinner from '../components/LoadingSpinner';
+import api from '../services/api';
 
 const FocusAnalytics = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [analytics, setAnalytics] = useState({
+    totalMinutes: 0,
+    totalSessions: 0,
+    sessions: []
+  });
+  
+  const [weeklyChartData, setWeeklyChartData] = useState([
+    { day: 'Mon', minutes: 0 },
+    { day: 'Tue', minutes: 0 },
+    { day: 'Wed', minutes: 0 },
+    { day: 'Thu', minutes: 0 },
+    { day: 'Fri', minutes: 0 },
+    { day: 'Sat', minutes: 0 },
+    { day: 'Sun', minutes: 0 },
+  ]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      setIsLoading(true);
+      const res = await api.get('/focus-sessions/analytics');
+      setAnalytics(res.data);
+      
+      const dayMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thu', 5: 'Fri', 6: 'Sat' };
+      const weekData = { 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0 };
+      
+      res.data.sessions.forEach(session => {
+        const date = new Date(session.createdAt);
+        const dayStr = dayMap[date.getDay()];
+        weekData[dayStr] += session.duration;
+      });
+
+      const formattedChart = [
+        { day: 'Mon', minutes: weekData['Mon'] },
+        { day: 'Tue', minutes: weekData['Tue'] },
+        { day: 'Wed', minutes: weekData['Wed'] },
+        { day: 'Thu', minutes: weekData['Thu'] },
+        { day: 'Fri', minutes: weekData['Fri'] },
+        { day: 'Sat', minutes: weekData['Sat'] },
+        { day: 'Sun', minutes: weekData['Sun'] },
+      ];
+      setWeeklyChartData(formattedChart);
+
+    } catch (error) {
+      toast.error('Failed to load analytics data.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       <PageHeader
@@ -28,7 +83,7 @@ const FocusAnalytics = () => {
         <StatCard
           icon={Clock}
           label="Focus Minutes"
-          value="1,460 mins"
+          value={`${analytics.totalMinutes.toLocaleString()} mins`}
           change={8}
           changeType="positive"
           color="purple"
@@ -44,7 +99,7 @@ const FocusAnalytics = () => {
         <StatCard
           icon={Calendar}
           label="Sessions Completed"
-          value="58 Sessions"
+          value={`${analytics.totalSessions.toLocaleString()} Sessions`}
           change={12}
           changeType="positive"
           color="blue"
@@ -68,7 +123,7 @@ const FocusAnalytics = () => {
         >
           <div className="h-[250px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyFocusData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={weeklyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                 <XAxis dataKey="day" stroke="#64748b" fontSize={11} tickLine={false} />
                 <YAxis stroke="#64748b" fontSize={11} tickLine={false} />
@@ -92,9 +147,9 @@ const FocusAnalytics = () => {
           <h3 className="font-semibold text-white text-base">Session Allocation</h3>
           <div className="space-y-4 pt-2">
             {[
-              { label: 'Deep Focus Mode', percentage: 70, minutes: 1022, color: 'text-brand-400' },
-              { label: 'Short Breaks', percentage: 20, minutes: 292, color: 'text-accent-400' },
-              { label: 'Long Breaks', percentage: 10, minutes: 146, color: 'text-success-400' },
+              { label: 'Deep Focus Mode', percentage: analytics.totalMinutes > 0 ? 100 : 0, minutes: analytics.totalMinutes, color: 'text-brand-400' },
+              { label: 'Short Breaks', percentage: 0, minutes: 0, color: 'text-accent-400' },
+              { label: 'Long Breaks', percentage: 0, minutes: 0, color: 'text-success-400' },
             ].map((item, idx) => (
               <div key={idx} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-1.5">
                 <div className="flex justify-between text-xs">
