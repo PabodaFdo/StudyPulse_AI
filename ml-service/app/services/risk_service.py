@@ -1,3 +1,14 @@
+from pathlib import Path
+
+import joblib
+import numpy as np
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_PATH = BASE_DIR / "models" / "academic_risk_model.pkl"
+ENCODER_PATH = BASE_DIR / "models" / "risk_label_encoder.pkl"
+
+
 def predict_academic_risk_rule_based(data):
     risk_score = 0
     reasons = []
@@ -59,4 +70,51 @@ def predict_academic_risk_rule_based(data):
         "confidence": confidence,
         "reasons": reasons,
         "recommendations": recommendations,
+    }
+
+
+def load_model():
+    if MODEL_PATH.exists() and ENCODER_PATH.exists():
+        loaded_model = joblib.load(MODEL_PATH)
+        loaded_encoder = joblib.load(ENCODER_PATH)
+        return loaded_model, loaded_encoder
+
+    return None, None
+
+
+model, encoder = load_model()
+
+
+def predict_academic_risk_ml(data):
+    """
+    Predict academic risk using trained ML model.
+    If model files are missing, use rule-based fallback.
+    """
+
+    rule_based_result = predict_academic_risk_rule_based(data)
+
+    if model is None or encoder is None:
+        return rule_based_result
+
+    features = np.array([[
+        data.attendancePercentage,
+        data.assignmentAverage,
+        data.quizAverage,
+        data.studyHoursPerWeek,
+        data.missedDeadlines,
+        data.focusSessionsCompleted,
+        data.previousExamMark,
+    ]])
+
+    prediction = model.predict(features)[0]
+    probabilities = model.predict_proba(features)[0]
+
+    risk_level = encoder.inverse_transform([prediction])[0]
+    confidence = float(max(probabilities))
+
+    return {
+        "riskLevel": risk_level,
+        "confidence": round(confidence, 2),
+        "reasons": rule_based_result["reasons"],
+        "recommendations": rule_based_result["recommendations"],
     }
