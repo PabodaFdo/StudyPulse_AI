@@ -104,11 +104,15 @@ model GrowthActivity {
 }
 
 model StudyQuest {
-  id        Int      @id @default(autoincrement())
-  title     String
-  completed Boolean  @default(false)
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  type         String   @default("DAILY")
+  targetCount  Int      @default(1)
+  rewardPoints Int      @default(10)
+  completed    Boolean  @default(false)
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
