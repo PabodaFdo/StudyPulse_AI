@@ -2,27 +2,40 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
+from app.schemas import AcademicRiskRequest, AcademicRiskResponse
+from app.services.risk_service import predict_academic_risk_rule_based
+
 app = FastAPI(
     title="StudyPulse ML Service",
-    description="Machine learning micro-service for StudyPulse AI",
+    description="Machine learning microservice for StudyPulse AI",
     version="0.1.0",
 )
 
-# --------------- CORS ---------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:5000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# --------------- Health Check ---------------
+@app.get("/")
+def root():
+    return {
+        "message": "StudyPulse AI ML Service is running"
+    }
+
+
 @app.get("/health")
-async def health_check():
+def health_check():
     return {
         "success": True,
-        "message": "StudyPulse ML service is healthy 🟢",
+        "message": "StudyPulse ML service is healthy",
         "timestamp": datetime.utcnow().isoformat(),
     }
+
+
+@app.post("/predict-risk", response_model=AcademicRiskResponse)
+def predict_risk(data: AcademicRiskRequest):
+    return predict_academic_risk_rule_based(data)
