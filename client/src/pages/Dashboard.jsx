@@ -1,117 +1,344 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import {
-  Timer, BookOpen, Clock, Flame, Sparkles, LayoutDashboard,
-  Trophy, AlertTriangle, Play, Flower2
+  Timer, BookOpen, Clock, Flame, LayoutDashboard,
+  AlertTriangle, Play, Flower2, RefreshCw, PlusCircle
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
 import ProgressBar from '../components/ProgressBar';
-import Badge from '../components/Badge';
 import Button from '../components/Button';
 import AnimatedCharacter from '../components/AnimatedCharacter';
+import dashboardService from '../services/dashboard.service';
 
-const focusHistoryData = [
-  { name: 'Mon', mins: 120 },
-  { name: 'Tue', mins: 180 },
-  { name: 'Wed', mins: 90 },
-  { name: 'Thu', mins: 210 },
-  { name: 'Fri', mins: 150 },
-  { name: 'Sat', mins: 270 },
-  { name: 'Sun', mins: 240 },
-];
-
-const healthScoresData = [
-  { name: 'Calculus', score: 88 },
-  { name: 'Physics', score: 76 },
-  { name: 'CS', score: 92 },
-  { name: 'Chem', score: 48 },
-];
+// Skeleton Component
+const DashboardSkeleton = () => (
+  <div className="space-y-6 animate-pulse">
+    <div className="h-10 w-64 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+    <div className="grid gap-6 lg:grid-cols-3">
+      <div className="lg:col-span-2 space-y-6">
+        <div className="h-40 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+        <div className="grid gap-4 sm:grid-cols-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>)}
+        </div>
+        <div className="h-72 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
+      </div>
+      <div className="space-y-6">
+        {[1,2,3,4].map(i => <div key={i} className="h-48 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>)}
+      </div>
+    </div>
+  </div>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [summary, setSummary] = useState(null);
+  const [charts, setCharts] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [chartTab, setChartTab] = useState('week');
+
+  // Suggested quests data (pseudo-interactive)
+  const [quests, setQuests] = useState([
+    { id: 1, quest: 'Complete one 25-min focus session', checked: false, path: '/focus-timer' },
+    { id: 2, quest: 'Revise one smart note summary sheet', checked: false, path: '/smart-notes' },
+    { id: 3, quest: 'Answer 5 quiz questions', checked: false, path: '/quiz-generator' },
+  ]);
+
+  const fetchDashboardData = async (isRefresh = false) => {
+    try {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      
+      const [summaryData, chartsData] = await Promise.all([
+        dashboardService.getSummary(),
+        dashboardService.getCharts()
+      ]);
+      setSummary(summaryData);
+      setCharts(chartsData);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      setError('Failed to load dashboard data. Please try again later.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+        <AlertTriangle className="h-12 w-12 text-danger-500" />
+        <p className="text-danger-500 font-medium">{error}</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
+
+  // --- Process Data ---
+  const getDayName = (dateString) => {
+    if (!dateString) return 'Unknown';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Unknown';
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
+  };
+
+  const processFocusHistory = (sessions) => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const data = days.map(day => ({ name: day, mins: 0 }));
+    if (sessions && sessions.length > 0) {
+      sessions.forEach(session => {
+        let dayName = getDayName(session.createdAt);
+        const dayItem = data.find(d => d.name === dayName);
+        if (dayItem) dayItem.mins += (session.duration || 0);
+      });
+    }
+    return data;
+  };
+
+  const processHealthScores = (records) => {
+    if (!records || records.length === 0) return [];
+    const subjectMap = {};
+    records.forEach(r => {
+      const subj = r.subject?.name || 'Unknown';
+      if (!subjectMap[subj]) subjectMap[subj] = { count: 0, scoreSum: 0 };
+      let score = 75;
+      if (r.examMark) score = r.examMark;
+      else if (r.grade) {
+        const g = r.grade.toUpperCase();
+        if (g.includes('A')) score = 90;
+        else if (g.includes('B')) score = 80;
+        else if (g.includes('C')) score = 70;
+        else if (g.includes('D')) score = 60;
+        else if (g.includes('F')) score = 50;
+      }
+      subjectMap[subj].scoreSum += score;
+      subjectMap[subj].count += 1;
+    });
+    return Object.keys(subjectMap).map(subj => ({
+      name: subj.substring(0, 8),
+      fullName: subj,
+      score: Math.round(subjectMap[subj].scoreSum / subjectMap[subj].count)
+    }));
+  };
+
+  const getAcademicRecordsSummary = () => {
+    const records = charts?.academicRecords || [];
+    if (records.length === 0) return null;
+    let totalScore = 0;
+    let scoreCount = 0;
+    records.forEach(r => {
+      if (r.examMark) {
+        totalScore += r.examMark;
+        scoreCount++;
+      } else if (r.grade) {
+        const g = r.grade.toUpperCase();
+        if (g.includes('A')) totalScore += 90;
+        else if (g.includes('B')) totalScore += 80;
+        else if (g.includes('C')) totalScore += 70;
+        else if (g.includes('D')) totalScore += 60;
+        else if (g.includes('F')) totalScore += 50;
+        else return;
+        scoreCount++;
+      }
+    });
+    const averageScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : null;
+    const latestRecord = records[records.length - 1];
+    return {
+      total: summary?.academicRecordsCount || records.length,
+      average: averageScore,
+      latest: latestRecord ? `${latestRecord.subject?.name || 'Unknown'} (${latestRecord.grade || latestRecord.examMark})` : null
+    };
+  };
+
+  const getRecentActivity = () => {
+    let activities = [];
+    if (charts?.focusSessions) {
+      charts.focusSessions.forEach(s => {
+        if (s.createdAt) {
+          const d = new Date(s.createdAt);
+          if (!isNaN(d.getTime())) {
+            activities.push({ type: 'focus', date: d, label: `${s.duration || 0} min focus on ${s.subject?.name || 'Subject'}` });
+          }
+        }
+      });
+    }
+    if (charts?.academicRecords) {
+      charts.academicRecords.forEach(r => {
+        if (r.createdAt) {
+          const d = new Date(r.createdAt);
+          if (!isNaN(d.getTime())) {
+            activities.push({ type: 'record', date: d, label: `Recorded ${r.grade || r.examMark} in ${r.subject?.name || 'Subject'}` });
+          }
+        }
+      });
+    }
+    // Sort descending by date
+    activities.sort((a, b) => b.date - a.date);
+    return activities.slice(0, 4);
+  };
+
+  // Stage logic
+  const getGardenStage = (pts) => {
+    if (pts === undefined) return { label: `Level ${summary?.gardenLevel || 1} Plant`, image: '/src/assets/characters/plant-buddy.png' };
+    if (pts <= 20) return { label: 'Seed', image: '/src/assets/characters/plant-buddy.png' };
+    if (pts <= 50) return { label: 'Small Sprout', image: '/src/assets/characters/plant-buddy.png' };
+    if (pts <= 100) return { label: 'Growing Plant', image: '/src/assets/characters/plant-buddy.png' };
+    if (pts <= 160) return { label: 'Healthy Plant', image: '/src/assets/characters/plant-buddy.png' };
+    if (pts <= 230) return { label: 'Flower Buds', image: '/src/assets/characters/plant-buddy.png' };
+    return { label: 'Blooming Flowers', image: '/src/assets/characters/plant-buddy.png' };
+  };
+
+  const focusHistoryData = processFocusHistory(charts?.focusSessions);
+  const healthScoresData = processHealthScores(charts?.academicRecords);
+  const academicSummary = getAcademicRecordsSummary();
+  const recentActivity = getRecentActivity();
+  
+  const totalFocusMinutes = charts?.focusSessions?.reduce((acc, s) => acc + s.duration, 0) || 0;
+  const totalFocusHours = (totalFocusMinutes / 60).toFixed(1);
+  const gardenStage = getGardenStage(summary?.growthPoints);
+
+  // Welcome message logic
+  let welcomeMessage = "You are making progress. Keep your study streak alive.";
+  if ((summary?.focusSessionsCount || 0) === 0) welcomeMessage = "Start your first focus session today.";
+  else if ((summary?.notesCount || 0) === 0) welcomeMessage = "Create your first smart note.";
+  else if ((summary?.academicRecordsCount || 0) === 0) welcomeMessage = "Add academic records to unlock subject health insights.";
+
+  const completedQuests = quests.filter(q => q.checked).length;
 
   return (
-    <div className="space-y-6 text-text-main">
-      <PageHeader
-        title="Student Portal Dashboard"
-        subtitle="Manage focus sessions, note reviews, and cultivate digital plants."
-        icon={LayoutDashboard}
-      />
+    <div className="space-y-6 text-text-main pb-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <PageHeader
+          title="Student Portal Dashboard"
+          subtitle="Manage focus sessions, note reviews, and cultivate digital plants."
+          icon={LayoutDashboard}
+        />
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => fetchDashboardData(true)}
+          className="flex items-center gap-2"
+          disabled={refreshing}
+        >
+          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Refreshing...' : 'Refresh Dashboard'}
+        </Button>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left column - main activities */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* Welcome Card with Mascot */}
-          <div className="liquid-card p-6 bg-gradient-to-r from-purple/10 via-pink/5 to-cream border-2 border-white relative overflow-hidden">
-            <div className="liquid-card-content flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10 w-full">
-              <div className="space-y-2 text-center sm:text-left">
-                <h2 className="text-xl sm:text-2xl font-extrabold text-text-main flex items-center justify-center sm:justify-start gap-2">
-                  Good Morning, Student 🌱
-                </h2>
-                <p className="text-xs sm:text-sm text-text-muted font-bold max-w-sm">
-                  Ready to grow your Study Garden today? Completing quests unlocks rare flower seeds.
-                </p>
-                <div className="pt-2">
-                  <Button onClick={() => navigate('/focus-timer')} className="gap-2 flex-shrink-0" size="sm">
-                    <Play className="fill-white h-4 w-4" /> Start Focus Session
-                  </Button>
+          {/* Welcome Card & Quick Actions */}
+          <div className="space-y-3">
+            <div className="liquid-card p-6 bg-gradient-to-r from-purple/10 via-pink/5 to-cream border-2 border-white relative overflow-hidden">
+              <div className="liquid-card-content flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10 w-full">
+                <div className="space-y-2 text-center sm:text-left">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-text-main flex items-center justify-center sm:justify-start gap-2">
+                    Good Morning, Student 🌱
+                  </h2>
+                  <p className="text-xs sm:text-sm text-text-muted font-bold max-w-sm">
+                    {welcomeMessage}
+                  </p>
+                  <div className="pt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
+                    <Button onClick={() => navigate('/focus-timer')} className="gap-2 text-xs py-1.5 px-3" size="sm">
+                      <Play className="fill-white h-3.5 w-3.5" /> Start Focus
+                    </Button>
+                    <Button onClick={() => navigate('/smart-notes')} variant="outline" className="gap-2 text-xs py-1.5 px-3" size="sm">
+                      <PlusCircle className="h-3.5 w-3.5" /> Add Note
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex-shrink-0">
+                  <AnimatedCharacter src="/src/assets/characters/study-girl-focus.png" variant="focus" size="md" />
                 </div>
               </div>
-
-              {/* Mascot in Welcome Banner */}
-              <div className="flex-shrink-0">
-                <AnimatedCharacter
-                  src="/src/assets/characters/study-girl-focus.png"
-                  variant="focus"
-                  size="md"
-                />
-              </div>
+            </div>
+            {/* Quick action secondary links */}
+            <div className="flex flex-wrap gap-2 justify-end">
+               <button onClick={() => navigate('/academic-records')} className="text-xs font-bold text-text-muted hover:text-purple transition-colors bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-lavender/30 shadow-sm">
+                 + Log Grade
+               </button>
+               <button onClick={() => navigate('/study-garden')} className="text-xs font-bold text-text-muted hover:text-green-500 transition-colors bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-lavender/30 shadow-sm">
+                 🌱 View Garden
+               </button>
             </div>
           </div>
 
           {/* Grid Stats */}
-          <div className="grid gap-4 sm:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             <StatCard
               icon={Timer}
               label="Focus Sessions"
-              value="12 Logged"
-              change={15}
-              changeType="positive"
+              value={`${summary?.focusSessionsCount || 0}`}
+              badgeText="This Week"
+              changeType="neutral"
               color="purple"
+              onClick={() => navigate('/focus-analytics')}
             />
             <StatCard
               icon={BookOpen}
-              label="Revised Notes"
-              value="8 Sheets"
-              change={8}
-              changeType="positive"
+              label="Total Notes"
+              value={`${summary?.notesCount || 0}`}
+              badgeText="Total"
+              changeType="neutral"
               color="blue"
+              onClick={() => navigate('/smart-notes')}
             />
             <StatCard
               icon={Clock}
               label="Study Hours"
-              value="24.5 Hours"
-              change={12}
-              changeType="positive"
+              value={`${totalFocusHours}`}
+              badgeText="This Week"
+              changeType="neutral"
               color="green"
+              onClick={() => navigate('/focus-timer')}
             />
             <StatCard
               icon={Flame}
-              label="Current Streak"
-              value="6 Days"
-              change={100}
-              changeType="positive"
+              label="Total Subjects"
+              value={`${summary?.subjectsCount || 0}`}
+              badgeText="Enrolled"
+              changeType="neutral"
               color="red"
+              onClick={() => navigate('/subjects')}
             />
           </div>
 
           {/* Weekly Focus Chart */}
           <ChartCard
-            title="Weekly Focus Overview"
+            title="Focus Overview"
             subtitle="Minutes spent focusing in study intervals"
+            headerAction={
+              <div className="flex bg-[#f8f3ff] dark:bg-slate-800 rounded-lg p-1">
+                <button 
+                  className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${chartTab === 'week' ? 'bg-white dark:bg-slate-700 shadow-sm text-text-main dark:text-white' : 'text-text-muted hover:text-text-main'}`}
+                  onClick={() => setChartTab('week')}
+                >
+                  Week
+                </button>
+                <button 
+                  className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${chartTab === 'month' ? 'bg-white dark:bg-slate-700 shadow-sm text-text-main dark:text-white' : 'text-text-muted hover:text-text-main'}`}
+                  title="Monthly analytics coming soon"
+                  disabled
+                >
+                  Month
+                </button>
+              </div>
+            }
           >
             <div className="h-[220px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
@@ -125,21 +352,52 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.08)" />
                   <XAxis dataKey="name" stroke="#6b6388" fontSize={11} tickLine={false} />
                   <YAxis stroke="#6b6388" fontSize={11} tickLine={false} />
-                  <Tooltip
+                  <RechartsTooltip
                     contentStyle={{
-                      background: '#ffffff',
-                      borderColor: '#b9a7ff',
+                      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                      borderColor: '#e2e8f0',
                       borderRadius: '12px',
-                      color: '#241b4b',
+                      color: '#1e293b',
                       fontSize: '12px',
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
+                    itemStyle={{ color: '#8b5cf6' }}
+                    wrapperClassName="dark:!bg-slate-800 dark:!border-slate-700 dark:!text-slate-200"
                   />
                   <Area type="monotone" dataKey="mins" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorFocus)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </ChartCard>
+
+          {/* Recent Activity Timeline */}
+          <div className="liquid-card p-5">
+            <h3 className="font-extrabold text-sm sm:text-base text-text-main mb-4 flex items-center gap-1.5">
+              <Clock className="h-4.5 w-4.5 text-purple" /> Recent Activity
+            </h3>
+            <div className="space-y-4">
+              {recentActivity.length > 0 ? (
+                <div className="relative border-l-2 border-lavender/30 dark:border-slate-700 ml-3 space-y-5">
+                  {recentActivity.map((activity, i) => (
+                    <div key={i} className="relative pl-6">
+                      <div className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 ${activity.type === 'focus' ? 'bg-purple' : 'bg-blue'}`}></div>
+                      <p className="text-xs font-bold text-text-main dark:text-slate-200">{activity.label}</p>
+                      <p className="text-[10px] font-semibold text-text-muted mt-0.5">{activity.date.toLocaleDateString()} at {activity.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center p-6 bg-[#f8f3ff] dark:bg-slate-900/50 rounded-xl border border-lavender/20 dark:border-white/5">
+                  <p className="text-xs font-bold text-text-muted">No recent activity yet.</p>
+                  <button onClick={() => navigate('/focus-timer')} className="text-purple hover:underline text-xs font-bold mt-2 inline-block">
+                    Start a focus session
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
 
         {/* Right column - sidebar cards */}
@@ -151,22 +409,29 @@ const Dashboard = () => {
                 <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
                   <Flower2 className="h-4.5 w-4.5 text-purple" /> Study Garden
                 </h3>
-                <span className="status-badge status-success">Healthy Plant</span>
+                <span className="status-badge status-success">Level {summary?.gardenLevel || 1}</span>
               </div>
               
               <div className="p-3 bg-[#f8f3ff] dark:bg-slate-900/80 rounded-2xl border border-lavender/35 dark:border-white/10 flex items-center gap-3">
                 <AnimatedCharacter
-                  src="/src/assets/characters/plant-buddy.png"
+                  src={gardenStage.image}
                   variant="plant"
                   size="sm"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-text-main truncate">Mint Lace Fern</p>
-                  <p className="text-[10px] text-text-muted">145 Growth Points</p>
+                  <p className="text-[10px] text-text-muted">
+                    {summary?.growthPoints !== undefined ? `${summary.growthPoints} Growth Points` : ''} - {gardenStage.label}
+                  </p>
                 </div>
               </div>
               
-              <ProgressBar value={65} color="green" label="Growth Progress" />
+              {summary?.gardenProgress !== undefined && (
+                <ProgressBar value={summary.gardenProgress} color="green" label="Growth Progress" />
+              )}
+              {summary?.gardenProgress === undefined && summary?.growthPoints !== undefined && summary?.nextLevelPoints !== undefined && (
+                <ProgressBar value={Math.round((summary.growthPoints / summary.nextLevelPoints) * 100)} color="green" label="Growth Progress" />
+              )}
               <button onClick={() => navigate('/study-garden')} className="w-full text-xs font-bold text-purple hover:underline text-right block">
                 Manage Garden →
               </button>
@@ -177,7 +442,10 @@ const Dashboard = () => {
           <div className="liquid-card p-5 relative overflow-hidden">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-start">
-                <h3 className="font-extrabold text-sm sm:text-base text-text-main">Today's Study Quests</h3>
+                <div className="space-y-1">
+                  <h3 className="font-extrabold text-sm sm:text-base text-text-main">Suggested Quests</h3>
+                  <p className="text-[10px] font-bold text-text-muted">{completedQuests} / {quests.length} completed</p>
+                </div>
                 <AnimatedCharacter
                   src="/src/assets/characters/study-girl-quest.png"
                   variant="quest"
@@ -186,60 +454,110 @@ const Dashboard = () => {
                 />
               </div>
               
-              <div className="space-y-2 text-xs">
-                {[
-                  { quest: 'Complete one 25-min focus session', checked: true },
-                  { quest: 'Revise one smart note summary sheet', checked: false },
-                  { quest: 'Answer 5 quiz questions', checked: false },
-                ].map((q, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
-                    <span className={`text-base ${q.checked ? 'text-green-500' : 'text-text-muted/40'}`}>
+              <div className="space-y-2 text-xs relative z-10">
+                {quests.map((q) => (
+                  <button 
+                    key={q.id} 
+                    onClick={() => {
+                      // Toggle checked state temporarily for UI feedback
+                      setQuests(quests.map(item => item.id === q.id ? { ...item, checked: !item.checked } : item));
+                      if (q.path) setTimeout(() => navigate(q.path), 300);
+                    }}
+                    className={`w-full text-left flex items-center gap-2 p-2.5 rounded-xl transition-all cursor-pointer hover:bg-purple/5 border ${q.checked ? 'bg-[#f8f3ff]/50 dark:bg-slate-900/40 border-lavender/10' : 'bg-[#f8f3ff] dark:bg-slate-900/80 border-lavender/20 dark:border-white/10'}`}
+                  >
+                    <span className={`text-base flex-shrink-0 ${q.checked ? 'text-green-500' : 'text-text-muted/40'}`}>
                       {q.checked ? '●' : '○'}
                     </span>
-                    <span className={`font-semibold ${q.checked ? 'text-text-muted line-through' : 'text-text-main'}`}>
+                    <span className={`font-semibold transition-all ${q.checked ? 'text-text-muted line-through opacity-70' : 'text-text-main dark:text-slate-200'}`}>
                       {q.quest}
                     </span>
-                  </div>
+                  </button>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Academic Records Summary */}
+          <div className="liquid-card p-5">
+            <div className="liquid-card-content space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
+                  <BookOpen className="h-4.5 w-4.5 text-purple" /> Academic Records
+                </h3>
+                <span className="status-badge status-success bg-blue/10 text-blue border border-blue/20 dark:bg-blue/20 dark:text-blue-400">
+                  {academicSummary ? academicSummary.total : 0} Saved
+                </span>
+              </div>
+              
+              {academicSummary ? (
+                <div className="space-y-2">
+                  {academicSummary.average !== null && (
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                      <span className="font-bold text-text-main dark:text-slate-200">Average Score</span>
+                      <span className="font-bold text-purple dark:text-cyan-400">{academicSummary.average}%</span>
+                    </div>
+                  )}
+                  {academicSummary.latest && (
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                      <span className="font-bold text-text-main dark:text-slate-200">Latest Record</span>
+                      <span className="font-bold text-text-muted dark:text-slate-400 truncate max-w-[120px]" title={academicSummary.latest}>
+                        {academicSummary.latest}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3 text-center rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                  <p className="text-xs font-bold text-text-muted">No academic records yet. Add your first record to unlock insights.</p>
+                </div>
+              )}
+              
+              <button onClick={() => navigate('/academic-records')} className="w-full text-xs font-bold text-purple hover:underline text-right block">
+                View Details →
+              </button>
             </div>
           </div>
 
           {/* Subject Health Chart */}
           <ChartCard title="Subject Health" className="p-4 sm:p-5">
             <div className="h-[150px] w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={healthScoresData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.05)" />
-                  <XAxis dataKey="name" stroke="#6b6388" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#6b6388" fontSize={10} tickLine={false} />
-                  <Tooltip
-                    contentStyle={{
-                      background: '#ffffff',
-                      borderColor: '#b9a7ff',
-                      borderRadius: '12px',
-                      color: '#241b4b',
-                      fontSize: '11px',
-                    }}
-                  />
-                  <Bar dataKey="score" fill="#ffb6d5" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {healthScoresData && healthScoresData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={healthScoresData} margin={{ top: 10, right: 0, left: -25, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(139,92,246,0.05)" />
+                    <XAxis dataKey="name" stroke="#6b6388" fontSize={10} tickLine={false} />
+                    <YAxis stroke="#6b6388" fontSize={10} tickLine={false} />
+                    <RechartsTooltip
+                      cursor={{fill: 'rgba(139,92,246,0.1)'}}
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderColor: '#e2e8f0',
+                        borderRadius: '12px',
+                        color: '#1e293b',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                      itemStyle={{ color: '#ffb6d5' }}
+                      wrapperClassName="dark:!bg-slate-800 dark:!border-slate-700 dark:!text-slate-200"
+                      formatter={(value, name, props) => [value + '%', props.payload.fullName || name]}
+                    />
+                    <Bar 
+                      dataKey="score" 
+                      fill="#ffb6d5" 
+                      radius={[4, 4, 0, 0]} 
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => navigate('/academic-records')}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-center px-4">
+                  <p className="text-xs font-bold text-text-muted">No academic records available yet.</p>
+                </div>
+              )}
             </div>
           </ChartCard>
-
-          {/* Risk Prediction Preview */}
-          <div className="liquid-card p-5 bg-gradient-to-br from-pink/5 to-white border border-lavender/25">
-            <div className="liquid-card-content space-y-3">
-              <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
-                <AlertTriangle className="h-4.5 w-4.5 text-danger-500" /> Academic Risk Alerts
-              </h3>
-              <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-pink/15 border border-pink/35">
-                <span className="font-bold text-text-main">Organic Chemistry</span>
-                <span className="status-badge status-danger">High Risk (76%)</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
