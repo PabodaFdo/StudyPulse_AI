@@ -12,6 +12,7 @@ import ProgressBar from '../components/ProgressBar';
 import Button from '../components/Button';
 import AnimatedCharacter from '../components/AnimatedCharacter';
 import dashboardService from '../services/dashboard.service';
+import questService from '../services/quest.service';
 
 // Skeleton Component
 const DashboardSkeleton = () => (
@@ -41,24 +42,22 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [chartTab, setChartTab] = useState('week');
 
-  // Suggested quests data (pseudo-interactive)
-  const [quests, setQuests] = useState([
-    { id: 1, quest: 'Complete one 25-min focus session', checked: false, path: '/focus-timer' },
-    { id: 2, quest: 'Revise one smart note summary sheet', checked: false, path: '/smart-notes' },
-    { id: 3, quest: 'Answer 5 quiz questions', checked: false, path: '/quiz-generator' },
-  ]);
+  const [quests, setQuests] = useState([]);
+  const [questLoadingId, setQuestLoadingId] = useState(null);
 
   const fetchDashboardData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const [summaryData, chartsData] = await Promise.all([
+      const [summaryData, chartsData, questsData] = await Promise.all([
         dashboardService.getSummary(),
-        dashboardService.getCharts()
+        dashboardService.getCharts(),
+        questService.getQuests()
       ]);
       setSummary(summaryData);
       setCharts(chartsData);
+      setQuests(questsData);
       setError(null);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -216,7 +215,7 @@ const Dashboard = () => {
   else if ((summary?.notesCount || 0) === 0) welcomeMessage = "Create your first smart note.";
   else if ((summary?.academicRecordsCount || 0) === 0) welcomeMessage = "Add academic records to unlock subject health insights.";
 
-  const completedQuests = quests.filter(q => q.checked).length;
+  const completedQuests = quests.filter(q => q.completed).length;
 
   return (
     <div className="space-y-6 text-text-main pb-10">
@@ -455,24 +454,78 @@ const Dashboard = () => {
               </div>
               
               <div className="space-y-2 text-xs relative z-10">
-                {quests.map((q) => (
+                {quests.map((q) => {
+                  let btnText = "Active";
+                  let btnStyle = "bg-[#f8f3ff] dark:bg-slate-900/80 border-lavender/20 dark:border-white/10 cursor-pointer hover:bg-purple/5";
+                  let iconColor = "text-text-muted/40";
+                  let icon = "○";
+                  let isClaimable = false;
+                  
+                  if (q.completed) {
+                    btnText = "Claimed";
+                    btnStyle = "bg-[#f8f3ff]/50 dark:bg-slate-900/40 border-lavender/10 cursor-default";
+                    iconColor = "text-green-500";
+                    icon = "●";
+                  } else if (q.targetReached) {
+                    btnText = "Claim Reward";
+                    btnStyle = "bg-purple/10 dark:bg-purple/20 border-purple/30 cursor-pointer hover:bg-purple/20 shadow-sm";
+                    iconColor = "text-purple";
+                    icon = "⭐";
+                    isClaimable = true;
+                  }
+
+                  return (
                   <button 
                     key={q.id} 
-                    onClick={() => {
-                      // Toggle checked state temporarily for UI feedback
-                      setQuests(quests.map(item => item.id === q.id ? { ...item, checked: !item.checked } : item));
-                      if (q.path) setTimeout(() => navigate(q.path), 300);
+                    onClick={async () => {
+                      if (q.completed || questLoadingId) return;
+                      
+                      if (!q.targetReached) {
+                        if (q.title.toLowerCase().includes('focus')) navigate('/focus-timer');
+                        else if (q.title.toLowerCase().includes('note')) navigate('/smart-notes');
+                        else if (q.title.toLowerCase().includes('academic')) navigate('/academic-records');
+                        return;
+                      }
+
+                      try {
+                        setQuestLoadingId(q.id);
+                        await questService.completeQuest(q.id);
+                        // Refetch dashboard data completely to update growth points and quest status
+                        await fetchDashboardData(true);
+                      } catch (err) {
+                        console.error('Error completing quest:', err);
+                      } finally {
+                        setQuestLoadingId(null);
+                      }
                     }}
-                    className={`w-full text-left flex items-center gap-2 p-2.5 rounded-xl transition-all cursor-pointer hover:bg-purple/5 border ${q.checked ? 'bg-[#f8f3ff]/50 dark:bg-slate-900/40 border-lavender/10' : 'bg-[#f8f3ff] dark:bg-slate-900/80 border-lavender/20 dark:border-white/10'}`}
+                    disabled={q.completed || questLoadingId === q.id}
+                    className={`w-full text-left flex items-center justify-between p-2.5 rounded-xl transition-all ${btnStyle} border`}
                   >
-                    <span className={`text-base flex-shrink-0 ${q.checked ? 'text-green-500' : 'text-text-muted/40'}`}>
-                      {q.checked ? '●' : '○'}
-                    </span>
-                    <span className={`font-semibold transition-all ${q.checked ? 'text-text-muted line-through opacity-70' : 'text-text-main dark:text-slate-200'}`}>
-                      {q.quest}
-                    </span>
+                    <div className="flex items-center gap-2 max-w-[75%]">
+                      <span className={`text-base flex-shrink-0 ${iconColor}`}>
+                        {questLoadingId === q.id ? <RefreshCw className="h-4 w-4 animate-spin text-purple" /> : icon}
+                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className={`font-semibold transition-all truncate ${q.completed ? 'text-text-muted line-through opacity-70' : 'text-text-main dark:text-slate-200'}`}>
+                          {q.title}
+                        </span>
+                        {q.description && (
+                          <span className={`text-[10px] truncate ${q.completed ? 'text-text-muted/50' : 'text-text-muted'}`}>
+                            {q.description}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end flex-shrink-0 gap-1">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${q.completed ? 'bg-green-500/10 text-green-500' : 'bg-purple/10 text-purple'}`}>
+                        +{q.rewardPoints} pts
+                      </span>
+                      <span className={`text-[9px] font-bold ${q.completed ? 'text-green-500' : (isClaimable ? 'text-purple dark:text-purple-400' : 'text-text-muted')}`}>
+                        {btnText}
+                      </span>
+                    </div>
                   </button>
-                ))}
+                )})}
               </div>
             </div>
           </div>

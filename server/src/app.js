@@ -8,6 +8,7 @@ const focusRoutes = require('./routes/focus.routes');
 const academicRoutes = require('./routes/academic.routes');
 const gardenRoutes = require('./routes/garden.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const questRoutes = require('./routes/quest.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/focus-sessions', focusRoutes);
 app.use('/api/academic-records', academicRoutes);
 app.use('/api/study-garden', gardenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/quests', questRoutes);
 
 // Error Handler
 app.use(errorHandler);
