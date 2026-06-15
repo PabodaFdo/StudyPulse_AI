@@ -1,9 +1,52 @@
+import { useState } from 'react';
 import { ShieldAlert, CheckCircle, TrendingUp, AlertTriangle } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
-import StatCard from '../components/StatCard';
-import Badge from '../components/Badge';
+import { riskService } from '../services/risk.service';
 
 const RiskPrediction = () => {
+  const [formData, setFormData] = useState({
+    attendancePercentage: 85,
+    assignmentAverage: 75,
+    quizAverage: 70,
+    studyHoursPerWeek: 15,
+    missedDeadlines: 1,
+    focusSessionsCompleted: 5,
+    previousExamMark: 65,
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [prediction, setPrediction] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    
+    const payload = {
+      attendancePercentage: Number(formData.attendancePercentage),
+      assignmentAverage: Number(formData.assignmentAverage),
+      quizAverage: Number(formData.quizAverage),
+      studyHoursPerWeek: Number(formData.studyHoursPerWeek),
+      missedDeadlines: Number(formData.missedDeadlines),
+      focusSessionsCompleted: Number(formData.focusSessionsCompleted),
+      previousExamMark: Number(formData.previousExamMark),
+    };
+
+    try {
+      const result = await riskService.predictRisk(payload);
+      setPrediction(result);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to predict risk. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -12,66 +55,135 @@ const RiskPrediction = () => {
         icon={ShieldAlert}
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Risk Card */}
-        <div className="glass-card p-6 border-danger-500/20 border bg-gradient-to-br from-danger-500/5 to-navy-900 text-center space-y-4">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-danger-500/15 text-danger-400">
-            <AlertTriangle className="h-6 w-6 animate-pulse-soft" />
-          </div>
-          <div>
-            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PREDICTED RISK STATUS</span>
-            <h3 className="text-2xl font-extrabold text-danger-400 mt-1">At Risk (76%)</h3>
-            <p className="text-xs text-gray-500 mt-0.5">Calculated: 2 hours ago</p>
-          </div>
-          <div className="p-3 bg-white/5 rounded-xl text-xs text-gray-400 leading-relaxed text-left">
-            <span className="font-semibold text-white block mb-1">Early Warning Indicators:</span>
-            Organic Chemistry average quiz score is below 60% and focus session minutes dropped by 45% compared to baseline.
-          </div>
-        </div>
-
-        {/* Factors Breakdown */}
-        <div className="lg:col-span-2 glass-card p-6 border border-white/5 bg-white/[0.02] space-y-4">
-          <h3 className="font-bold text-white text-base">Key Academic Indicators</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Organic Chemistry (CHEM 202)', score: '56% Quiz Avg', status: 'High Risk', color: 'red' },
-              { label: 'Quantum Mechanics (PHYS 410)', score: '78% Quiz Avg', status: 'Medium Risk', color: 'yellow' },
-              { label: 'Calculus III (MATH 301)', score: '88% Quiz Avg', status: 'Low Risk', color: 'green' },
-              { label: 'Data Structures (CS 210)', score: '94% Quiz Avg', status: 'Low Risk', color: 'green' }
-            ].map((ind, idx) => (
-              <div key={idx} className="flex justify-between items-center p-3.5 bg-white/[0.01] border border-white/5 rounded-xl">
-                <div>
-                  <h4 className="text-xs font-semibold text-gray-200">{ind.label}</h4>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{ind.score}</p>
-                </div>
-                <span className={`status-badge ${ind.color === 'red' ? 'status-danger' : ind.color === 'yellow' ? 'status-warning' : 'status-success'}`}>{ind.status}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Recommendations */}
-      <div className="glass-card p-5 border border-white/5 bg-white/[0.02] space-y-4">
-        <h3 className="font-bold text-white text-base">AI Correction Strategy</h3>
-        <div className="grid gap-4 sm:grid-cols-3 text-xs">
-          {[
-            { title: 'Create Spaced Review', desc: 'Synthesize Organic Chemistry chapter 6 PDF to generate 15 target cards.', action: 'Create Cards' },
-            { title: 'Increase Focus Time', desc: 'Schedule 2 Pomodoro focus sessions (50 mins total) for physics homework.', action: 'Start Timer' },
-            { title: 'Complete Quests', desc: 'Solve 3 daily wellness/mood check-in quests to boost subject health metrics.', action: 'View Quests' }
-          ].map((rec, i) => (
-            <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col justify-between">
-              <div>
-                <h4 className="font-semibold text-gray-200">{rec.title}</h4>
-                <p className="text-gray-500 text-[10px] mt-1 leading-relaxed">{rec.desc}</p>
-              </div>
-              <button className="text-brand-400 hover:text-brand-300 font-bold mt-4 self-start">
-                {rec.action} →
-              </button>
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+        <h3 className="font-bold text-slate-900 dark:text-white text-base">Enter Metrics for Prediction</h3>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Object.keys(formData).map((key) => (
+            <div key={key} className="flex flex-col space-y-1">
+              <label className="text-xs text-slate-500 dark:text-gray-400 capitalize">
+                {key.replace(/([A-Z])/g, ' $1').trim()}
+              </label>
+              <input 
+                type="number" 
+                name={key} 
+                value={formData[key]} 
+                onChange={handleChange}
+                className="rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none dark:border-white/10 dark:bg-navy-900 dark:text-white"
+                required
+              />
             </div>
           ))}
         </div>
-      </div>
+        <div className="flex items-center gap-4 pt-2">
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+          >
+            {loading ? 'Predicting...' : 'Predict Academic Risk'}
+          </button>
+          {error && <p className="text-danger-400 text-xs">{error}</p>}
+        </div>
+      </form>
+
+      {prediction ? (
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Main Risk Card */}
+          <div className={`rounded-2xl border p-6 text-center shadow-sm backdrop-blur-xl space-y-4 ${
+            prediction.riskLevel === 'High Risk'
+              ? 'border-red-300 bg-red-50/90 dark:border-red-500/30 dark:bg-red-500/10'
+              : prediction.riskLevel === 'Medium Risk'
+              ? 'border-amber-300 bg-amber-50/90 dark:border-amber-500/30 dark:bg-amber-500/10'
+              : 'border-emerald-300 bg-emerald-50/90 dark:border-emerald-500/30 dark:bg-emerald-500/10'
+          }`}>
+            <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${
+              prediction.riskLevel === 'High Risk'
+                ? 'bg-red-100 text-red-500 dark:bg-red-500/20 dark:text-red-300'
+                : prediction.riskLevel === 'Medium Risk'
+                ? 'bg-amber-100 text-amber-500 dark:bg-amber-500/20 dark:text-amber-300'
+                : 'bg-emerald-100 text-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-300'
+            }`}>
+              <AlertTriangle className="h-6 w-6 animate-pulse-soft" />
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-500 dark:text-gray-300 font-bold uppercase tracking-wider block">PREDICTED RISK STATUS</span>
+              <h3 className={`mt-1 text-2xl font-extrabold ${
+                prediction.riskLevel === 'High Risk'
+                  ? 'text-red-600 dark:text-red-300'
+                  : prediction.riskLevel === 'Medium Risk'
+                  ? 'text-amber-600 dark:text-amber-300'
+                  : 'text-emerald-600 dark:text-emerald-300'
+              }`}>
+                {prediction.riskLevel} ({(prediction.confidence * 100).toFixed(0)}%)
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-gray-300 mt-0.5">Calculated: Just now</p>
+            </div>
+          </div>
+
+          {/* Factors Breakdown */}
+          <div className="lg:col-span-2 rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">Key Academic Indicators (Reasons)</h3>
+            <div className="space-y-3">
+              {prediction.reasons && prediction.reasons.length > 0 ? prediction.reasons.map((reason, idx) => (
+                <div key={idx} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/80 p-3.5 shadow-sm dark:border-white/5 dark:bg-white/[0.01]">
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-800 dark:text-white">{reason}</h4>
+                  </div>
+                  <span className="rounded border border-amber-400 bg-amber-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:border-warning-500/30 dark:bg-warning-500/20 dark:text-warning-300">Risk Factor</span>
+                </div>
+              )) : (
+                <p className="text-gray-400 text-sm">No specific risk indicators found.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <div className="lg:col-span-3 rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">AI Correction Strategy</h3>
+            <div className="grid gap-4 sm:grid-cols-3 text-xs">
+              {prediction.recommendations && prediction.recommendations.length > 0 ? prediction.recommendations.map((rec, i) => (
+                <div key={i} className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white/90 p-4 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 dark:border-white/5 dark:bg-white/5 dark:hover:border-white/20 dark:hover:bg-white/10">
+                  <div>
+                    <h4 className="font-semibold text-slate-800 dark:text-white">{rec}</h4>
+                  </div>
+                  <span
+                    className="mt-4 self-start text-xs font-extrabold tracking-wide text-cyan-600 transition-colors group-hover:text-cyan-700 dark:!text-cyan-300 dark:group-hover:!text-cyan-200"
+                  >
+                    {prediction.riskLevel === 'Low Risk' ? 'Maintain Plan →' : 'Action Required →'}
+                  </span>
+                </div>
+              )) : (
+                <p className="text-gray-400 text-sm">Keep up the good work!</p>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-3 opacity-50">
+          {/* Default/Placeholder before prediction */}
+          <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 text-center shadow-sm backdrop-blur-xl dark:border-danger-500/20 dark:bg-gradient-to-br dark:from-danger-500/5 dark:to-navy-900 space-y-4">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-danger-500/15 text-danger-400">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+            <div>
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PREDICTED RISK STATUS</span>
+              <h3 className="text-2xl font-extrabold text-danger-400 mt-1">Pending</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Submit form to predict</p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">Key Academic Indicators</h3>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/80 p-3.5 shadow-sm dark:border-white/5 dark:bg-white/[0.01]">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-800 dark:text-white">Awaiting prediction data...</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
