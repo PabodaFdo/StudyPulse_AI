@@ -10,6 +10,7 @@ const gardenRoutes = require('./routes/garden.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const questRoutes = require('./routes/quest.routes');
 const riskRoutes = require('./routes/risk.routes');
+const subjectHealthRoutes = require('./routes/subjectHealth.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/study-garden', gardenRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/quests', questRoutes);
 app.use('/api/risk', riskRoutes);
+app.use('/api/subject-health', subjectHealthRoutes);
 // Error Handler
 app.use(errorHandler);
 
