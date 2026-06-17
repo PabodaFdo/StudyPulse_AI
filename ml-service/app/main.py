@@ -8,6 +8,9 @@ from app.services.risk_service import predict_academic_risk_ml
 from app.schemas import SubjectHealthRequest, SubjectHealthResponse
 from app.services.subject_health_service import calculate_subject_health
 
+from app.schemas import WeakTopicRequest, WeakTopicResponse
+from app.services.weak_topic_service import predict_weak_topic
+
 app = FastAPI(
     title="StudyPulse ML Service",
     description="Machine learning microservice for StudyPulse AI",
@@ -46,3 +49,7 @@ def predict_risk(data: AcademicRiskRequest):
 @app.post("/subject-health", response_model=SubjectHealthResponse)
 def subject_health(data: SubjectHealthRequest):
     return calculate_subject_health(data)
+
+@app.post("/predict-weak-topic", response_model=WeakTopicResponse)
+def weak_topic_prediction(data: WeakTopicRequest):
+    return predict_weak_topic(data)
