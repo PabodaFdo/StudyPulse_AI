@@ -89,3 +89,26 @@ class SummaryResponse(BaseModel):
     section_summaries: Optional[List[SectionSummary]] = None
     word_count: int
     message: str
+
+
+class QuizQuestion(BaseModel):
+    id: int
+    type: str
+    question: str
+    options: List[str]
+    correct_answer: str
+    explanation: str
+
+
+class QuizRequest(BaseModel):
+    text: str = Field(..., min_length=10)
+    question_count: Optional[int] = Field(5, ge=1, le=10)
+    difficulty: Optional[str] = Field("medium")
+
+
+class QuizResponse(BaseModel):
+    success: bool
+    source: str
+    questions: List[QuizQuestion]
+    word_count: int
+    message: str
