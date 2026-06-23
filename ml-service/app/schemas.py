@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 
 class HealthResponse(BaseModel):
@@ -74,11 +74,18 @@ class SummaryRequest(BaseModel):
     text: str = Field(..., min_length=10)
 
 
+class SectionSummary(BaseModel):
+    section_title: str
+    section_summary: str
+    important_points: List[str]
+
+
 class SummaryResponse(BaseModel):
     success: bool
     source: str
     main_summary: str
     important_points: List[str]
     key_terms: List[str]
+    section_summaries: Optional[List[SectionSummary]] = None
     word_count: int
     message: str
