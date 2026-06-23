@@ -16,7 +16,7 @@ from app.schemas import PdfExtractResponse
 from app.services.pdf_service import extract_text_from_pdf_bytes
 
 from app.schemas import SummaryRequest, SummaryResponse
-from app.services.summary_service import generate_rule_based_summary
+from app.services.summary_service import generate_summary
 
 app = FastAPI(
     title="StudyPulse ML Service",
@@ -106,8 +106,13 @@ async def extract_pdf_text(file: UploadFile = File(...)):
         )
 
 @app.post("/generate-summary", response_model=SummaryResponse)
-def generate_summary(data: SummaryRequest):
-    return generate_rule_based_summary(
-        text=data.text,
-        max_sentences=data.maxSentences
-    )
+def generate_summary_endpoint(data: SummaryRequest):
+    if not data.text or not data.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty.")
+    
+    try:
+        return generate_summary(data.text)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to generate summary.")
