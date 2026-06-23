@@ -15,6 +15,9 @@ from fastapi import UploadFile, File, HTTPException
 from app.schemas import PdfExtractResponse
 from app.services.pdf_service import extract_text_from_pdf_bytes
 
+from app.schemas import SummaryRequest, SummaryResponse
+from app.services.summary_service import generate_rule_based_summary
+
 app = FastAPI(
     title="StudyPulse ML Service",
     description="Machine learning microservice for StudyPulse AI",
@@ -101,3 +104,10 @@ async def extract_pdf_text(file: UploadFile = File(...)):
             status_code=500,
             detail=f"Failed to extract PDF text: {str(error)}"
         )
+
+@app.post("/generate-summary", response_model=SummaryResponse)
+def generate_summary(data: SummaryRequest):
+    return generate_rule_based_summary(
+        text=data.text,
+        max_sentences=data.maxSentences
+    )
