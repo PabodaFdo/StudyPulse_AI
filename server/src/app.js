@@ -13,6 +13,7 @@ const riskRoutes = require('./routes/risk.routes');
 const subjectHealthRoutes = require('./routes/subjectHealth.routes');
 const weakTopicRoutes = require('./routes/weakTopic.routes');
 const pdfRoutes = require('./routes/pdf.routes');
+const summaryRoutes = require('./routes/summary.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api/risk', riskRoutes);
 app.use('/api/subject-health', subjectHealthRoutes);
 app.use('/api/weak-topics', weakTopicRoutes);
 app.use('/api/pdf', pdfRoutes);
+app.use('/api/summary', summaryRoutes);
 // Error Handler
 app.use(errorHandler);
 
