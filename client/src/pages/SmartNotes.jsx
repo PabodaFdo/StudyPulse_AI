@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Plus, Sparkles, Save, BookOpen, Trash2, CheckCircle } from 'lucide-react';
+import { FileText, Plus, Sparkles, Save, BookOpen, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import Button from '../components/Button';
@@ -10,6 +10,7 @@ import Select from '../components/Select';
 import Modal from '../components/Modal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import api from '../services/api';
+import { generateSummary } from '../services/summary.service';
 
 const SmartNotes = () => {
   const [notes, setNotes] = useState([]);
@@ -115,20 +116,26 @@ const SmartNotes = () => {
 
   const handleGenerateSummary = async () => {
     if (!selectedNote?.content || selectedNote.content === 'Type your notes here...') {
-      toast.error('Note is empty.');
+      toast.error('Please write some note content before generating a summary.');
       return;
     }
+    
     setIsSummarizing(true);
     
-    setTimeout(() => {
+    try {
+      const data = await generateSummary(selectedNote.content);
       setNotes(notes.map((n) =>
         n.id === selectedNote.id
-          ? { ...n, summary: `AI-Synthesized Summary: Core concepts focus on ${n.title} key properties and formulas. Verified by StudyPulse AI.` }
+          ? { ...n, summary: data }
           : n
       ));
-      setIsSummarizing(false);
       toast.success('AI Summary Generated!');
-    }, 1200);
+    } catch (error) {
+      console.error('Summary Generation Error:', error);
+      toast.error('Unable to generate summary right now. Please try again.');
+    } finally {
+      setIsSummarizing(false);
+    }
   };
 
   const handleMarkRevised = async () => {
@@ -273,7 +280,94 @@ const SmartNotes = () => {
                 placeholder="Start typing your study notes here..."
               />
 
-              {selectedNote.summary ? (
+              {selectedNote.summary && typeof selectedNote.summary === 'object' ? (
+                <div className="mt-4 space-y-4 p-5 rounded-2xl bg-white/[0.02] border border-white/10 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
+                    <h4 className="text-sm font-bold text-brand-400 flex items-center gap-2 uppercase tracking-wider">
+                      <Sparkles className="h-4 w-4 text-brand-400" /> AI STUDY SUMMARY
+                    </h4>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-800 text-slate-300 flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        {selectedNote.summary.word_count} words
+                      </span>
+                    </div>
+                  </div>
+
+                  {selectedNote.summary.important_points?.length > 0 && (
+                    <div className="space-y-2">
+                      <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Important Study Points</h5>
+                      <ul className="space-y-1.5">
+                        {selectedNote.summary.important_points.map((point, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[9px] font-bold text-brand-300">
+                              {index + 1}
+                            </span>
+                            <span className="text-xs text-slate-300 leading-relaxed">{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="space-y-1.5">
+                    <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Main Summary</h5>
+                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      {selectedNote.summary.main_summary}
+                    </p>
+                  </div>
+
+                  {selectedNote.summary.section_summaries && selectedNote.summary.section_summaries.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <h5 className="text-xs font-semibold text-brand-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <BookOpen className="h-3.5 w-3.5" /> Section Summaries
+                      </h5>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {selectedNote.summary.section_summaries.map((section, idx) => (
+                          <div key={idx} className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 flex flex-col">
+                            <h6 className="text-xs font-bold text-slate-200 mb-1.5">{section.section_title}</h6>
+                            <p className="text-[11px] text-slate-400 leading-relaxed mb-2 flex-grow whitespace-pre-wrap">{section.section_summary}</p>
+                            {section.important_points && section.important_points.length > 0 && (
+                              <div className="pt-2 border-t border-slate-700/50">
+                                <ul className="space-y-1">
+                                  {section.important_points.map((pt, pIdx) => (
+                                    <li key={pIdx} className="flex items-start gap-1.5">
+                                      <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[8px] font-bold text-brand-300">
+                                        {pIdx + 1}
+                                      </span>
+                                      <span className="text-[10px] text-slate-400 leading-relaxed">{pt}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedNote.summary.key_terms?.length > 0 && (
+                    <div className="space-y-2">
+                      <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Key Terms</h5>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedNote.summary.key_terms.map((term, index) => (
+                          <span key={index} className="px-2 py-1 bg-slate-800 text-slate-300 text-[10px] font-semibold rounded-md border border-slate-700">
+                            {term}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 mt-2">
+                    <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <p className="text-[10px] leading-relaxed">
+                      Note: AI can make mistakes. Please review the summary with your original study material.
+                    </p>
+                  </div>
+                </div>
+              ) : selectedNote.summary ? (
                 <div className="mt-4 p-4 rounded-xl bg-brand-500/5 border border-brand-500/25">
                   <h4 className="text-xs font-bold text-brand-300 flex items-center gap-1.5 mb-1.5">
                     <Sparkles className="h-4 w-4 text-brand-400" /> AI STUDY SUMMARY
