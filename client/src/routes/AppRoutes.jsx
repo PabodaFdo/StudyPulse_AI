@@ -20,6 +20,7 @@ import GenerateSummary from '../pages/GenerateSummary';
 import AIStudyPlan from '../pages/AIStudyPlan';
 import QuizGenerator from '../pages/QuizGenerator';
 import Flashcards from '../pages/Flashcards';
+import AILibrary from '../pages/AILibrary';
 import FocusTimer from '../pages/FocusTimer';
 import FocusAnalytics from '../pages/FocusAnalytics';
 import AcademicRecords from '../pages/AcademicRecords';
@@ -66,6 +67,8 @@ const AppRoutes = () => {
           <Route path="/quizzes" element={<QuizGenerator />} />
 
           <Route path="/flashcards" element={<Flashcards />} />
+
+          <Route path="/ai-library" element={<AILibrary />} />
 
           <Route path="/focus-timer" element={<FocusTimer />} />
           <Route path="/focus" element={<FocusTimer />} />
