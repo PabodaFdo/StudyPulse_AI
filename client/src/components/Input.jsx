@@ -4,7 +4,7 @@ const Input = forwardRef(({ label, error, icon: Icon, className = '', ...props }
   return (
     <div className="flex flex-col gap-1.5 w-full text-left">
       {label && (
-        <label className="text-xs font-bold text-text-muted dark:text-slate-400 px-2">
+        <label className="text-xs font-bold text-slate-700 dark:text-slate-200 px-2">
           {label}
         </label>
       )}
@@ -16,10 +16,11 @@ const Input = forwardRef(({ label, error, icon: Icon, className = '', ...props }
           ref={ref}
           className={`
             w-full liquid-input text-xs sm:text-sm transition-all duration-200
-            text-text-main placeholder:text-text-muted/40
-            dark:bg-slate-900/55 dark:border-white/15 dark:text-white
-            dark:placeholder:text-slate-500 dark:focus:border-cyan-400/60
-            dark:focus:ring-cyan-400/15
+            text-slate-900 dark:text-white bg-white dark:bg-slate-800
+            placeholder:text-slate-400 dark:placeholder:text-slate-500
+            border border-slate-300 dark:border-slate-700
+            focus:border-brand-500 dark:focus:border-brand-400
+            focus:ring-brand-500/20 dark:focus:ring-brand-400/20
             ${Icon ? 'pl-11' : ''}
             ${error ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}
             ${className}
