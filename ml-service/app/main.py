@@ -21,6 +21,9 @@ from app.services.summary_service import generate_summary
 from app.schemas import QuizRequest, QuizResponse
 from app.services.quiz_service import generate_quiz
 
+from app.schemas import FlashcardRequest, FlashcardResponse
+from app.services.flashcard_service import generate_flashcards
+
 app = FastAPI(
     title="StudyPulse ML Service",
     description="Machine learning microservice for StudyPulse AI",
@@ -139,3 +142,24 @@ def generate_quiz_endpoint(data: QuizRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to generate quiz.")
+
+
+@app.post("/generate-flashcards", response_model=FlashcardResponse)
+def generate_flashcards_endpoint(data: FlashcardRequest):
+    if not data.text or not data.text.strip():
+        raise HTTPException(status_code=400, detail="Text cannot be empty.")
+    
+    card_count = data.card_count if data.card_count else 10
+    if card_count < 1:
+        card_count = 10
+    if card_count > 20:
+        card_count = 20
+        
+    difficulty = data.difficulty if data.difficulty else "medium"
+    
+    try:
+        return generate_flashcards(data.text, card_count, difficulty)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to generate flashcards.")
