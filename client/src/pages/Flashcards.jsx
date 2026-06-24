@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
   Layers, RotateCw, ChevronLeft, ChevronRight, RefreshCw, 
-  PlusCircle, AlertTriangle, FileText, Check, Clock, Star, Shuffle 
+  PlusCircle, AlertTriangle, FileText, Check, Clock, Star, Shuffle, Save 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -11,20 +11,31 @@ import Badge from '../components/Badge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import Select from '../components/Select';
+import Modal from '../components/Modal';
 import { generateFlashcards } from '../services/flashcard.service';
+import { saveFlashcards } from '../services/aiLibrary.service';
+import { getStudyMaterials } from '../services/studyMaterial.service';
 import api from '../services/api';
 
 const Flashcards = () => {
   const navigate = useNavigate();
   const [extractedText, setExtractedText] = useState('');
   const [source, setSource] = useState('pdf');
+  
+  const [savedMaterials, setSavedMaterials] = useState([]);
+  const [selectedMaterialId, setSelectedMaterialId] = useState('');
+  
   const [savedNotes, setSavedNotes] = useState([]);
   const [selectedNoteId, setSelectedNoteId] = useState('');
-  const [loadingNotes, setLoadingNotes] = useState(true);
+  const [loadingSources, setLoadingSources] = useState(true);
 
   const [cardCount, setCardCount] = useState(5);
   const [difficulty, setDifficulty] = useState('medium');
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [saveTitle, setSaveTitle] = useState('');
 
   const [flashcardsData, setFlashcardsData] = useState(null);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -34,25 +45,9 @@ const Flashcards = () => {
 
   useEffect(() => {
     const text = localStorage.getItem('studypulse_extracted_text');
-    if (text) {
-      setExtractedText(text);
-    }
+    if (text) setExtractedText(text);
 
-    const savedSource = localStorage.getItem('studypulse_flashcard_source');
-    if (savedSource) {
-      setSource(savedSource);
-    } else if (text) {
-      setSource('pdf');
-    } else {
-      setSource('note');
-    }
-
-    const savedNoteId = localStorage.getItem('studypulse_flashcard_selected_note_id');
-    if (savedNoteId) {
-      setSelectedNoteId(savedNoteId);
-    }
-
-    fetchSavedNotes();
+    fetchSources();
 
     const savedCards = localStorage.getItem('studypulse_generated_flashcards');
     if (savedCards) {
@@ -83,30 +78,74 @@ const Flashcards = () => {
     }
   }, []);
 
-  const fetchSavedNotes = async () => {
-    setLoadingNotes(true);
+  const fetchSources = async () => {
+    setLoadingSources(true);
     try {
-      const res = await api.get('/notes');
-      setSavedNotes(res.data);
-      if (res.data.length > 0) {
-        const savedNoteId = localStorage.getItem('studypulse_flashcard_selected_note_id');
-        const exists = res.data.find(n => n.id.toString() === savedNoteId);
+      const [notesRes, materialsRes] = await Promise.all([
+        api.get('/notes').catch(() => ({ data: [] })),
+        getStudyMaterials().catch(() => [])
+      ]);
+      
+      const normalizeList = (response) => {
+        const payload = response?.data ?? response;
+        if (Array.isArray(payload)) return payload;
+        if (Array.isArray(payload?.data)) return payload.data;
+        return [];
+      };
+
+      const notes = normalizeList(notesRes);
+      const materials = normalizeList(materialsRes);
+      
+      setSavedNotes(notes);
+      setSavedMaterials(materials);
+      
+      let finalNoteId = localStorage.getItem('studypulse_flashcard_selected_note_id');
+      if (notes.length > 0) {
+        const exists = notes.find(n => n.id.toString() === finalNoteId);
         if (!exists) {
-          const firstId = res.data[0].id.toString();
-          setSelectedNoteId(firstId);
-          localStorage.setItem('studypulse_flashcard_selected_note_id', firstId);
+          finalNoteId = notes[0].id.toString();
+          localStorage.setItem('studypulse_flashcard_selected_note_id', finalNoteId);
         }
+        setSelectedNoteId(finalNoteId);
+      } else if (finalNoteId) {
+        localStorage.removeItem('studypulse_flashcard_selected_note_id');
+        setSelectedNoteId('');
       }
+
+      let finalMaterialId = localStorage.getItem('studypulse_selected_material_id');
+      if (materials.length > 0) {
+        const exists = materials.find(m => m.id.toString() === finalMaterialId);
+        if (!exists) {
+          finalMaterialId = materials[0].id.toString();
+          localStorage.setItem('studypulse_selected_material_id', finalMaterialId);
+        }
+        setSelectedMaterialId(finalMaterialId);
+      } else if (finalMaterialId) {
+        localStorage.removeItem('studypulse_selected_material_id');
+        setSelectedMaterialId('');
+      }
+
+      const initialSource = localStorage.getItem('studypulse_flashcard_source') || 
+        (materials.length > 0 || localStorage.getItem('studypulse_extracted_text') ? 'pdf' : 'note');
+      
+      setSource(initialSource);
+
     } catch (error) {
-      console.error('Failed to load notes', error);
+      console.error('Failed to load sources', error);
+      const initialSource = localStorage.getItem('studypulse_flashcard_source') || 'pdf';
     } finally {
-      setLoadingNotes(false);
+      setLoadingSources(false);
     }
   };
 
   const handleSourceChange = (newSource) => {
     setSource(newSource);
     localStorage.setItem('studypulse_flashcard_source', newSource);
+  };
+
+  const handleMaterialChange = (newMaterialId) => {
+    setSelectedMaterialId(newMaterialId);
+    localStorage.setItem('studypulse_selected_material_id', newMaterialId);
   };
 
   const handleNoteChange = (newNoteId) => {
@@ -139,9 +178,19 @@ const Flashcards = () => {
     let textToUse = '';
     
     if (source === 'pdf') {
-      textToUse = extractedText;
+      if (selectedMaterialId) {
+        const material = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+        if (material) {
+          textToUse = material.extractedText;
+        }
+      }
+      
+      if (!textToUse && extractedText) {
+        textToUse = extractedText;
+      }
+
       if (!textToUse) {
-        toast.error('No PDF text found. Please extract a PDF first.');
+        toast.error('No PDF text found. Please upload a PDF first.');
         return;
       }
     } else if (source === 'note') {
@@ -261,6 +310,45 @@ const Flashcards = () => {
     localStorage.removeItem('studypulse_flashcard_status');
   };
 
+  const handleOpenSaveModal = () => {
+    setSaveTitle(`Flashcards - ${new Date().toLocaleDateString()}`);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!saveTitle.trim()) {
+      toast.error('Please enter a title.');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      let sourceTitle = "Extracted PDF Material";
+      if (source === 'note') {
+        const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
+        sourceTitle = note ? note.title : 'Saved Note';
+      } else if (selectedMaterialId) {
+        const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+        if (mat) sourceTitle = mat.title;
+      }
+
+      await saveFlashcards({
+        title: saveTitle.trim(),
+        sourceType: source,
+        sourceTitle,
+        flashcards: flashcardsData.flashcards,
+        wordCount: flashcardsData.word_count
+      });
+      toast.success('Flashcards saved to My AI Library.');
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to save flashcards.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleFlip = () => {
     const newFlipped = !flipped;
     setFlipped(newFlipped);
@@ -343,7 +431,7 @@ const Flashcards = () => {
   }, [flashcardsData, currentIdx, flipped, showCompletion, flashcardStatuses]);
 
   const renderSetup = () => {
-    if (loadingNotes) {
+    if (loadingSources) {
       return (
         <div className="flex flex-col items-center justify-center py-20">
           <LoadingSpinner size="lg" />
@@ -352,7 +440,7 @@ const Flashcards = () => {
       );
     }
 
-    if (!extractedText && savedNotes.length === 0) {
+    if (!extractedText && savedMaterials.length === 0 && savedNotes.length === 0) {
       return (
         <EmptyState
           icon={FileText}
@@ -372,10 +460,13 @@ const Flashcards = () => {
       );
     }
 
+    const safeMaterials = Array.isArray(savedMaterials) ? savedMaterials : [];
+    const safeNotes = Array.isArray(savedNotes) ? savedNotes : [];
+
     // Determine available sources
     const sourceOptions = [];
-    if (extractedText) sourceOptions.push({ label: 'Extracted PDF Text', value: 'pdf' });
-    if (savedNotes.length > 0) sourceOptions.push({ label: 'Saved Smart Note', value: 'note' });
+    if (extractedText || safeMaterials.length > 0) sourceOptions.push({ label: 'Saved PDF Material', value: 'pdf' });
+    if (safeNotes.length > 0) sourceOptions.push({ label: 'Saved Smart Note', value: 'note' });
 
     return (
       <div className="glass-card max-w-xl mx-auto p-6 md:p-8 space-y-6">
@@ -397,10 +488,27 @@ const Flashcards = () => {
               onChange={(e) => handleSourceChange(e.target.value)}
               options={sourceOptions}
             />
-            {source === 'pdf' && (
-              <p className="text-[11px] text-brand-400 font-medium px-2">Using extracted PDF text from your last uploaded material.</p>
-            )}
           </div>
+
+          {source === 'pdf' && safeMaterials.length > 0 && (
+            <div className="space-y-1 animate-fade-in">
+              <Select
+                label="Select PDF Material"
+                value={selectedMaterialId}
+                onChange={(e) => handleMaterialChange(e.target.value)}
+                options={safeMaterials.map(m => ({
+                  label: m.title,
+                  value: m.id.toString()
+                }))}
+              />
+            </div>
+          )}
+          {source === 'pdf' && safeMaterials.length === 0 && extractedText && (
+             <p className="text-[11px] text-brand-400 font-medium px-2">Using extracted PDF text from your last uploaded material.</p>
+          )}
+          {source === 'pdf' && safeMaterials.length === 0 && !extractedText && (
+             <p className="text-[11px] text-brand-400 font-medium px-2">No saved PDF materials found. Upload a PDF first.</p>
+          )}
 
           {source === 'note' && (
             <div className="space-y-1 animate-fade-in">
@@ -408,7 +516,7 @@ const Flashcards = () => {
                 label="Select Note"
                 value={selectedNoteId}
                 onChange={(e) => handleNoteChange(e.target.value)}
-                options={savedNotes.map(n => ({
+                options={safeNotes.map(n => ({
                   label: `${n.title} — ${n.subject?.name || 'Unknown Subject'}`,
                   value: n.id.toString()
                 }))}
@@ -521,6 +629,15 @@ const Flashcards = () => {
             </Button>
             <Button onClick={handleNew} variant="ghost" size="sm" className="gap-2 text-xs">
               <PlusCircle className="h-3 w-3" /> New Flashcards
+            </Button>
+            <Button 
+              onClick={handleOpenSaveModal} 
+              disabled={isSaving} 
+              variant="primary" 
+              size="sm" 
+              className="gap-2 text-xs"
+            >
+              <Save className="h-3 w-3" /> {isSaving ? 'Saving...' : 'Save Flashcards'}
             </Button>
           </div>
           <div className="text-sm font-semibold text-gray-500">
@@ -688,6 +805,28 @@ const Flashcards = () => {
       ) : (
         renderSetup()
       )}
+
+      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="Save to My AI Library">
+        <div className="space-y-4">
+          <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Title</label>
+          <input 
+            type="text"
+            value={saveTitle} 
+            onChange={(e) => setSaveTitle(e.target.value)} 
+            placeholder="Enter a title for these flashcards"
+            autoFocus
+            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="ghost" className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleConfirmSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
