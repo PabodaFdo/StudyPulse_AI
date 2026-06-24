@@ -112,3 +112,25 @@ class QuizResponse(BaseModel):
     questions: List[QuizQuestion]
     word_count: int
     message: str
+
+
+class Flashcard(BaseModel):
+    id: int
+    front: str
+    back: str
+    category: str
+    difficulty: str
+
+
+class FlashcardRequest(BaseModel):
+    text: str = Field(..., min_length=10)
+    card_count: Optional[int] = Field(10, ge=1, le=20)
+    difficulty: Optional[str] = Field("medium")
+
+
+class FlashcardResponse(BaseModel):
+    success: bool
+    source: str
+    flashcards: List[Flashcard]
+    word_count: int
+    message: str
