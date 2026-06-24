@@ -28,13 +28,13 @@ const Modal = ({ open, onClose, title, children, maxWidth = 'max-w-lg' }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2 }}
-            className={`relative w-full ${maxWidth} rounded-2xl border border-white/10 bg-navy-800 p-6 shadow-2xl`}
+            className={`relative w-full ${maxWidth} rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-2xl`}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">{title}</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
               <button
                 onClick={onClose}
-                className="rounded-lg p-1 text-gray-400 transition hover:bg-white/5 hover:text-white"
+                className="rounded-lg p-1 text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
               >
                 <X className="h-5 w-5" />
               </button>
