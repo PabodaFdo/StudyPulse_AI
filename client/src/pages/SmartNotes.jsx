@@ -175,7 +175,7 @@ const SmartNotes = () => {
       <div className="grid gap-6 lg:grid-cols-4">
         {/* Notes list */}
         <div className="glass-card p-4 space-y-4 flex flex-col h-[550px]">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
             <span className="text-xs font-semibold text-gray-400">YOUR NOTES</span>
             <Badge color="purple">{notes.length}</Badge>
           </div>
@@ -230,9 +230,9 @@ const SmartNotes = () => {
         <div className="lg:col-span-3 space-y-6">
           {selectedNote ? (
             <div className="glass-card p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
                 <div>
-                  <span className="text-xs font-bold text-brand-300 uppercase tracking-wider">{selectedNote.subject?.name || 'Unknown'}</span>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">{selectedNote.subject?.name || 'Unknown'}</span>
                   <Input 
                     value={selectedNote.title} 
                     onChange={(e) => setNotes(notes.map(n => n.id === selectedNote.id ? { ...n, title: e.target.value } : n))}
@@ -281,13 +281,13 @@ const SmartNotes = () => {
               />
 
               {selectedNote.summary && typeof selectedNote.summary === 'object' ? (
-                <div className="mt-4 space-y-4 p-5 rounded-2xl bg-white/[0.02] border border-white/10 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex items-center justify-between border-b border-white/5 pb-3">
-                    <h4 className="text-sm font-bold text-brand-400 flex items-center gap-2 uppercase tracking-wider">
+                <div className="mt-4 space-y-4 p-5 rounded-2xl bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none text-slate-900 dark:text-white animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-3">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2 uppercase tracking-wider">
                       <Sparkles className="h-4 w-4 text-brand-400" /> AI STUDY SUMMARY
                     </h4>
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-800 text-slate-300 flex items-center gap-1">
+                      <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-200 flex items-center gap-1">
                         <FileText className="h-3 w-3" />
                         {selectedNote.summary.word_count} words
                       </span>
@@ -296,14 +296,14 @@ const SmartNotes = () => {
 
                   {selectedNote.summary.important_points?.length > 0 && (
                     <div className="space-y-2">
-                      <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Important Study Points</h5>
+                      <h5 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Important Study Points</h5>
                       <ul className="space-y-1.5">
                         {selectedNote.summary.important_points.map((point, index) => (
                           <li key={index} className="flex items-start gap-2">
-                            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[9px] font-bold text-brand-300">
+                            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-500/20 text-[9px] font-bold text-purple-700 dark:text-purple-200">
                               {index + 1}
                             </span>
-                            <span className="text-xs text-slate-300 leading-relaxed">{point}</span>
+                            <span className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">{point}</span>
                           </li>
                         ))}
                       </ul>
@@ -311,31 +311,31 @@ const SmartNotes = () => {
                   )}
 
                   <div className="space-y-1.5">
-                    <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Main Summary</h5>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                    <h5 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Main Summary</h5>
+                    <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-wrap">
                       {selectedNote.summary.main_summary}
                     </p>
                   </div>
 
                   {selectedNote.summary.section_summaries && selectedNote.summary.section_summaries.length > 0 && (
                     <div className="space-y-3 pt-2">
-                      <h5 className="text-xs font-semibold text-brand-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <h5 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                         <BookOpen className="h-3.5 w-3.5" /> Section Summaries
                       </h5>
                       <div className="grid gap-3 sm:grid-cols-2">
                         {selectedNote.summary.section_summaries.map((section, idx) => (
-                          <div key={idx} className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 flex flex-col">
-                            <h6 className="text-xs font-bold text-slate-200 mb-1.5">{section.section_title}</h6>
-                            <p className="text-[11px] text-slate-400 leading-relaxed mb-2 flex-grow whitespace-pre-wrap">{section.section_summary}</p>
+                          <div key={idx} className="p-4 rounded-xl bg-white/90 dark:bg-slate-800/70 border border-purple-100 dark:border-slate-700 text-slate-900 dark:text-white shadow-sm shadow-purple-100/40 dark:shadow-none flex flex-col">
+                            <h6 className="text-xs font-bold text-slate-900 dark:text-white mb-1.5">{section.section_title}</h6>
+                            <p className="text-[11px] text-slate-700 dark:text-slate-200 leading-relaxed mb-2 flex-grow whitespace-pre-wrap">{section.section_summary}</p>
                             {section.important_points && section.important_points.length > 0 && (
-                              <div className="pt-2 border-t border-slate-700/50">
+                              <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
                                 <ul className="space-y-1">
                                   {section.important_points.map((pt, pIdx) => (
                                     <li key={pIdx} className="flex items-start gap-1.5">
-                                      <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[8px] font-bold text-brand-300">
+                                      <span className="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-500/20 text-[8px] font-bold text-purple-700 dark:text-purple-200">
                                         {pIdx + 1}
                                       </span>
-                                      <span className="text-[10px] text-slate-400 leading-relaxed">{pt}</span>
+                                      <span className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">{pt}</span>
                                     </li>
                                   ))}
                                 </ul>
@@ -349,10 +349,10 @@ const SmartNotes = () => {
 
                   {selectedNote.summary.key_terms?.length > 0 && (
                     <div className="space-y-2">
-                      <h5 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Key Terms</h5>
+                      <h5 className="text-xs font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Key Terms</h5>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedNote.summary.key_terms.map((term, index) => (
-                          <span key={index} className="px-2 py-1 bg-slate-800 text-slate-300 text-[10px] font-semibold rounded-md border border-slate-700">
+                          <span key={index} className="px-2 py-1 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-200 text-[10px] font-semibold rounded-md border border-slate-700">
                             {term}
                           </span>
                         ))}
@@ -360,7 +360,7 @@ const SmartNotes = () => {
                     </div>
                   )}
 
-                  <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-300 mt-2">
+                  <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-blue-200 mt-2">
                     <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
                     <p className="text-[10px] leading-relaxed">
                       Note: AI can make mistakes. Please review the summary with your original study material.
@@ -368,14 +368,14 @@ const SmartNotes = () => {
                   </div>
                 </div>
               ) : selectedNote.summary ? (
-                <div className="mt-4 p-4 rounded-xl bg-brand-500/5 border border-brand-500/25">
-                  <h4 className="text-xs font-bold text-brand-300 flex items-center gap-1.5 mb-1.5">
+                <div className="mt-4 p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none text-slate-900 dark:text-white">
+                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 mb-1.5">
                     <Sparkles className="h-4 w-4 text-brand-400" /> AI STUDY SUMMARY
                   </h4>
-                  <p className="text-xs text-gray-300 leading-relaxed font-mono">{selectedNote.summary}</p>
+                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-mono">{selectedNote.summary}</p>
                 </div>
               ) : (
-                <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 text-center text-xs text-gray-500">
+                <div className="mt-4 p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none text-slate-600 dark:text-slate-500 text-center text-xs">
                   Click "Generate AI Summary" to extract core insights.
                 </div>
               )}
