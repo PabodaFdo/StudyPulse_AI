@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { ShieldAlert, CheckCircle, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShieldAlert, CheckCircle, TrendingUp, AlertTriangle, Download } from 'lucide-react';
+import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import { riskService } from '../services/risk.service';
+import { subjectService } from '../services/subject.service';
 
 const RiskPrediction = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,59 @@ const RiskPrediction = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [prediction, setPrediction] = useState(null);
+  
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const data = await subjectService.getSubjects();
+        setSubjects(data);
+      } catch (err) {
+        console.error('Failed to fetch subjects', err);
+      }
+    };
+    fetchSubjects();
+  }, []);
+
+  const handleAutoFill = async () => {
+    if (!selectedSubjectId) {
+      toast.error('Please select a subject first.');
+      return;
+    }
+    setIsAutoFilling(true);
+    try {
+      const analytics = await subjectService.getSubjectAnalytics(selectedSubjectId);
+      
+      if (
+        !analytics.attendancePercentage && 
+        !analytics.assignmentAverage && 
+        !analytics.quizAverage && 
+        !analytics.studyHoursPerWeek && 
+        !analytics.focusSessionsCompleted && 
+        !analytics.previousExamMark
+      ) {
+        toast.error('No academic data found for this subject. You can enter values manually.');
+      } else {
+        setFormData({
+          attendancePercentage: analytics.attendancePercentage || 0,
+          assignmentAverage: analytics.assignmentAverage || 0,
+          quizAverage: analytics.quizAverage || 0,
+          studyHoursPerWeek: analytics.studyHoursPerWeek || 0,
+          missedDeadlines: analytics.missedDeadlines || 0,
+          focusSessionsCompleted: analytics.focusSessionsCompleted || 0,
+          previousExamMark: analytics.previousExamMark || 0,
+        });
+        toast.success('Risk prediction form filled from your study data.');
+      }
+    } catch (err) {
+      toast.error('Failed to fetch subject data for auto-fill.');
+    } finally {
+      setIsAutoFilling(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,12 +110,44 @@ const RiskPrediction = () => {
         icon={ShieldAlert}
       />
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
-        <h3 className="font-bold text-slate-900 dark:text-white text-base">Enter Metrics for Prediction</h3>
+      <form onSubmit={handleSubmit} className="bg-slate-900/70 border border-slate-700 p-6 rounded-2xl space-y-4">
+        <div className="mb-6 space-y-3">
+          <label className="block text-sm font-semibold text-slate-200">
+            Select Subject
+          </label>
+
+          <div className="flex flex-col md:flex-row gap-3">
+            <select
+              value={selectedSubjectId}
+              onChange={(e) => setSelectedSubjectId(e.target.value)}
+              className="w-full md:flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            >
+              <option value="">Select a subject...</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name || subject.subjectName}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={handleAutoFill}
+              disabled={!selectedSubjectId || isAutoFilling}
+              className={`w-full md:w-auto px-5 py-3 rounded-xl font-bold transition-all ${
+                !selectedSubjectId || isAutoFilling
+                  ? "bg-slate-700 !text-slate-300 cursor-not-allowed"
+                  : "bg-cyan-500 hover:bg-cyan-600 !text-white shadow-lg shadow-cyan-500/20"
+              }`}
+            >
+              {isAutoFilling ? "Filling..." : "Auto Fill from My Data"}
+            </button>
+          </div>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Object.keys(formData).map((key) => (
             <div key={key} className="flex flex-col space-y-1">
-              <label className="text-xs text-slate-500 dark:text-gray-400 capitalize">
+              <label className="block text-sm text-slate-200 capitalize">
                 {key.replace(/([A-Z])/g, ' $1').trim()}
               </label>
               <input 
@@ -68,7 +155,8 @@ const RiskPrediction = () => {
                 name={key} 
                 value={formData[key]} 
                 onChange={handleChange}
-                className="rounded-lg border border-slate-200 bg-white p-2 text-sm text-slate-900 focus:border-brand-500 focus:outline-none dark:border-white/10 dark:bg-navy-900 dark:text-white"
+                step={['missedDeadlines', 'focusSessionsCompleted'].includes(key) ? "1" : "any"}
+                className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
                 required
               />
             </div>
@@ -78,7 +166,7 @@ const RiskPrediction = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+            className="px-6 py-4 rounded-xl bg-purple-500 hover:bg-purple-600 !text-white font-bold transition-all shadow-lg shadow-purple-500/20"
           >
             {loading ? 'Predicting...' : 'Predict Academic Risk'}
           </button>
@@ -159,16 +247,16 @@ const RiskPrediction = () => {
           </div>
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-3 opacity-50">
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Default/Placeholder before prediction */}
-          <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-6 text-center shadow-sm backdrop-blur-xl dark:border-danger-500/20 dark:bg-gradient-to-br dark:from-danger-500/5 dark:to-navy-900 space-y-4">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-danger-500/15 text-danger-400">
+          <div className="rounded-2xl bg-slate-900/70 border border-slate-700 text-slate-200 p-6 text-center space-y-4">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-300">
               <AlertTriangle className="h-6 w-6" />
             </div>
             <div>
-              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">PREDICTED RISK STATUS</span>
-              <h3 className="text-2xl font-extrabold text-danger-400 mt-1">Pending</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Submit form to predict</p>
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">PREDICTED RISK STATUS</span>
+              <h3 className="text-2xl font-extrabold text-slate-100 mt-1">Pending</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Submit form to predict</p>
             </div>
           </div>
 
