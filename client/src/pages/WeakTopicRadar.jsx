@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 import { Radar as RadarIcon, AlertTriangle, CheckCircle, Activity, Trash2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ChartCard from '../components/ChartCard';
 import { weakTopicService } from '../services/weakTopic.service';
+import { subjectService } from '../services/subject.service';
+import { noteService } from '../services/note.service';
 
 const defaultFormData = {
   topicName: '',
@@ -22,8 +24,81 @@ const WeakTopicRadar = () => {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   
+  const [subjects, setSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  
+  const [notes, setNotes] = useState([]);
+  const [selectedNoteId, setSelectedNoteId] = useState('');
+  
+  const [autoFillMessage, setAutoFillMessage] = useState('');
+
   // Dynamic radar topics
   const [radarTopics, setRadarTopics] = useState([]);
+
+  import('react').then(({ useEffect }) => {
+    // hack to ensure useEffect exists if import is modified, though we already import it.
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [subjectsData, notesData] = await Promise.all([
+          subjectService.getSubjects(),
+          noteService.getNotes().catch(() => []) // Gracefully fail if no notes
+        ]);
+        setSubjects(subjectsData);
+        setNotes(notesData);
+      } catch (err) {
+        console.error('Failed to fetch data', err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const filteredNotes = notes.filter(
+    (note) => String(note.subjectId) === String(selectedSubjectId)
+  );
+
+  const handleSubjectChange = (e) => {
+    setSelectedSubjectId(e.target.value);
+    setSelectedNoteId('');
+    setFormData({ ...formData, topicName: '' });
+    setAutoFillMessage('');
+  };
+
+  const handleNoteChange = (e) => {
+    const noteId = e.target.value;
+    setSelectedNoteId(noteId);
+    
+    if (noteId) {
+      const selectedNote = filteredNotes.find(
+        (note) => String(note.id) === String(noteId)
+      );
+
+      const noteDate = selectedNote.updatedAt || selectedNote.createdAt;
+      const daysSinceStudy = noteDate
+        ? Math.max(0, Math.floor((Date.now() - new Date(noteDate).getTime()) / (1000 * 60 * 60 * 24)))
+        : 0;
+
+      const confidence = selectedNote.revised ? 4 : 3;
+
+      setFormData({
+        ...formData,
+        topicName: selectedNote?.title || '',
+        quizScore: 0,
+        wrongAnswers: 0,
+        attemptCount: 1,
+        timeSpentMinutes: 0,
+        daysSinceLastStudy: daysSinceStudy,
+        confidenceLevel: confidence,
+        topicDifficulty: 3
+      });
+      setAutoFillMessage('Topic data filled from selected Smart Note.');
+    } else {
+      setFormData({ ...formData, topicName: '' });
+      setAutoFillMessage('');
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -34,6 +109,9 @@ const WeakTopicRadar = () => {
 
   const handleReset = () => {
     setFormData(defaultFormData);
+    setSelectedSubjectId('');
+    setSelectedNoteId('');
+    setAutoFillMessage('');
     setResult(null);
     setError(null);
     setLoading(false);
@@ -41,6 +119,14 @@ const WeakTopicRadar = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedSubjectId) {
+      setError('Please select a subject first.');
+      return;
+    }
+    if (!formData.topicName) {
+      setError('Please select a topic.');
+      return;
+    }
     setLoading(true);
     setError(null);
     setResult(null);
@@ -222,49 +308,95 @@ const WeakTopicRadar = () => {
       </div>
 
       {/* Prediction Form Section */}
-      <div className="glass-card p-6 border border-white/5 bg-white/[0.02] dark:bg-slate-900/50 rounded-2xl">
-        <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-4">Topic Assessment</h3>
+      <div className="bg-slate-900/70 border border-slate-700 p-6 rounded-2xl">
+        <h3 className="font-semibold text-lg text-white mb-6">Subject & Topic</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label className="block text-sm font-semibold text-slate-200 mb-1">Select Subject</label>
+            <select
+              value={selectedSubjectId}
+              onChange={handleSubjectChange}
+              required
+              className="w-full px-4 py-3 rounded-xl bg-slate-950/60 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+            >
+              <option value="">Select a subject...</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name || subject.subjectName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-200 mb-1">Select Topic from Smart Notes</label>
+            {filteredNotes.length > 0 ? (
+              <>
+                <select
+                  value={selectedNoteId}
+                  onChange={handleNoteChange}
+                  disabled={!selectedSubjectId}
+                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <option value="">-- Select a saved note --</option>
+                  {filteredNotes.map((note) => (
+                    <option key={note.id} value={note.id}>{note.title}</option>
+                  ))}
+                </select>
+                {autoFillMessage && (
+                  <p className="mt-2 text-xs text-cyan-400 font-medium">
+                    {autoFillMessage}
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="w-full px-4 py-3 bg-slate-900/60 border border-slate-700 rounded-xl text-slate-400 text-sm">
+                {!selectedSubjectId 
+                  ? "Select a subject first" 
+                  : "No Smart Notes found for this subject. Create a Smart Note first."}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <h3 className="font-semibold text-lg text-white mb-4 pt-4 border-t border-slate-700">Topic Assessment</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="lg:col-span-2">
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Topic Name</label>
-              <input type="text" name="topicName" value={formData.topicName} onChange={handleChange} required className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-slate-200 mb-1">Quiz Score (%)</label>
+              <input type="number" name="quizScore" value={formData.quizScore} onChange={handleChange} required min="0" max="100" step="any" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Quiz Score (%)</label>
-              <input type="number" name="quizScore" value={formData.quizScore} onChange={handleChange} required min="0" max="100" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Wrong Answers</label>
+              <input type="number" name="wrongAnswers" value={formData.wrongAnswers} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Wrong Answers</label>
-              <input type="number" name="wrongAnswers" value={formData.wrongAnswers} onChange={handleChange} required min="0" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Attempt Count</label>
+              <input type="number" name="attemptCount" value={formData.attemptCount} onChange={handleChange} required min="1" step="1" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Attempt Count</label>
-              <input type="number" name="attemptCount" value={formData.attemptCount} onChange={handleChange} required min="1" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Time Spent (mins)</label>
+              <input type="number" name="timeSpentMinutes" value={formData.timeSpentMinutes} onChange={handleChange} required min="0" step="any" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Time Spent (mins)</label>
-              <input type="number" name="timeSpentMinutes" value={formData.timeSpentMinutes} onChange={handleChange} required min="0" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Days Since Study</label>
+              <input type="number" name="daysSinceLastStudy" value={formData.daysSinceLastStudy} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Days Since Study</label>
-              <input type="number" name="daysSinceLastStudy" value={formData.daysSinceLastStudy} onChange={handleChange} required min="0" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Confidence (1-5)</label>
+              <input type="number" name="confidenceLevel" value={formData.confidenceLevel} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
             <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Confidence (1-5)</label>
-              <input type="number" name="confidenceLevel" value={formData.confidenceLevel} onChange={handleChange} required min="1" max="5" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
-            </div>
-            <div>
-              <label className="block text-sm text-slate-700 dark:text-gray-300 mb-1">Difficulty (1-5)</label>
-              <input type="number" name="topicDifficulty" value={formData.topicDifficulty} onChange={handleChange} required min="1" max="5" className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-white/10 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-900 dark:text-white" />
+              <label className="block text-sm text-slate-200 mb-1">Difficulty (1-5)</label>
+              <input type="number" name="topicDifficulty" value={formData.topicDifficulty} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400" />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 max-w-md">
-            <button type="submit" disabled={loading} className="w-full rounded-xl bg-brand-500 px-4 py-3 font-bold text-white transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <button type="submit" disabled={loading} className="w-full px-6 py-4 rounded-xl bg-purple-500 hover:bg-purple-600 !text-white font-bold transition-all shadow-lg shadow-purple-500/20 disabled:cursor-not-allowed disabled:opacity-60">
               {loading ? 'Predicting...' : 'Predict Weakness'}
             </button>
-            <button type="button" onClick={handleReset} disabled={loading} className="w-full rounded-xl border border-slate-300 bg-white/80 px-4 py-3 font-bold text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:!text-cyan-300 dark:hover:bg-white/10 dark:hover:!text-cyan-200">
+            <button type="button" onClick={handleReset} disabled={loading} className="w-full px-6 py-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:bg-slate-800 !text-cyan-300 font-bold transition-all disabled:cursor-not-allowed disabled:opacity-60">
               Reset Form
             </button>
           </div>
