@@ -5,6 +5,12 @@ const getNotes = async () => {
   return response.data;
 };
 
+const createNote = async (data) => {
+  const response = await api.post('/notes', data);
+  return response.data;
+};
+
 export const noteService = {
   getNotes,
+  createNote,
 };
