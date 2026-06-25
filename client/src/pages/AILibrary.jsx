@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import {
@@ -85,7 +86,25 @@ const isWithinDateFilter = (dateValue, filter) => {
 };
 
 const AILibrary = () => {
-  const [activeTab, setActiveTab] = useState('summaries');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const validTabs = ["summaries", "quizzes", "flashcards", "materials"];
+  const tabFromUrl = searchParams.get("tab");
+
+  const [activeTab, setActiveTab] = useState(
+    validTabs.includes(tabFromUrl) ? tabFromUrl : 'summaries'
+  );
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (validTabs.includes(tab) && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId });
+  };
   const [isLoading, setIsLoading] = useState(true);
   const [summaries, setSummaries] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
@@ -593,7 +612,7 @@ const AILibrary = () => {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`
                   flex items-center gap-2 px-5 py-3 rounded-xl font-semibold transition-all
                   ${isActive 
