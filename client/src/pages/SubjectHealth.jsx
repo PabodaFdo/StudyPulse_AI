@@ -152,11 +152,11 @@ const SubjectHealth = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Form Section */}
-        <div className="bg-slate-900/70 border border-slate-700 p-6 rounded-2xl">
-          <h3 className="font-semibold text-lg text-white mb-6">Calculate Score</h3>
+        <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none p-6 rounded-2xl">
+          <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-6">Calculate Score</h3>
           
           <div className="mb-6 space-y-3">
-            <label className="block text-sm font-semibold text-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200">
               Select Subject
             </label>
 
@@ -164,7 +164,7 @@ const SubjectHealth = () => {
               <select
                 value={selectedSubjectId}
                 onChange={(e) => setSelectedSubjectId(e.target.value)}
-                className="w-full md:flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                className="w-full md:flex-1 px-4 py-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
               >
                 <option value="">Select a subject...</option>
                 {subjects.map((subject) => (
@@ -180,8 +180,8 @@ const SubjectHealth = () => {
                 disabled={!selectedSubjectId || isAutoFilling}
                 className={`w-full md:w-auto px-5 py-3 rounded-xl font-bold transition-all ${
                   !selectedSubjectId || isAutoFilling
-                    ? "bg-slate-700 !text-slate-300 cursor-not-allowed"
-                    : "bg-cyan-500 hover:bg-cyan-600 !text-white shadow-lg shadow-cyan-500/20"
+                    ? "bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300 cursor-not-allowed"
+                    : "bg-cyan-500 hover:bg-cyan-600 !text-slate-900 dark:text-white shadow-lg shadow-cyan-500/20"
                 }`}
               >
                 {isAutoFilling ? "Filling..." : "Auto Fill from My Data"}
@@ -192,7 +192,7 @@ const SubjectHealth = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Attendance (%)</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Attendance (%)</label>
                 <input 
                   type="number" 
                   name="attendancePercentage" 
@@ -201,11 +201,11 @@ const SubjectHealth = () => {
                   required
                   step="any"
                   min="0" max="100"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Avg Mark (%)</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Avg Mark (%)</label>
                 <input 
                   type="number" 
                   name="averageMark" 
@@ -214,11 +214,11 @@ const SubjectHealth = () => {
                   required
                   step="any"
                   min="0" max="100"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Quiz Avg (%)</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Quiz Avg (%)</label>
                 <input 
                   type="number" 
                   name="quizAverage" 
@@ -227,11 +227,11 @@ const SubjectHealth = () => {
                   required
                   step="any"
                   min="0" max="100"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Study Hours</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Study Hours</label>
                 <input 
                   type="number" 
                   name="studyHoursThisWeek" 
@@ -240,11 +240,11 @@ const SubjectHealth = () => {
                   required
                   step="any"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Focus Sessions</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Focus Sessions</label>
                 <input 
                   type="number" 
                   name="focusSessionsCompleted" 
@@ -253,11 +253,11 @@ const SubjectHealth = () => {
                   required
                   step="1"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Notes Count</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Notes Count</label>
                 <input 
                   type="number" 
                   name="notesCount" 
@@ -266,11 +266,11 @@ const SubjectHealth = () => {
                   required
                   step="1"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-200 mb-1">Missed Deadlines</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Missed Deadlines</label>
                 <input 
                   type="number" 
                   name="missedDeadlines" 
@@ -279,7 +279,7 @@ const SubjectHealth = () => {
                   required
                   step="1"
                   min="0"
-                  className="w-full px-4 py-3 bg-slate-950/60 border border-slate-600 rounded-xl focus:outline-none focus:border-cyan-400 text-white placeholder-slate-400"
+                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ const SubjectHealth = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 rounded-xl bg-purple-500 hover:bg-purple-600 !text-white font-bold transition-all shadow-lg shadow-purple-500/20"
+                className="w-full px-6 py-4 rounded-xl bg-purple-500 hover:bg-purple-600 !text-slate-900 dark:text-white font-bold transition-all shadow-lg shadow-purple-500/20"
               >
                 {loading ? 'Calculating...' : 'Calculate Health'}
               </button>
@@ -297,7 +297,7 @@ const SubjectHealth = () => {
                 type="button"
                 onClick={handleReset}
                 disabled={loading}
-                className="w-full px-6 py-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:bg-slate-800 !text-slate-200 font-bold transition-all"
+                className="w-full px-6 py-4 rounded-xl border border-slate-600 bg-slate-900/60 hover:bg-slate-800 !text-slate-700 dark:text-slate-200 font-bold transition-all"
               >
                 Reset
               </button>
@@ -312,8 +312,8 @@ const SubjectHealth = () => {
         </div>
 
         {/* Results Section */}
-        <div className="glass-card p-6 border border-white/5 bg-white/[0.02] dark:bg-slate-900/50 rounded-2xl flex flex-col">
-          <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-4">Analysis Results</h3>
+        <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 text-slate-900 dark:text-slate-900 dark:text-white p-6 rounded-2xl flex flex-col">
+          <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-900 dark:text-white mb-4">Analysis Results</h3>
           
           {!result ? (
             <div className="flex-1 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 space-y-3">
@@ -324,7 +324,7 @@ const SubjectHealth = () => {
             <div className="space-y-6 flex-1 overflow-y-auto pr-2">
               <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10">
                 <div>
-                  <h4 className="text-xl font-bold text-slate-900 dark:text-white">{result.subjectName || 'Subject'}</h4>
+                  <h4 className="text-xl font-bold text-slate-900 dark:text-slate-900 dark:text-white">{result.subjectName || 'Subject'}</h4>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Health Score: {Math.round(result.healthScore)}%</p>
                 </div>
                 <div className={`px-3 py-1.5 rounded-full border flex items-center gap-2 font-medium text-sm ${getStatusColorClass(result.status)}`}>
