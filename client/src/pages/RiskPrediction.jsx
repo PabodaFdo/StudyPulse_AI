@@ -3,7 +3,6 @@ import { ShieldAlert, CheckCircle, TrendingUp, AlertTriangle, Download } from 'l
 import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import { riskService } from '../services/risk.service';
-import { subjectService } from '../services/subject.service';
 
 const RiskPrediction = () => {
   const [formData, setFormData] = useState({
@@ -19,59 +18,6 @@ const RiskPrediction = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [prediction, setPrediction] = useState(null);
-  
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubjectId, setSelectedSubjectId] = useState('');
-  const [isAutoFilling, setIsAutoFilling] = useState(false);
-
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const data = await subjectService.getSubjects();
-        setSubjects(data);
-      } catch (err) {
-        console.error('Failed to fetch subjects', err);
-      }
-    };
-    fetchSubjects();
-  }, []);
-
-  const handleAutoFill = async () => {
-    if (!selectedSubjectId) {
-      toast.error('Please select a subject first.');
-      return;
-    }
-    setIsAutoFilling(true);
-    try {
-      const analytics = await subjectService.getSubjectAnalytics(selectedSubjectId);
-      
-      if (
-        !analytics.attendancePercentage && 
-        !analytics.assignmentAverage && 
-        !analytics.quizAverage && 
-        !analytics.studyHoursPerWeek && 
-        !analytics.focusSessionsCompleted && 
-        !analytics.previousExamMark
-      ) {
-        toast.error('No academic data found for this subject. You can enter values manually.');
-      } else {
-        setFormData({
-          attendancePercentage: analytics.attendancePercentage || 0,
-          assignmentAverage: analytics.assignmentAverage || 0,
-          quizAverage: analytics.quizAverage || 0,
-          studyHoursPerWeek: analytics.studyHoursPerWeek || 0,
-          missedDeadlines: analytics.missedDeadlines || 0,
-          focusSessionsCompleted: analytics.focusSessionsCompleted || 0,
-          previousExamMark: analytics.previousExamMark || 0,
-        });
-        toast.success('Risk prediction form filled from your study data.');
-      }
-    } catch (err) {
-      toast.error('Failed to fetch subject data for auto-fill.');
-    } finally {
-      setIsAutoFilling(false);
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -92,11 +38,49 @@ const RiskPrediction = () => {
       previousExamMark: Number(formData.previousExamMark),
     };
 
+    if (payload.attendancePercentage < 0 || payload.attendancePercentage > 100) {
+      toast.error("Attendance percentage must be between 0 and 100.");
+      setLoading(false);
+      return;
+    }
+    if (payload.assignmentAverage < 0 || payload.assignmentAverage > 100) {
+      toast.error("Assignment average must be between 0 and 100.");
+      setLoading(false);
+      return;
+    }
+    if (payload.quizAverage < 0 || payload.quizAverage > 100) {
+      toast.error("Quiz average must be between 0 and 100.");
+      setLoading(false);
+      return;
+    }
+    if (payload.previousExamMark < 0 || payload.previousExamMark > 100) {
+      toast.error("Previous exam mark must be between 0 and 100.");
+      setLoading(false);
+      return;
+    }
+    if (payload.studyHoursPerWeek < 0) {
+      toast.error("Study hours per week must be 0 or greater.");
+      setLoading(false);
+      return;
+    }
+    if (payload.missedDeadlines < 0) {
+      toast.error("Missed deadlines must be 0 or greater.");
+      setLoading(false);
+      return;
+    }
+    if (payload.focusSessionsCompleted < 0) {
+      toast.error("Focus sessions completed must be 0 or greater.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const result = await riskService.predictRisk(payload);
       setPrediction(result);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to predict risk. Please try again.');
+      const errorMsg = err.response?.data?.message || err.response?.data?.detail || err.message || 'Failed to predict risk. Please try again.';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -111,39 +95,9 @@ const RiskPrediction = () => {
       />
 
       <form onSubmit={handleSubmit} className="bg-slate-900/70 border border-slate-700 p-6 rounded-2xl space-y-4">
-        <div className="mb-6 space-y-3">
-          <label className="block text-sm font-semibold text-slate-200">
-            Select Subject
-          </label>
-
-          <div className="flex flex-col md:flex-row gap-3">
-            <select
-              value={selectedSubjectId}
-              onChange={(e) => setSelectedSubjectId(e.target.value)}
-              className="w-full md:flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            >
-              <option value="">Select a subject...</option>
-              {subjects.map((subject) => (
-                <option key={subject.id} value={subject.id}>
-                  {subject.name || subject.subjectName}
-                </option>
-              ))}
-            </select>
-
-            <button
-              type="button"
-              onClick={handleAutoFill}
-              disabled={!selectedSubjectId || isAutoFilling}
-              className={`w-full md:w-auto px-5 py-3 rounded-xl font-bold transition-all ${
-                !selectedSubjectId || isAutoFilling
-                  ? "bg-slate-700 !text-slate-300 cursor-not-allowed"
-                  : "bg-cyan-500 hover:bg-cyan-600 !text-white shadow-lg shadow-cyan-500/20"
-              }`}
-            >
-              {isAutoFilling ? "Filling..." : "Auto Fill from My Data"}
-            </button>
-          </div>
-        </div>
+        <p className="text-sm text-slate-300 mb-6">
+          Enter your current academic and study metrics manually to predict your academic risk.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Object.keys(formData).map((key) => (
             <div key={key} className="flex flex-col space-y-1">
