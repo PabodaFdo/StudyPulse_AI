@@ -6,7 +6,8 @@ const {
   getSubject,
   updateSubject,
   deleteSubject,
-  getSubjectAnalytics
+  getSubjectAnalytics,
+  getOverallAnalytics
 } = require('../controllers/subject.controller');
 const { protect } = require('../middleware/auth.middleware');
 
@@ -15,6 +16,9 @@ router.use(protect);
 router.route('/')
   .get(getSubjects)
   .post(createSubject);
+
+router.route('/analytics/overall')
+  .get(getOverallAnalytics);
 
 router.route('/:id')
   .get(getSubject)
