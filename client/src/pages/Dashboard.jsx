@@ -4,7 +4,8 @@ import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as
 import {
   Timer, BookOpen, Clock, Flame, LayoutDashboard,
   AlertTriangle, Play, Flower2, RefreshCw, PlusCircle,
-  FileText, HelpCircle, Layers, File
+  FileText, HelpCircle, Layers, File,
+  BarChart3, Trophy, Target, TrendingUp, Brain
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
@@ -14,6 +15,7 @@ import Button from '../components/Button';
 import AnimatedCharacter from '../components/AnimatedCharacter';
 import dashboardService from '../services/dashboard.service';
 import questService from '../services/quest.service';
+import { getQuizAttemptStats } from '../services/quizAttempt.service';
 
 // Skeleton Component
 const DashboardSkeleton = () => (
@@ -46,19 +48,42 @@ const Dashboard = () => {
   const [quests, setQuests] = useState([]);
   const [questLoadingId, setQuestLoadingId] = useState(null);
 
+  const [quizStats, setQuizStats] = useState({
+    totalAttempts: 0,
+    averageQuizScore: 0,
+    totalWrongAnswers: 0,
+    bestScore: 0,
+    latestScore: 0,
+    recentAttempts: [],
+  });
+
   const fetchDashboardData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const [summaryData, chartsData, questsData] = await Promise.all([
+      const [summaryData, chartsData, questsData, quizStatsRes] = await Promise.all([
         dashboardService.getSummary(),
         dashboardService.getCharts(),
-        questService.getQuests()
+        questService.getQuests(),
+        getQuizAttemptStats().catch(() => ({ data: null }))
       ]);
       setSummary(summaryData);
       setCharts(chartsData);
       setQuests(questsData);
+      
+      if (quizStatsRes && (quizStatsRes.data || quizStatsRes.success)) {
+        const stats = quizStatsRes.data || quizStatsRes;
+        setQuizStats({
+          totalAttempts: stats.totalAttempts || 0,
+          averageQuizScore: stats.averageQuizScore || 0,
+          totalWrongAnswers: stats.totalWrongAnswers || 0,
+          bestScore: stats.bestScore || 0,
+          latestScore: stats.latestScore || 0,
+          recentAttempts: stats.recentAttempts || [],
+        });
+      }
+      
       setError(null);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -360,6 +385,88 @@ const Dashboard = () => {
               onClick={() => navigate('/ai-library?tab=materials')}
               className="cursor-pointer hover:scale-[1.02] transition"
             />
+          </div>
+
+          {/* Quiz Performance Analytics */}
+          <div className="space-y-4 pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
+            <h3 className="font-extrabold text-lg text-text-main flex items-center gap-2">
+              <Brain className="h-5 w-5 text-purple" /> Quiz Performance Analytics
+            </h3>
+            
+            {quizStats.totalAttempts === 0 && (
+              <div className="p-4 mb-4 bg-purple/5 dark:bg-purple-900/10 rounded-xl border border-purple/20 dark:border-purple/30 text-center">
+                <p className="text-xs font-bold text-purple dark:text-purple-300">
+                  No quiz attempts saved yet. Complete and save a quiz result to see your quiz analytics here.
+                </p>
+              </div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5">
+              <StatCard
+                icon={BarChart3}
+                label="Attempts"
+                value={`${quizStats.totalAttempts}`}
+                badgeText="Total"
+                changeType="neutral"
+                color="purple"
+              />
+              <StatCard
+                icon={Target}
+                label="Avg Score"
+                value={`${Math.round(quizStats.averageQuizScore)}%`}
+                badgeText="Average"
+                changeType="neutral"
+                color="blue"
+              />
+              <StatCard
+                icon={Trophy}
+                label="Best Score"
+                value={`${Math.round(quizStats.bestScore)}%`}
+                badgeText="Highest"
+                changeType="neutral"
+                color="amber"
+              />
+              <StatCard
+                icon={TrendingUp}
+                label="Latest"
+                value={`${Math.round(quizStats.latestScore)}%`}
+                badgeText="Recent"
+                changeType="neutral"
+                color="emerald"
+              />
+              <StatCard
+                icon={AlertTriangle}
+                label="Wrong"
+                value={`${quizStats.totalWrongAnswers}`}
+                badgeText="Total"
+                changeType="neutral"
+                color="red"
+              />
+            </div>
+            
+            {quizStats.recentAttempts && quizStats.recentAttempts.length > 0 && (
+              <div className="liquid-card p-5 mt-4">
+                <h4 className="font-extrabold text-sm text-text-main mb-4 flex items-center gap-1.5">
+                  <Clock className="h-4 w-4 text-purple" /> Recent Quiz Attempts
+                </h4>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {quizStats.recentAttempts.slice(0, 3).map((attempt, i) => (
+                    <div key={attempt.id || i} className="flex justify-between items-center p-3 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                      <div className="min-w-0 flex-1 pr-2">
+                        <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Quiz Attempt'}</p>
+                        <p className="text-[10px] text-text-muted mt-0.5">
+                          {new Date(attempt.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end flex-shrink-0 gap-1">
+                        <span className="text-sm font-extrabold text-purple dark:text-cyan-400">{Math.round(attempt.percentage || 0)}%</span>
+                        <span className="text-[10px] font-bold text-text-muted">{attempt.score}/{attempt.totalQuestions}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Weekly Focus Chart */}
