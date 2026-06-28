@@ -28,9 +28,12 @@ const createFocusSession = asyncHandler(async (req, res) => {
     throw new Error('Please provide durationMinutes and subjectId');
   }
 
+  const parsedDuration = parseFloat(durationMinutes);
+  const finalDuration = parsedDuration > 0 && parsedDuration < 1 ? 1 : Math.round(parsedDuration);
+
   const session = await prisma.focusSession.create({
     data: {
-      duration: parseInt(durationMinutes),
+      duration: finalDuration,
       subjectId: parseInt(subjectId),
       userId: req.user.id
     },
