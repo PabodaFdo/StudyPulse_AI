@@ -153,6 +153,10 @@ const FocusTimer = () => {
 
   const toggleTimer = () => {
     if (!isRunning) {
+      if (mode === 'focus' && !selectedSubjectId) {
+        toast.error('Please select a subject before starting a focus session.');
+        return;
+      }
       completionLockRef.current = false;
     }
     setIsRunning((prev) => !prev);

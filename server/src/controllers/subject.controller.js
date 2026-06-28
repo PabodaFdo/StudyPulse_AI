@@ -128,48 +128,158 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     orderBy: { createdAt: 'desc' }
   });
 
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-  const recentFocusSessions = await prisma.focusSession.findMany({
+  const allFocusSessions = await prisma.focusSession.findMany({
     where: { 
       subjectId: subject.id, 
-      userId: req.user.id,
-      createdAt: { gte: sevenDaysAgo }
+      userId: req.user.id
     }
   });
 
-  const focusSessionsCompleted = recentFocusSessions.length;
-  const totalFocusMinutes = recentFocusSessions.reduce((acc, curr) => acc + curr.duration, 0);
-  const studyHoursPerWeek = totalFocusMinutes > 0 ? Number((totalFocusMinutes / 60).toFixed(1)) : 0;
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const recentFocusSessions = allFocusSessions.filter(fs => new Date(fs.createdAt) >= sevenDaysAgo);
+
+  const focusSessionsCompleted = allFocusSessions.length > 0 ? allFocusSessions.length : null;
+  const focusSessionsThisWeek = recentFocusSessions.length;
+  
+  const totalFocusMinutes = allFocusSessions.reduce((acc, curr) => acc + curr.duration, 0);
+  const studyHours = allFocusSessions.length > 0 ? Number((totalFocusMinutes / 60).toFixed(1)) : null;
+
+  const totalFocusMinutesThisWeek = recentFocusSessions.reduce((acc, curr) => acc + curr.duration, 0);
+  const studyHoursPerWeek = recentFocusSessions.length > 0 ? Number((totalFocusMinutesThisWeek / 60).toFixed(1)) : null;
+
+  const focusSessionsSource = allFocusSessions.length > 0 ? "focus_sessions" : "manual_required";
+  const studyHoursSource = allFocusSessions.length > 0 ? "focus_sessions" : "manual_required";
 
   const notesCount = await prisma.note.count({
     where: { subjectId: subject.id, userId: req.user.id }
   });
+  const finalNotesCount = notesCount;
+  const notesCountSource = "smart_notes";
 
-  let averageMark = latestRecord?.examMark || 0;
-  if (latestRecord?.grade && averageMark === 0) {
+  const quizAttempts = await prisma.quizAttempt.findMany({
+    where: {
+      userId: req.user.id,
+      subjectId: subject.id
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  let quizAttemptAverage = null;
+  let quizAttemptCount = 0;
+  let latestQuizScore = null;
+  let bestQuizScore = null;
+  let totalWrongAnswers = 0;
+
+  if (quizAttempts.length > 0) {
+    quizAttemptCount = quizAttempts.length;
+    let totalScore = 0;
+    
+    quizAttempts.forEach(attempt => {
+      totalScore += attempt.percentage;
+      totalWrongAnswers += (attempt.totalQuestions - attempt.score);
+      if (bestQuizScore === null || attempt.percentage > bestQuizScore) {
+        bestQuizScore = attempt.percentage;
+      }
+    });
+    
+    quizAttemptAverage = totalScore / quizAttemptCount;
+    latestQuizScore = quizAttempts[0].percentage;
+  }
+
+  let finalQuizAverage = null;
+  let quizAverageSource = "manual_required";
+  
+  if (quizAttempts.length > 0) {
+    finalQuizAverage = quizAttemptAverage;
+    quizAverageSource = "quiz_attempts";
+  } else if (latestRecord && latestRecord.quizAverage !== null) {
+    finalQuizAverage = latestRecord.quizAverage;
+    quizAverageSource = "academic_records";
+  }
+
+  let attendancePercentage = null;
+  let attendanceSource = "manual_required";
+  if (latestRecord && latestRecord.attendancePercentage !== null) {
+    attendancePercentage = latestRecord.attendancePercentage;
+    attendanceSource = "academic_records";
+  }
+
+  let assignmentAverage = null;
+  let assignmentSource = "manual_required";
+  if (latestRecord && latestRecord.assignmentAverage !== null) {
+    assignmentAverage = latestRecord.assignmentAverage;
+    assignmentSource = "academic_records";
+  }
+
+  let missedDeadlines = null;
+  let missedDeadlinesSource = "manual_required";
+  if (latestRecord && latestRecord.missedDeadlines !== null) {
+    missedDeadlines = latestRecord.missedDeadlines;
+    missedDeadlinesSource = "academic_records";
+  }
+
+  let previousExamMark = null;
+  let previousExamMarkSource = "manual_required";
+  if (latestRecord && latestRecord.previousExamMark !== null) {
+    previousExamMark = latestRecord.previousExamMark;
+    previousExamMarkSource = "academic_records";
+  }
+
+  let examMark = null;
+  let examMarkSource = "manual_required";
+  if (latestRecord && latestRecord.examMark !== null) {
+    examMark = latestRecord.examMark;
+    examMarkSource = "academic_records";
+  }
+
+  let avgMark = null;
+  let avgMarkSource = "manual_required";
+
+  if (quizAttempts.length > 0) {
+    avgMark = quizAttemptAverage;
+    avgMarkSource = "quiz_attempts";
+  } else if (examMark !== null) {
+    avgMark = examMark;
+    avgMarkSource = "academic_records";
+  } else if (latestRecord?.grade) {
     const g = latestRecord.grade.toUpperCase();
-    if (g.includes('A')) averageMark = 90;
-    else if (g.includes('B')) averageMark = 80;
-    else if (g.includes('C')) averageMark = 70;
-    else if (g.includes('D')) averageMark = 60;
-    else averageMark = 50;
+    if (g.includes('A')) avgMark = 90;
+    else if (g.includes('B')) avgMark = 80;
+    else if (g.includes('C')) avgMark = 70;
+    else if (g.includes('D')) avgMark = 60;
+    else avgMark = 50;
+    avgMarkSource = "academic_records";
   }
 
   const analytics = {
     subjectId: subject.id,
     subjectName: subject.name,
-    attendancePercentage: latestRecord?.attendancePercentage || 0,
-    assignmentAverage: latestRecord?.assignmentAverage || 0,
-    quizAverage: latestRecord?.quizAverage || 0,
-    studyHoursPerWeek: studyHoursPerWeek,
-    focusSessionsCompleted: focusSessionsCompleted,
-    missedDeadlines: latestRecord?.missedDeadlines || 0,
-    previousExamMark: latestRecord?.previousExamMark || 0,
-    examMark: latestRecord?.examMark || 0,
-    averageMark: averageMark,
-    notesCount: notesCount
+    attendancePercentage,
+    attendanceSource,
+    avgMark,
+    avgMarkSource,
+    quizAverage: finalQuizAverage,
+    quizAverageSource,
+    studyHours,
+    studyHoursPerWeek,
+    studyHoursSource,
+    focusSessions: focusSessionsCompleted,
+    focusSessionsCompleted,
+    focusSessionsThisWeek,
+    focusSessionsSource,
+    notesCount: finalNotesCount,
+    notesCountSource,
+    missedDeadlines,
+    missedDeadlinesSource,
+    examMark,
+    examMarkSource,
+    quizAttemptAverage,
+    quizAttemptCount,
+    latestQuizScore,
+    bestQuizScore,
+    totalWrongAnswers
   };
 
   res.status(200).json(analytics);

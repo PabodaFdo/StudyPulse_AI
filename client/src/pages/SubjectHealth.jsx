@@ -8,7 +8,6 @@ import { subjectService } from '../services/subject.service';
 const defaultFormData = {
   attendancePercentage: "",
   averageMark: "",
-  quizAverage: "",
   studyHoursThisWeek: "",
   focusSessionsCompleted: "",
   notesCount: "",
@@ -25,6 +24,8 @@ const SubjectHealth = () => {
   const [subjects, setSubjects] = useState([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState('');
   const [isAutoFilling, setIsAutoFilling] = useState(false);
+  const [quizInfo, setQuizInfo] = useState(null);
+  const [showQuizInfo, setShowQuizInfo] = useState(false);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -48,25 +49,31 @@ const SubjectHealth = () => {
       const analytics = await subjectService.getSubjectAnalytics(selectedSubjectId);
       
       if (
-        !analytics.attendancePercentage && 
-        !analytics.averageMark && 
-        !analytics.quizAverage && 
-        !analytics.studyHoursPerWeek && 
-        !analytics.focusSessionsCompleted && 
-        !analytics.notesCount &&
-        !analytics.examMark
+        analytics.attendancePercentage === null && 
+        analytics.averageMark === null && 
+        analytics.quizAverage === null && 
+        analytics.studyHoursPerWeek === null && 
+        analytics.focusSessionsCompleted === null && 
+        analytics.notesCount === null &&
+        analytics.examMark === null
       ) {
         toast.error('No academic data found for this subject. You can enter values manually.');
       } else {
+        let calculatedAvgMark = formData.averageMark;
+        if (analytics.avgMark !== null) {
+          calculatedAvgMark = analytics.avgMark;
+        }
+
         setFormData({
-          attendancePercentage: analytics.attendancePercentage || 0,
-          averageMark: analytics.averageMark || 0,
-          quizAverage: analytics.quizAverage || 0,
-          studyHoursThisWeek: analytics.studyHoursPerWeek || 0,
-          focusSessionsCompleted: analytics.focusSessionsCompleted || 0,
-          notesCount: analytics.notesCount || 0,
-          missedDeadlines: analytics.missedDeadlines || 0,
+          attendancePercentage: analytics.attendancePercentage !== null ? analytics.attendancePercentage : formData.attendancePercentage,
+          averageMark: calculatedAvgMark,
+          studyHoursThisWeek: analytics.studyHours !== null ? analytics.studyHours : (analytics.studyHoursPerWeek !== null ? analytics.studyHoursPerWeek : formData.studyHoursThisWeek),
+          focusSessionsCompleted: analytics.focusSessions !== null ? analytics.focusSessions : (analytics.focusSessionsCompleted !== null ? analytics.focusSessionsCompleted : formData.focusSessionsCompleted),
+          notesCount: analytics.notesCount !== null ? analytics.notesCount : formData.notesCount,
+          missedDeadlines: analytics.missedDeadlines !== null ? analytics.missedDeadlines : formData.missedDeadlines,
         });
+        setQuizInfo(analytics);
+        setShowQuizInfo(true);
         toast.success('Subject health form filled from your study data.');
       }
     } catch (err) {
@@ -81,6 +88,8 @@ const SubjectHealth = () => {
     setResult(null);
     setError(null);
     setLoading(false);
+    setShowQuizInfo(false);
+    setQuizInfo(null);
   };
 
   const handleChange = (e) => {
@@ -92,6 +101,21 @@ const SubjectHealth = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.attendancePercentage === "") return toast.error('Please enter Attendance before calculating subject health.');
+    if (formData.averageMark === "") return toast.error('Please enter Avg Mark before calculating subject health.');
+    if (formData.studyHoursThisWeek === "") return toast.error('Please enter Study Hours before calculating subject health.');
+    if (formData.focusSessionsCompleted === "") return toast.error('Please enter Focus Sessions before calculating subject health.');
+    if (formData.notesCount === "") return toast.error('Please enter Notes Count before calculating subject health.');
+    if (formData.missedDeadlines === "") return toast.error('Please enter Missed Deadlines before calculating subject health.');
+
+    if (formData.attendancePercentage < 0 || formData.attendancePercentage > 100) return toast.error('Attendance must be between 0 and 100.');
+    if (formData.averageMark < 0 || formData.averageMark > 100) return toast.error('Average mark must be between 0 and 100.');
+    if (formData.studyHoursThisWeek < 0) return toast.error('Study hours must be 0 or greater.');
+    if (formData.focusSessionsCompleted < 0) return toast.error('Focus sessions must be 0 or greater.');
+    if (formData.notesCount < 0) return toast.error('Notes count must be 0 or greater.');
+    if (formData.missedDeadlines < 0) return toast.error('Missed deadlines must be 0 or greater.');
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -104,7 +128,7 @@ const SubjectHealth = () => {
         subjectName: subjectName,
         attendancePercentage: Number(formData.attendancePercentage),
         averageMark: Number(formData.averageMark),
-        quizAverage: Number(formData.quizAverage),
+        quizAverage: Number(formData.averageMark),
         studyHoursThisWeek: Number(formData.studyHoursThisWeek),
         focusSessionsCompleted: Number(formData.focusSessionsCompleted),
         notesCount: Number(formData.notesCount),
@@ -140,6 +164,33 @@ const SubjectHealth = () => {
       case 'Critical': return <XCircle className="w-5 h-5 text-red-500" />;
       default: return <Activity className="w-5 h-5" />;
     }
+  };
+
+  const getSourceLabel = (sourceKey) => {
+    if (!quizInfo || !showQuizInfo) return null;
+    const source = quizInfo[sourceKey];
+    if (source === 'academic_records') return <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">✓ From academic records</p>;
+    if (source === 'quiz_attempts') return <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1">✓ From saved quiz attempts</p>;
+    if (source === 'smart_notes') return <p className="text-[10px] text-purple-600 dark:text-purple-400 mt-1">✓ From Smart Notes</p>;
+    if (source === 'focus_sessions') return <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1">✓ From Focus Timer</p>;
+    if (source === 'manual_required' || source === 'none' || !source) {
+      if (sourceKey === 'attendanceSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+      if (sourceKey === 'avgMarkSource' || sourceKey === 'assignmentSource' || sourceKey === 'examMarkSource') {
+        if (quizInfo.avgMarkSource === 'quiz_attempts') {
+          return <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1">✓ From saved quiz attempts</p>;
+        } else if (quizInfo.avgMarkSource === 'academic_records') {
+          return <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">✓ From academic records</p>;
+        } else {
+          return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+        }
+      }
+      if (sourceKey === 'quizAverageSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+      if (sourceKey === 'studyHoursSource' || sourceKey === 'focusSessionsSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually or use Focus Timer first</p>;
+      if (sourceKey === 'notesCountSource') return <p className="text-[10px] text-slate-500 mt-1">No Smart Notes found</p>;
+      if (sourceKey === 'missedDeadlinesSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+      return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+    }
+    return null;
   };
 
   return (
@@ -189,6 +240,33 @@ const SubjectHealth = () => {
             </div>
           </div>
 
+          {showQuizInfo && quizInfo?.avgMarkSource === 'quiz_attempts' && (
+            <div className="mb-4 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300">
+              <p className="text-sm font-semibold mb-2">Average mark is based on saved quiz attempts.</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <div><span className="opacity-70">Attempts:</span> <strong>{quizInfo.quizAttemptCount}</strong></div>
+                <div><span className="opacity-70">Latest Score:</span> <strong>{Math.round(quizInfo.latestQuizScore)}%</strong></div>
+                <div><span className="opacity-70">Best Score:</span> <strong>{Math.round(quizInfo.bestQuizScore)}%</strong></div>
+                <div><span className="opacity-70">Average Score:</span> <strong>{Math.round(quizInfo.quizAttemptAverage)}%</strong></div>
+              </div>
+            </div>
+          )}
+
+          {showQuizInfo && (
+            Object.values({
+              a: quizInfo.attendanceSource,
+              b: quizInfo.avgMarkSource,
+              d: quizInfo.studyHoursSource,
+              e: quizInfo.focusSessionsSource,
+              f: quizInfo.notesCountSource,
+              g: quizInfo.missedDeadlinesSource
+            }).some(val => val === 'none' || val === 'manual_required')
+          ) && (
+            <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+              <p className="text-sm font-medium flex items-center gap-1.5">Some fields are not tracked automatically yet. Please enter them manually before calculating subject health.</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -198,11 +276,11 @@ const SubjectHealth = () => {
                   name="attendancePercentage" 
                   value={formData.attendancePercentage} 
                   onChange={handleChange} 
-                  required
                   step="any"
                   min="0" max="100"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
+                {getSourceLabel('attendanceSource')}
               </div>
               <div>
                 <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Avg Mark (%)</label>
@@ -211,24 +289,11 @@ const SubjectHealth = () => {
                   name="averageMark" 
                   value={formData.averageMark} 
                   onChange={handleChange} 
-                  required
                   step="any"
                   min="0" max="100"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
-              </div>
-              <div>
-                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Quiz Avg (%)</label>
-                <input 
-                  type="number" 
-                  name="quizAverage" 
-                  value={formData.quizAverage} 
-                  onChange={handleChange} 
-                  required
-                  step="any"
-                  min="0" max="100"
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
-                />
+                {getSourceLabel('avgMarkSource')}
               </div>
               <div>
                 <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Study Hours</label>
@@ -237,11 +302,11 @@ const SubjectHealth = () => {
                   name="studyHoursThisWeek" 
                   value={formData.studyHoursThisWeek} 
                   onChange={handleChange} 
-                  required
                   step="any"
                   min="0"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
+                {getSourceLabel('studyHoursSource')}
               </div>
               <div>
                 <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Focus Sessions</label>
@@ -250,11 +315,11 @@ const SubjectHealth = () => {
                   name="focusSessionsCompleted" 
                   value={formData.focusSessionsCompleted} 
                   onChange={handleChange} 
-                  required
                   step="1"
                   min="0"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
+                {getSourceLabel('focusSessionsSource')}
               </div>
               <div>
                 <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Notes Count</label>
@@ -263,11 +328,11 @@ const SubjectHealth = () => {
                   name="notesCount" 
                   value={formData.notesCount} 
                   onChange={handleChange} 
-                  required
                   step="1"
                   min="0"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
+                {getSourceLabel('notesCountSource')}
               </div>
               <div>
                 <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Missed Deadlines</label>
@@ -276,11 +341,11 @@ const SubjectHealth = () => {
                   name="missedDeadlines" 
                   value={formData.missedDeadlines} 
                   onChange={handleChange} 
-                  required
                   step="1"
                   min="0"
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
+                {getSourceLabel('missedDeadlinesSource')}
               </div>
             </div>
 
