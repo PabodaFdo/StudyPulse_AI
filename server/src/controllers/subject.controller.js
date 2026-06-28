@@ -237,12 +237,85 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     quizAverageSource = "academic_records";
   }
 
-  let attendancePercentage = null;
-  let attendanceSource = "manual_required";
-  if (latestRecord && latestRecord.attendancePercentage !== null) {
-    attendancePercentage = latestRecord.attendancePercentage;
-    attendanceSource = "academic_records";
+  // Study Engagement Calculation (Version 1)
+  const safeStudyHours = studyHours || 0;
+  const safeFocusSessionsCount = allFocusSessions.length;
+  
+  const quizActivity = Math.min(quizAttemptCount / 3, 1) * 25;
+  const focusHoursScore = Math.min(safeStudyHours / 5, 1) * 15;
+  const focusSessionsScore = Math.min(safeFocusSessionsCount / 3, 1) * 10;
+  const focusActivity = focusHoursScore + focusSessionsScore;
+  const notesActivity = Math.min(notesCount / 3, 1) * 20;
+  const assessmentActivity = Math.min(assessmentCount / 2, 1) * 15;
+
+  let latestActivityDate = null;
+  const dates = [];
+  if (quizAttempts.length > 0) dates.push(new Date(quizAttempts[0].createdAt));
+  if (allFocusSessions.length > 0) {
+    const latestFs = allFocusSessions.reduce((latest, current) => 
+      new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+    );
+    dates.push(new Date(latestFs.createdAt));
   }
+  // For notes, we need to fetch them if we want their dates, or we can fetch the latest note date
+  const latestNote = await prisma.note.findFirst({
+    where: { subjectId: subject.id, userId: req.user.id },
+    orderBy: { updatedAt: 'desc' }
+  });
+  if (latestNote) dates.push(new Date(latestNote.updatedAt));
+  
+  if (assessments.length > 0) {
+    const latestAsst = assessments.reduce((latest, current) => {
+      const lDate = latest.updatedAt ? new Date(latest.updatedAt) : new Date(latest.createdAt);
+      const cDate = current.updatedAt ? new Date(current.updatedAt) : new Date(current.createdAt);
+      return cDate > lDate ? current : latest;
+    });
+    dates.push(latestAsst.updatedAt ? new Date(latestAsst.updatedAt) : new Date(latestAsst.createdAt));
+  }
+
+  if (dates.length > 0) {
+    latestActivityDate = new Date(Math.max(...dates));
+  }
+
+  let recentActivity = 0;
+  if (latestActivityDate) {
+    const daysSinceLatestActivity = (new Date() - latestActivityDate) / (1000 * 60 * 60 * 24);
+    if (daysSinceLatestActivity <= 7) {
+      recentActivity = 15;
+    } else if (daysSinceLatestActivity <= 14) {
+      recentActivity = 8;
+    } else {
+      recentActivity = 0;
+    }
+  }
+
+  const studyEngagementScore = Math.round(quizActivity + focusActivity + notesActivity + assessmentActivity + recentActivity);
+  
+  let studyEngagementLevel = "Low";
+  if (studyEngagementScore >= 75) studyEngagementLevel = "High";
+  else if (studyEngagementScore >= 50) studyEngagementLevel = "Moderate";
+
+  const studyEngagementBreakdown = {
+    quizActivity: Math.round(quizActivity),
+    focusActivity: Math.round(focusActivity),
+    notesActivity: Math.round(notesActivity),
+    assessmentActivity: Math.round(assessmentActivity),
+    recentActivity: Math.round(recentActivity)
+  };
+
+  const engagementMetrics = {
+    quizAttemptCount,
+    averageQuizScore: quizAttemptAverage ? Number(quizAttemptAverage.toFixed(2)) : 0,
+    focusSessions: safeFocusSessionsCount,
+    studyHours: safeStudyHours,
+    notesCount,
+    assessmentCount,
+    latestActivityDate: latestActivityDate ? latestActivityDate.toISOString() : null
+  };
+
+  // Keep compatibility with Subject Health
+  let attendancePercentage = studyEngagementScore;
+  let attendanceSource = "study_engagement";
 
   let assignmentAverage = null;
   let assignmentSource = "manual_required";
@@ -322,7 +395,12 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     quizAttemptCount,
     latestQuizScore,
     bestQuizScore,
-    totalWrongAnswers
+    totalWrongAnswers,
+    studyEngagementScore,
+    studyEngagementLevel,
+    studyEngagementSource: "calculated_from_app_activity",
+    studyEngagementBreakdown,
+    engagementMetrics
   };
 
   res.status(200).json(analytics);
