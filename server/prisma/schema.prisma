@@ -26,6 +26,7 @@ model User {
   savedFlashcardDecks SavedFlashcardDeck[]
   studyMaterials      StudyMaterial[]
   quizAttempts        QuizAttempt[]
+  assessments         Assessment[]
 }
 
 model Subject {
@@ -45,6 +46,7 @@ model Subject {
   focusSessions   FocusSession[]
   academicRecords AcademicRecord[]
   quizAttempts    QuizAttempt[]
+  assessments     Assessment[]
 }
 
 model Note {
@@ -196,4 +198,21 @@ model QuizAttempt {
 
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject        Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+}
+
+model Assessment {
+  id             String   @id @default(cuid())
+  userId         Int
+  subjectId      Int
+  title          String
+  type           String
+  mark           Float
+  weight         Float
+  assessmentDate DateTime?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject        Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 }
