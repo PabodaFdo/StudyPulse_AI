@@ -35,6 +35,7 @@ import MoodCheckIn from '../pages/MoodCheckIn';
 import BurnoutWarning from '../pages/BurnoutWarning';
 import RevisionReminders from '../pages/RevisionReminders';
 import Profile from '../pages/Profile';
+import Assessments from '../pages/Assessments';
 
 const AppRoutes = () => {
   return (
@@ -90,6 +91,7 @@ const AppRoutes = () => {
           <Route path="/mood-checkin" element={<MoodCheckIn />} />
           <Route path="/burnout-warning" element={<BurnoutWarning />} />
           <Route path="/revision-reminders" element={<RevisionReminders />} />
+          <Route path="/assessments" element={<Assessments />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>

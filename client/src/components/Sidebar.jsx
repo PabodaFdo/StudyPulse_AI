@@ -3,7 +3,7 @@ import {
   LayoutDashboard, BookOpen, FileText, Upload, BrainCircuit, HelpCircle,
   Layers, Timer, BarChart3, GraduationCap, AlertTriangle, Clock,
   Flower2, Swords, Album, Radar, HeartPulse, Smile, Flame,
-  Bell, Sparkles, Library, LogOut
+  Bell, Sparkles, Library, LogOut, ClipboardList
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
@@ -38,6 +38,7 @@ const sections = [
     title: 'Academic',
     links: [
       { to: '/academic-records', label: 'Academic Records', icon: GraduationCap },
+      { to: '/assessments', label: 'Assessments / Marks', icon: ClipboardList },
       { to: '/risk-prediction', label: 'Risk Prediction', icon: AlertTriangle },
       { to: '/risk-timeline', label: 'Risk Timeline', icon: Clock },
     ],
