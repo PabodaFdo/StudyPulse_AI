@@ -19,7 +19,7 @@ import api from '../services/api';
 
 const getCorrectAnswerLabel = (question) => {
   const labels = ["A", "B", "C", "D"];
-
+  
   if (!question.correct_answer) return "";
 
   if (labels.includes(question.correct_answer)) {
@@ -33,10 +33,22 @@ const getCorrectAnswerLabel = (question) => {
   return index >= 0 ? labels[index] : question.correct_answer;
 };
 
+const showInfoToast = (message) => {
+  toast(message, {
+    icon: 'ℹ️',
+    duration: 3000,
+  });
+};
+
 const QuizGenerator = () => {
   const navigate = useNavigate();
+  const [quizMode, setQuizMode] = useState('practice'); // 'practice' or 'assessment'
+  
   const [extractedText, setExtractedText] = useState('');
   const [source, setSource] = useState('pdf');
+  
+  const [savedSubjects, setSavedSubjects] = useState([]);
+  const [selectedSubjectId, setSelectedSubjectId] = useState('');
   
   const [savedMaterials, setSavedMaterials] = useState([]);
   const [selectedMaterialId, setSelectedMaterialId] = useState('');
@@ -62,12 +74,15 @@ const QuizGenerator = () => {
 
   const [currentQuizSubjectId, setCurrentQuizSubjectId] = useState(null);
   const [currentQuizSourceTitle, setCurrentQuizSourceTitle] = useState('');
+  const [currentQuizNoteId, setCurrentQuizNoteId] = useState(null);
   
   const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
   const [isAssessmentAdded, setIsAssessmentAdded] = useState(false);
   const [isSavingAssessment, setIsSavingAssessment] = useState(false);
   const [assessmentRemainingWeight, setAssessmentRemainingWeight] = useState(100);
   const [assessmentTotalWeight, setAssessmentTotalWeight] = useState(0);
+  const [topicStats, setTopicStats] = useState(null);
+  const [scoreSourceOption, setScoreSourceOption] = useState('current');
   const [assessmentFormData, setAssessmentFormData] = useState({
     title: '',
     type: 'Quiz',
@@ -87,9 +102,10 @@ const QuizGenerator = () => {
   const fetchSources = async () => {
     setLoadingSources(true);
     try {
-      const [notesRes, materialsRes] = await Promise.all([
+      const [notesRes, materialsRes, subjectsRes] = await Promise.all([
         api.get('/notes').catch(() => ({ data: [] })),
-        getStudyMaterials().catch(() => [])
+        getStudyMaterials().catch(() => []),
+        api.get('/subjects').catch(() => ({ data: [] }))
       ]);
       
       const normalizeList = (response) => {
@@ -101,9 +117,11 @@ const QuizGenerator = () => {
 
       const notes = normalizeList(notesRes);
       const materials = normalizeList(materialsRes);
+      const subjects = normalizeList(subjectsRes);
       
       setSavedNotes(notes);
       setSavedMaterials(materials);
+      setSavedSubjects(subjects);
       
       let finalNoteId = localStorage.getItem('studypulse_quiz_selected_note_id');
       if (notes.length > 0) {
@@ -203,6 +221,16 @@ const QuizGenerator = () => {
     }
   };
 
+  const handleQuizModeChange = (mode) => {
+    setQuizMode(mode);
+    setQuizResult(null);
+    setSelectedAnswers({});
+    setCheckedQuestions({});
+    setIsAttemptSaved(false);
+    setIsAssessmentAdded(false);
+    setIsAssessmentModalOpen(false);
+  };
+
   const handleSourceChange = (newSource) => {
     setSource(newSource);
     localStorage.setItem('studypulse_quiz_source', newSource);
@@ -225,36 +253,58 @@ const QuizGenerator = () => {
     let textToUse = '';
     let newIdentity = '';
     
-    if (source === 'pdf') {
-      if (selectedMaterialId) {
-        const material = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
-        if (material) {
-          textToUse = material.extractedText;
-          newIdentity = 'pdf_' + material.id;
-        }
+    if (quizMode === 'assessment') {
+      if (!selectedSubjectId) {
+        toast.error('Please select a subject before generating an assessment quiz.');
+        return;
       }
       
-      if (!textToUse && extractedText) {
-        textToUse = extractedText;
-        newIdentity = 'pdf_' + (localStorage.getItem('studypulse_extracted_text_updated_at') || '');
+      const subjectNotes = savedNotes.filter(n => n.subjectId && n.subjectId.toString() === selectedSubjectId.toString());
+      if (subjectNotes.length === 0) {
+        toast.error('No Smart Notes found for this subject. Add Smart Notes before generating an assessment quiz.');
+        return;
       }
+      
+      let combined = '';
+      subjectNotes.forEach((n, idx) => {
+        combined += `Note ${idx + 1}: ${n.title}\n${n.content}\n\n`;
+      });
+      
+      textToUse = combined.substring(0, 15000); // Safely truncate
+      newIdentity = 'assessment_' + selectedSubjectId;
+      showInfoToast('Using available Smart Notes under this subject to generate the assessment quiz.');
+    } else {
+      if (source === 'pdf') {
+        if (selectedMaterialId) {
+          const material = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+          if (material) {
+            textToUse = material.extractedText;
+            newIdentity = 'pdf_' + material.id;
+          }
+        }
+        
+        if (!textToUse && extractedText) {
+          textToUse = extractedText;
+          newIdentity = 'pdf_' + (localStorage.getItem('studypulse_extracted_text_updated_at') || '');
+        }
 
-      if (!textToUse) {
-        toast.error('No PDF text found. Please upload a PDF first.');
-        return;
+        if (!textToUse) {
+          toast.error('No PDF text found. Please upload a PDF first.');
+          return;
+        }
+      } else if (source === 'note') {
+        if (!selectedNoteId) {
+          toast.error('Please select study material before generating a quiz.');
+          return;
+        }
+        newIdentity = 'note_' + selectedNoteId;
+        const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
+        if (!note || !note.content || note.content.trim() === '' || note.content === 'Type your notes here...') {
+          toast.error('This note does not have enough content to generate a quiz.');
+          return;
+        }
+        textToUse = note.content;
       }
-    } else if (source === 'note') {
-      if (!selectedNoteId) {
-        toast.error('Please select study material before generating a quiz.');
-        return;
-      }
-      newIdentity = 'note_' + selectedNoteId;
-      const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
-      if (!note || !note.content || note.content.trim() === '' || note.content === 'Type your notes here...') {
-        toast.error('This note does not have enough content to generate a quiz.');
-        return;
-      }
-      textToUse = note.content;
     }
 
     if (!textToUse) {
@@ -390,20 +440,29 @@ const QuizGenerator = () => {
       let sourceTitle = "AI Quiz";
       let finalSourceType = source;
 
-      if (source === 'note' && selectedNoteId) {
-        const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
-        if (note) {
-          finalNoteId = note.id;
-          subjectId = note.subjectId || null;
-          sourceTitle = note.title;
+      if (quizMode === 'assessment') {
+        subjectId = selectedSubjectId;
+        finalNoteId = null;
+        finalSourceType = 'assessment_quiz';
+        
+        const subj = savedSubjects.find(s => s.id.toString() === selectedSubjectId.toString());
+        sourceTitle = subj ? `${subj.name || subj.subjectName} Assessment Quiz` : 'Assessment Quiz';
+      } else {
+        if (source === 'note' && selectedNoteId) {
+          const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
+          if (note) {
+            finalNoteId = note.id;
+            subjectId = note.subjectId || null;
+            sourceTitle = note.title;
+          }
+        } else if (source === 'pdf' && selectedMaterialId) {
+          const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+          if (mat) {
+            sourceTitle = mat.title;
+          }
+        } else if (source === 'pdf' && extractedText) {
+          sourceTitle = "Extracted PDF Material";
         }
-      } else if (source === 'pdf' && selectedMaterialId) {
-        const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
-        if (mat) {
-          sourceTitle = mat.title;
-        }
-      } else if (source === 'pdf' && extractedText) {
-        sourceTitle = "Extracted PDF Material";
       }
 
       const totalQuestions = quizResult.questions.length;
@@ -439,6 +498,7 @@ const QuizGenerator = () => {
       setIsAttemptSaved(true);
       setCurrentQuizSubjectId(subjectId);
       setCurrentQuizSourceTitle(sourceTitle);
+      setCurrentQuizNoteId(finalNoteId ? String(finalNoteId) : null);
     } catch (error) {
       console.error(error);
       toast.error('Failed to save quiz result.');
@@ -465,6 +525,21 @@ const QuizGenerator = () => {
     setAssessmentRemainingWeight(remaining);
     setAssessmentTotalWeight(total);
 
+    let tStats = null;
+    if (currentQuizNoteId) {
+      try {
+        const statsRes = await quizAttemptService.getTopicQuizAttemptStats(currentQuizNoteId);
+        if (statsRes && statsRes.data) {
+          tStats = statsRes.data;
+        }
+      } catch (err) {
+        console.error("Failed to fetch topic stats", err);
+      }
+    }
+    
+    setTopicStats(tStats);
+    setScoreSourceOption('current');
+
     const totalQuestions = quizResult?.questions?.length || 1;
     const percentage = (score / totalQuestions) * 100;
     
@@ -478,9 +553,34 @@ const QuizGenerator = () => {
       mark: percentage.toFixed(2),
       weight: defaultWeight,
       assessmentDate: new Date().toISOString().split('T')[0],
-      notes: 'Created from saved AI quiz result.'
+      notes: 'Created from saved AI quiz result.\nScore source: This attempt score.'
     });
     setIsAssessmentModalOpen(true);
+  };
+
+  const handleScoreSourceChange = (option) => {
+    setScoreSourceOption(option);
+    
+    const totalQuestions = quizResult?.questions?.length || 1;
+    let newMark = (score / totalQuestions) * 100;
+    let sourceText = 'This attempt score.';
+
+    if (option === 'best' && topicStats) {
+      newMark = topicStats.bestScore;
+      sourceText = 'Best topic score.';
+    } else if (option === 'average' && topicStats) {
+      newMark = topicStats.averageScore;
+      sourceText = 'Average topic score.';
+    } else if (option === 'latest' && topicStats) {
+      newMark = topicStats.latestScore;
+      sourceText = 'Latest topic score.';
+    }
+
+    setAssessmentFormData(prev => ({
+      ...prev,
+      mark: newMark.toFixed(2),
+      notes: `Created from saved AI quiz result.\nScore source: ${sourceText}`
+    }));
   };
 
   const handleSaveAssessment = async (e) => {
@@ -493,6 +593,7 @@ const QuizGenerator = () => {
     if (!assessmentFormData.title.trim()) return toast.error('Assessment Title is required.');
     if (!assessmentFormData.weight) return toast.error('Please enter assessment weight.');
     if (isNaN(weightVal) || weightVal <= 0 || weightVal > 100) return toast.error('Assessment weight must be between 1 and 100.');
+    if (weightVal > assessmentRemainingWeight) return toast.error('Assessment weight cannot exceed remaining weight.');
     if (isNaN(markVal) || markVal < 0 || markVal > 100) return toast.error('Assessment mark must be between 0 and 100.');
 
     try {
@@ -565,50 +666,101 @@ const QuizGenerator = () => {
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <Select
-              label="Study Source"
-              value={source}
-              onChange={(e) => handleSourceChange(e.target.value)}
-              options={sourceOptions}
-            />
+        <div className="space-y-6">
+          
+          <div className="space-y-3">
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-200">Quiz Mode</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div 
+                onClick={() => handleQuizModeChange('practice')}
+                className={`cursor-pointer border p-4 rounded-xl transition-all ${quizMode === 'practice' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-4 h-4 rounded-full border-[4px] ${quizMode === 'practice' ? 'border-cyan-500 bg-white' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}></div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Practice Quiz</h3>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 pl-6 leading-relaxed">
+                  Generate quizzes from a selected Smart Note for revision and weak topic detection.
+                </p>
+              </div>
+
+              <div 
+                onClick={() => handleQuizModeChange('assessment')}
+                className={`cursor-pointer border p-4 rounded-xl transition-all ${quizMode === 'assessment' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-4 h-4 rounded-full border-[4px] ${quizMode === 'assessment' ? 'border-cyan-500 bg-white' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}></div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Assessment Quiz</h3>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 pl-6 leading-relaxed">
+                  Generate a subject-level quiz that can be added to your Assessment Tracker.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {source === 'pdf' && safeMaterials.length > 0 && (
-            <div className="space-y-1 animate-fade-in">
-              <Select
-                label="Select PDF Material"
-                value={selectedMaterialId}
-                onChange={(e) => handleMaterialChange(e.target.value)}
-                options={safeMaterials.map(m => ({
-                  label: m.title,
-                  value: m.id.toString()
-                }))}
-              />
-            </div>
-          )}
-          {source === 'pdf' && safeMaterials.length === 0 && extractedText && (
-             <p className="text-[11px] text-brand-400 font-medium px-2">Using extracted PDF text from your last uploaded material.</p>
-          )}
-          {source === 'pdf' && safeMaterials.length === 0 && !extractedText && (
-             <p className="text-[11px] text-brand-400 font-medium px-2">No saved PDF materials found. Upload a PDF first.</p>
-          )}
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-6 space-y-4">
+            
+            {quizMode === 'practice' ? (
+              <div className="space-y-1">
+                <Select
+                  label="Study Source"
+                  value={source}
+                  onChange={(e) => handleSourceChange(e.target.value)}
+                  options={sourceOptions}
+                />
+              </div>
+            ) : (
+              <div className="space-y-1">
+                <Select
+                  label="Select Subject"
+                  value={selectedSubjectId}
+                  onChange={(e) => setSelectedSubjectId(e.target.value)}
+                  options={[
+                    { value: '', label: 'Select a subject...' },
+                    ...savedSubjects.map(s => ({
+                      label: s.name || s.subjectName,
+                      value: s.id.toString()
+                    }))
+                  ]}
+                />
+              </div>
+            )}
 
-          {source === 'note' && (
-            <div className="space-y-1 animate-fade-in">
-              <Select
-                label="Select Note"
-                value={selectedNoteId}
-                onChange={(e) => handleNoteChange(e.target.value)}
-                options={safeNotes.map(n => ({
-                  label: `${n.title} — ${n.subject?.name || 'Unknown Subject'}`,
-                  value: n.id.toString()
-                }))}
-              />
-              <p className="text-[11px] text-brand-400 font-medium px-2">Choose one of your saved Smart Notes to create a quiz.</p>
-            </div>
-          )}
+            {quizMode === 'practice' && source === 'pdf' && safeMaterials.length > 0 && (
+              <div className="space-y-1 animate-fade-in">
+                <Select
+                  label="Select PDF Material"
+                  value={selectedMaterialId}
+                  onChange={(e) => handleMaterialChange(e.target.value)}
+                  options={safeMaterials.map(m => ({
+                    label: m.title,
+                    value: m.id.toString()
+                  }))}
+                />
+              </div>
+            )}
+            {quizMode === 'practice' && source === 'pdf' && safeMaterials.length === 0 && extractedText && (
+               <p className="text-[11px] text-brand-400 font-medium px-2">Using extracted PDF text from your last uploaded material.</p>
+            )}
+            {quizMode === 'practice' && source === 'pdf' && safeMaterials.length === 0 && !extractedText && (
+               <p className="text-[11px] text-brand-400 font-medium px-2">No saved PDF materials found. Upload a PDF first.</p>
+            )}
+
+            {quizMode === 'practice' && source === 'note' && (
+              <div className="space-y-1 animate-fade-in">
+                <Select
+                  label="Select Note"
+                  value={selectedNoteId}
+                  onChange={(e) => handleNoteChange(e.target.value)}
+                  options={safeNotes.map(n => ({
+                    label: `${n.title} — ${n.subject?.name || 'Unknown Subject'}`,
+                    value: n.id.toString()
+                  }))}
+                />
+                <p className="text-[11px] text-brand-400 font-medium px-2">Choose one of your saved Smart Notes to create a quiz.</p>
+              </div>
+            )}
 
           <div className="grid gap-4 sm:grid-cols-2 pt-2">
             <Select
@@ -633,14 +785,15 @@ const QuizGenerator = () => {
             />
           </div>
 
-          <Button
-            onClick={handleGenerate}
-            disabled={isLoading}
-            className="w-full mt-4"
-            variant="primary"
-          >
-            {isLoading ? <LoadingSpinner size="sm" /> : 'Generate Quiz'}
-          </Button>
+            <Button
+              onClick={handleGenerate}
+              disabled={isLoading}
+              className="w-full mt-4"
+              variant="primary"
+            >
+              {isLoading ? <LoadingSpinner size="sm" /> : 'Generate Quiz'}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -735,27 +888,43 @@ const QuizGenerator = () => {
               <div className="mt-6 p-5 rounded-xl border border-purple-100 dark:border-slate-700 bg-white/80 dark:bg-slate-900/70 shadow-sm">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div>
-                    <h4 className="font-bold text-slate-800 dark:text-white mb-1">Your quiz result has been saved for analytics.</h4>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      You can also add this score to your Assessment Tracker if it should count toward your subject mark.
-                    </p>
-                  </div>
-                  <div>
-                    {!currentQuizSubjectId ? (
-                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[250px]">
-                        This quiz cannot be added to Assessment Tracker because no subject is linked to it.
+                    <h4 className="font-bold text-slate-800 dark:text-white mb-1">
+                      Your quiz result has been saved for analytics.
+                    </h4>
+
+                    {quizMode === 'practice' ? (
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        This practice quiz will be used for topic analytics and Weak Topic Radar.
                       </p>
                     ) : (
-                      <Button 
-                        onClick={handleOpenAssessmentModal}
-                        disabled={isAssessmentAdded}
-                        className={`whitespace-nowrap font-bold ${isAssessmentAdded ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}
-                      >
-                        <Layers className="h-4 w-4 mr-2" />
-                        {isAssessmentAdded ? 'Added to Assessment Tracker' : 'Add to Assessment Tracker'}
-                      </Button>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        You can add this assessment quiz score to your Assessment Tracker if it should count toward your subject mark.
+                      </p>
                     )}
                   </div>
+
+                  {quizMode === 'assessment' && (
+                    <div>
+                      {!currentQuizSubjectId ? (
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[250px]">
+                          This quiz cannot be added to Assessment Tracker because no subject is linked to it.
+                        </p>
+                      ) : (
+                        <Button
+                          onClick={handleOpenAssessmentModal}
+                          disabled={isAssessmentAdded}
+                          className={`whitespace-nowrap font-bold ${
+                            isAssessmentAdded
+                              ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300'
+                              : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                          }`}
+                        >
+                          <Layers className="h-4 w-4 mr-2" />
+                          {isAssessmentAdded ? 'Added to Assessment Tracker' : 'Add to Assessment Tracker'}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -841,7 +1010,61 @@ const QuizGenerator = () => {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-3 block">Choose Mark Source</label>
+            {!topicStats ? (
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full border-[5px] border-cyan-500 bg-white"></div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">This attempt score: {((score / (quizResult?.questions?.length || 1)) * 100).toFixed(2)}%</p>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-2 ml-7">
+                  {quizMode === 'assessment' 
+                    ? 'Assessment Quizzes are subject-level, so only this attempt score is used.' 
+                    : 'Topic-level best and average scores are available only for Smart Note quizzes.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'current' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  <input type="radio" name="scoreSource" value="current" checked={scoreSourceOption === 'current'} onChange={() => handleScoreSourceChange('current')} className="mt-1 accent-cyan-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">This attempt score</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{((score / (quizResult?.questions?.length || 1)) * 100).toFixed(2)}%</p>
+                  </div>
+                </label>
+                
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'best' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  <input type="radio" name="scoreSource" value="best" checked={scoreSourceOption === 'best'} onChange={() => handleScoreSourceChange('best')} className="mt-1 accent-cyan-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Best topic score</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{topicStats.bestScore}%</p>
+                  </div>
+                </label>
+                
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'average' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  <input type="radio" name="scoreSource" value="average" checked={scoreSourceOption === 'average'} onChange={() => handleScoreSourceChange('average')} className="mt-1 accent-cyan-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Average topic score</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{topicStats.averageScore}%</p>
+                  </div>
+                </label>
+
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'latest' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                  <input type="radio" name="scoreSource" value="latest" checked={scoreSourceOption === 'latest'} onChange={() => handleScoreSourceChange('latest')} className="mt-1 accent-cyan-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Latest topic score</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{topicStats.latestScore}%</p>
+                  </div>
+                </label>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-2">
             <div>
               <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Mark (%)</label>
               <input 
