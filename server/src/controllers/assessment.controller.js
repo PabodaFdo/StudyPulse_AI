@@ -37,6 +37,19 @@ const createAssessment = asyncHandler(async (req, res) => {
     throw new Error('Subject not found or unauthorized');
   }
 
+  // Check total weight limit
+  const existingAssessments = await prisma.assessment.findMany({
+    where: { userId: req.user.id, subjectId: parseInt(subjectId) }
+  });
+
+  const currentTotalWeight = existingAssessments.reduce((acc, curr) => acc + curr.weight, 0);
+  const newTotalWeight = currentTotalWeight + weightNum;
+
+  if (Number(newTotalWeight.toFixed(2)) > 100) {
+    res.status(400);
+    throw new Error('Total assessment weight cannot exceed 100%. Please adjust existing weights first.');
+  }
+
   const assessment = await prisma.assessment.create({
     data: {
       userId: req.user.id,
@@ -156,9 +169,34 @@ const updateAssessment = asyncHandler(async (req, res) => {
   if (title !== undefined) dataToUpdate.title = title;
   if (type !== undefined) dataToUpdate.type = type;
   if (mark !== undefined) dataToUpdate.mark = parseFloat(mark);
-  if (weight !== undefined) dataToUpdate.weight = parseFloat(weight);
   if (assessmentDate !== undefined) dataToUpdate.assessmentDate = assessmentDate ? new Date(assessmentDate) : null;
   if (notes !== undefined) dataToUpdate.notes = notes;
+
+  if (weight !== undefined) {
+    const weightNum = parseFloat(weight);
+    if (weightNum <= 0 || weightNum > 100) {
+      res.status(400);
+      throw new Error('Weight must be greater than 0 and less than or equal to 100');
+    }
+
+    const otherAssessments = await prisma.assessment.findMany({
+      where: {
+        userId: req.user.id,
+        subjectId: assessment.subjectId,
+        NOT: { id }
+      }
+    });
+
+    const totalOtherWeight = otherAssessments.reduce((acc, curr) => acc + curr.weight, 0);
+    const newTotalWeight = totalOtherWeight + weightNum;
+
+    if (Number(newTotalWeight.toFixed(2)) > 100) {
+      res.status(400);
+      throw new Error('Total assessment weight cannot exceed 100%. Please adjust existing weights first.');
+    }
+
+    dataToUpdate.weight = weightNum;
+  }
 
   const updatedAssessment = await prisma.assessment.update({
     where: { id },

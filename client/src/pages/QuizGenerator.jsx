@@ -13,6 +13,7 @@ import Input from '../components/Input';
 import { generateQuiz } from '../services/quiz.service';
 import { saveQuiz } from '../services/aiLibrary.service';
 import { quizAttemptService } from '../services/quizAttempt.service';
+import { assessmentService } from '../services/assessment.service';
 import { getStudyMaterials } from '../services/studyMaterial.service';
 import api from '../services/api';
 
@@ -58,6 +59,23 @@ const QuizGenerator = () => {
   const [checkedQuestions, setCheckedQuestions] = useState({});
   const [isAttemptSaved, setIsAttemptSaved] = useState(false);
   const [isSavingAttempt, setIsSavingAttempt] = useState(false);
+
+  const [currentQuizSubjectId, setCurrentQuizSubjectId] = useState(null);
+  const [currentQuizSourceTitle, setCurrentQuizSourceTitle] = useState('');
+  
+  const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
+  const [isAssessmentAdded, setIsAssessmentAdded] = useState(false);
+  const [isSavingAssessment, setIsSavingAssessment] = useState(false);
+  const [assessmentRemainingWeight, setAssessmentRemainingWeight] = useState(100);
+  const [assessmentTotalWeight, setAssessmentTotalWeight] = useState(0);
+  const [assessmentFormData, setAssessmentFormData] = useState({
+    title: '',
+    type: 'Quiz',
+    mark: '',
+    weight: '10',
+    assessmentDate: new Date().toISOString().split('T')[0],
+    notes: 'Created from saved AI quiz result.'
+  });
 
   useEffect(() => {
     const text = localStorage.getItem('studypulse_extracted_text');
@@ -181,6 +199,7 @@ const QuizGenerator = () => {
       }
 
       setIsAttemptSaved(false);
+      setIsAssessmentAdded(false);
     }
   };
 
@@ -265,6 +284,7 @@ const QuizGenerator = () => {
 
       localStorage.setItem("studypulse_quiz_source_updated_at", newIdentity);
       setIsAttemptSaved(false);
+      setIsAssessmentAdded(false);
 
       toast.success('Quiz generated successfully!');
     } catch (error) {
@@ -284,6 +304,7 @@ const QuizGenerator = () => {
     localStorage.removeItem('studypulse_quiz_checked_questions');
     localStorage.removeItem('studypulse_quiz_source_updated_at');
     setIsAttemptSaved(false);
+    setIsAssessmentAdded(false);
   };
 
   const handleOpenSaveModal = () => {
@@ -331,6 +352,7 @@ const QuizGenerator = () => {
     localStorage.setItem('studypulse_quiz_selected_answers', JSON.stringify({}));
     localStorage.setItem('studypulse_quiz_checked_questions', JSON.stringify({}));
     setIsAttemptSaved(false);
+    setIsAssessmentAdded(false);
   };
 
   const handleSelectAnswer = (idx, ans) => {
@@ -415,11 +437,82 @@ const QuizGenerator = () => {
       await quizAttemptService.saveQuizAttempt(payload);
       toast.success('Quiz result saved successfully.');
       setIsAttemptSaved(true);
+      setCurrentQuizSubjectId(subjectId);
+      setCurrentQuizSourceTitle(sourceTitle);
     } catch (error) {
       console.error(error);
       toast.error('Failed to save quiz result.');
     } finally {
       setIsSavingAttempt(false);
+    }
+  };
+
+  const handleOpenAssessmentModal = async () => {
+    if (!currentQuizSubjectId) return;
+
+    let remaining = 100;
+    let total = 0;
+    try {
+      const res = await assessmentService.getAssessmentSummary(currentQuizSubjectId);
+      if (res && res.data) {
+        remaining = res.data.remainingWeight;
+        total = res.data.totalWeight;
+      }
+    } catch (err) {
+      console.error("Failed to fetch assessment summary", err);
+    }
+
+    setAssessmentRemainingWeight(remaining);
+    setAssessmentTotalWeight(total);
+
+    const totalQuestions = quizResult?.questions?.length || 1;
+    const percentage = (score / totalQuestions) * 100;
+    
+    let defaultWeight = '';
+    if (remaining >= 10) defaultWeight = '10';
+    else if (remaining > 0) defaultWeight = remaining.toString();
+
+    setAssessmentFormData({
+      title: `AI Quiz - ${currentQuizSourceTitle}`,
+      type: 'Quiz',
+      mark: percentage.toFixed(2),
+      weight: defaultWeight,
+      assessmentDate: new Date().toISOString().split('T')[0],
+      notes: 'Created from saved AI quiz result.'
+    });
+    setIsAssessmentModalOpen(true);
+  };
+
+  const handleSaveAssessment = async (e) => {
+    e.preventDefault();
+    if (!currentQuizSubjectId) return toast.error('Missing subject ID.');
+    
+    const weightVal = Number(assessmentFormData.weight);
+    const markVal = Number(assessmentFormData.mark);
+    
+    if (!assessmentFormData.title.trim()) return toast.error('Assessment Title is required.');
+    if (!assessmentFormData.weight) return toast.error('Please enter assessment weight.');
+    if (isNaN(weightVal) || weightVal <= 0 || weightVal > 100) return toast.error('Assessment weight must be between 1 and 100.');
+    if (isNaN(markVal) || markVal < 0 || markVal > 100) return toast.error('Assessment mark must be between 0 and 100.');
+
+    try {
+      setIsSavingAssessment(true);
+      await assessmentService.createAssessment({
+        subjectId: currentQuizSubjectId,
+        title: assessmentFormData.title.trim(),
+        type: assessmentFormData.type,
+        mark: markVal,
+        weight: weightVal,
+        assessmentDate: assessmentFormData.assessmentDate || null,
+        notes: assessmentFormData.notes
+      });
+      toast.success('Quiz result added to Assessment Tracker.');
+      setIsAssessmentAdded(true);
+      setIsAssessmentModalOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add to Assessment Tracker');
+    } finally {
+      setIsSavingAssessment(false);
     }
   };
 
@@ -637,10 +730,40 @@ const QuizGenerator = () => {
                 Note: AI-generated quizzes may contain mistakes. Please review with your original study material.
               </p>
             </div>
+
+            {isAttemptSaved && (
+              <div className="mt-6 p-5 rounded-xl border border-purple-100 dark:border-slate-700 bg-white/80 dark:bg-slate-900/70 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h4 className="font-bold text-slate-800 dark:text-white mb-1">Your quiz result has been saved for analytics.</h4>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      You can also add this score to your Assessment Tracker if it should count toward your subject mark.
+                    </p>
+                  </div>
+                  <div>
+                    {!currentQuizSubjectId ? (
+                      <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[250px]">
+                        This quiz cannot be added to Assessment Tracker because no subject is linked to it.
+                      </p>
+                    ) : (
+                      <Button 
+                        onClick={handleOpenAssessmentModal}
+                        disabled={isAssessmentAdded}
+                        className={`whitespace-nowrap font-bold ${isAssessmentAdded ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}
+                      >
+                        <Layers className="h-4 w-4 mr-2" />
+                        {isAssessmentAdded ? 'Added to Assessment Tracker' : 'Add to Assessment Tracker'}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
+      {/* Save to AI Library Modal */}
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} title="Save to My AI Library">
         <div className="space-y-4">
           <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Title</label>
@@ -661,6 +784,111 @@ const QuizGenerator = () => {
             </Button>
           </div>
         </div>
+      </Modal>
+
+      {/* Assessment Tracker Modal */}
+      <Modal open={isAssessmentModalOpen} onClose={() => setIsAssessmentModalOpen(false)} title="Add to Assessment Tracker">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+            Remaining Weight: {assessmentRemainingWeight}%
+          </span>
+        </div>
+        {assessmentRemainingWeight === 0 && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 font-medium text-sm flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <p>This subject already has 100% assessment weight. Please edit existing weights before adding this quiz.</p>
+          </div>
+        )}
+        {assessmentTotalWeight > 100 && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-600 dark:text-red-400 font-medium text-sm flex items-start gap-2">
+            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+            <p>This subject already exceeds 100% assessment weight. Please fix existing weights before adding this quiz.</p>
+          </div>
+        )}
+        <form onSubmit={handleSaveAssessment} className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Assessment Title</label>
+            <input 
+              required
+              type="text"
+              value={assessmentFormData.title}
+              onChange={(e) => setAssessmentFormData({...assessmentFormData, title: e.target.value})}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Type</label>
+              <select 
+                value={assessmentFormData.type}
+                onChange={(e) => setAssessmentFormData({...assessmentFormData, type: e.target.value})}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+              >
+                <option value="Quiz">Quiz</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Mid Exam">Mid Exam</option>
+                <option value="Final Exam">Final Exam</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Date (Optional)</label>
+              <input 
+                type="date"
+                value={assessmentFormData.assessmentDate}
+                onChange={(e) => setAssessmentFormData({...assessmentFormData, assessmentDate: e.target.value})}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Mark (%)</label>
+              <input 
+                required
+                type="number"
+                step="0.01"
+                min="0" max="100"
+                value={assessmentFormData.mark}
+                onChange={(e) => setAssessmentFormData({...assessmentFormData, mark: e.target.value})}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                Weight (%) <span className="text-slate-500 font-normal ml-1">e.g. 10</span>
+              </label>
+              <input 
+                required
+                type="number"
+                step="0.01"
+                min="0.01" max="100"
+                value={assessmentFormData.weight}
+                onChange={(e) => setAssessmentFormData({...assessmentFormData, weight: e.target.value})}
+                disabled={assessmentRemainingWeight === 0}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white disabled:opacity-50"
+              />
+              <p className="text-[10px] text-slate-500 mt-1">Example: Use 5 or 10 if this quiz is a small assessment.</p>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Notes</label>
+            <textarea 
+              rows={2}
+              value={assessmentFormData.notes}
+              onChange={(e) => setAssessmentFormData({...assessmentFormData, notes: e.target.value})}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-900 dark:text-white"
+            />
+          </div>
+          <div className="flex justify-end gap-3 mt-6">
+            <Button type="button" variant="ghost" className="text-slate-700 dark:text-slate-200" onClick={() => setIsAssessmentModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" disabled={isSavingAssessment || assessmentRemainingWeight === 0} className={`bg-cyan-500 hover:bg-cyan-600 text-white ${assessmentRemainingWeight === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+              {isSavingAssessment ? 'Saving...' : 'Add Assessment'}
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

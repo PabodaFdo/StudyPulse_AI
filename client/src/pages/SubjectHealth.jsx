@@ -247,9 +247,20 @@ const SubjectHealth = () => {
               <p className="text-sm font-semibold mb-2">Average mark is based on weighted assessments.</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                 <div><span className="opacity-70">Assessments:</span> <strong>{quizInfo.assessmentCount}</strong></div>
-                <div><span className="opacity-70">Total Weight:</span> <strong>{quizInfo.assessmentTotalWeight}%</strong></div>
-                <div><span className="opacity-70">Weighted Average:</span> <strong>{quizInfo.avgMark}%</strong></div>
+                <div>
+                  <span className="opacity-70">Total Weight:</span>{' '}
+                  <strong className={quizInfo.assessmentTotalWeight > 100 ? 'text-red-600 dark:text-red-400 font-extrabold' : ''}>
+                    {quizInfo.assessmentTotalWeight}%
+                  </strong>
+                </div>
+                <div><span className="opacity-70">Avg Mark:</span> <strong>{quizInfo.assessmentWeightedAverage}%</strong></div>
               </div>
+              {quizInfo.assessmentTotalWeight > 100 && (
+                <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <p className="text-xs font-semibold">Warning: Assessment weights exceed 100%. Please fix weights for accurate health calculation.</p>
+                </div>
+              )}
             </div>
           )}
 

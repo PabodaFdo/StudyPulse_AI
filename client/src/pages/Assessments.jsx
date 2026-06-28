@@ -141,7 +141,14 @@ const Assessments = () => {
       
       setShowForm(false);
       setEditingId(null);
-      setFormData(defaultFormState);
+      setFormData({
+        title: '',
+        type: 'Quiz',
+        mark: '',
+        weight: '',
+        assessmentDate: '',
+        notes: ''
+      });
       fetchAssessmentData(selectedSubjectId);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save assessment');
@@ -172,11 +179,29 @@ const Assessments = () => {
           {selectedSubjectId && (
             <button
               onClick={() => {
+                if (summary?.remainingWeight === 0) {
+                  return toast.error('This subject already has 100% total weight. Edit existing assessments before adding more.');
+                }
                 setEditingId(null);
-                setFormData(defaultFormState);
+                
+                let defaultWeight = '';
+                if (summary?.remainingWeight >= 10) {
+                  defaultWeight = '10';
+                } else if (summary?.remainingWeight > 0) {
+                  defaultWeight = summary.remainingWeight.toString();
+                }
+
+                setFormData({
+                  title: '',
+                  type: 'Quiz',
+                  mark: '',
+                  weight: defaultWeight,
+                  assessmentDate: '',
+                  notes: ''
+                });
                 setShowForm(true);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 bg-purple hover:bg-purple-dark text-white rounded-xl font-bold transition-colors"
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold transition-colors ${summary?.remainingWeight === 0 ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-purple hover:bg-purple-dark text-white'}`}
             >
               <Plus className="w-4 h-4" /> Add Assessment
             </button>
@@ -248,9 +273,14 @@ const Assessments = () => {
           {showForm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
               <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg p-6 md:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
-                  {editingId ? 'Edit Assessment' : 'Add Assessment'}
-                </h3>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                    {editingId ? 'Edit Assessment' : 'Add Assessment'}
+                  </h3>
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+                    Remaining: {summary?.remainingWeight || 0}%
+                  </span>
+                </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Title</label>
@@ -277,7 +307,7 @@ const Assessments = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Weight (%)</label>
-                      <input required type="number" step="0.1" name="weight" value={formData.weight} onChange={handleInputChange} placeholder="e.g. 20" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white" />
+                      <input required type="number" step="0.01" name="weight" value={formData.weight} onChange={handleInputChange} disabled={!editingId && summary?.remainingWeight === 0} placeholder="e.g. 20" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white disabled:opacity-50" />
                     </div>
                   </div>
 
