@@ -144,13 +144,34 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
   const focusSessionsThisWeek = recentFocusSessions.length;
   
   const totalFocusMinutes = allFocusSessions.reduce((acc, curr) => acc + curr.duration, 0);
-  const studyHours = allFocusSessions.length > 0 ? Number((totalFocusMinutes / 60).toFixed(1)) : null;
+  let studyHours = null;
+  if (allFocusSessions.length > 0) {
+    studyHours = Number((totalFocusMinutes / 60).toFixed(2));
+    if (studyHours < 0.01) {
+      studyHours = 0.01;
+    }
+  }
 
   const totalFocusMinutesThisWeek = recentFocusSessions.reduce((acc, curr) => acc + curr.duration, 0);
-  const studyHoursPerWeek = recentFocusSessions.length > 0 ? Number((totalFocusMinutesThisWeek / 60).toFixed(1)) : null;
+  let studyHoursPerWeek = null;
+  if (recentFocusSessions.length > 0) {
+    studyHoursPerWeek = Number((totalFocusMinutesThisWeek / 60).toFixed(2));
+    if (studyHoursPerWeek < 0.01) {
+      studyHoursPerWeek = 0.01;
+    }
+  }
 
   const focusSessionsSource = allFocusSessions.length > 0 ? "focus_sessions" : "manual_required";
   const studyHoursSource = allFocusSessions.length > 0 ? "focus_sessions" : "manual_required";
+
+  console.log("Subject analytics focus debug:", {
+    userId: req.user.id,
+    subjectId: subject.id,
+    focusSessionsCount: allFocusSessions.length,
+    totalFocusMinutes,
+    studyHours,
+    focusSessions: allFocusSessions,
+  });
 
   const notesCount = await prisma.note.count({
     where: { subjectId: subject.id, userId: req.user.id }
@@ -165,6 +186,23 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     },
     orderBy: { createdAt: 'desc' }
   });
+
+  const assessments = await prisma.assessment.findMany({
+    where: {
+      userId: req.user.id,
+      subjectId: subject.id
+    }
+  });
+
+  let assessmentTotalWeight = 0;
+  let sumProduct = 0;
+  assessments.forEach(a => {
+    assessmentTotalWeight += a.weight;
+    sumProduct += (a.mark * a.weight);
+  });
+  
+  const assessmentWeightedAverage = assessmentTotalWeight > 0 ? Number((sumProduct / assessmentTotalWeight).toFixed(2)) : null;
+  const assessmentCount = assessments.length;
 
   let quizAttemptAverage = null;
   let quizAttemptCount = 0;
@@ -237,7 +275,10 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
   let avgMark = null;
   let avgMarkSource = "manual_required";
 
-  if (quizAttempts.length > 0) {
+  if (assessmentWeightedAverage !== null) {
+    avgMark = assessmentWeightedAverage;
+    avgMarkSource = "assessments";
+  } else if (quizAttempts.length > 0) {
     avgMark = quizAttemptAverage;
     avgMarkSource = "quiz_attempts";
   } else if (examMark !== null) {
@@ -260,6 +301,8 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     attendanceSource,
     avgMark,
     avgMarkSource,
+    assessmentTotalWeight,
+    assessmentCount,
     quizAverage: finalQuizAverage,
     quizAverageSource,
     studyHours,

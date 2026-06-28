@@ -176,7 +176,9 @@ const SubjectHealth = () => {
     if (source === 'manual_required' || source === 'none' || !source) {
       if (sourceKey === 'attendanceSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
       if (sourceKey === 'avgMarkSource' || sourceKey === 'assignmentSource' || sourceKey === 'examMarkSource') {
-        if (quizInfo.avgMarkSource === 'quiz_attempts') {
+        if (quizInfo.avgMarkSource === 'assessments') {
+          return <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1">✓ From Assessment Tracker</p>;
+        } else if (quizInfo.avgMarkSource === 'quiz_attempts') {
           return <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1">✓ From saved quiz attempts</p>;
         } else if (quizInfo.avgMarkSource === 'academic_records') {
           return <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1">✓ From academic records</p>;
@@ -239,6 +241,17 @@ const SubjectHealth = () => {
               </button>
             </div>
           </div>
+
+          {showQuizInfo && quizInfo?.avgMarkSource === 'assessments' && (
+            <div className="mb-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300">
+              <p className="text-sm font-semibold mb-2">Average mark is based on weighted assessments.</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <div><span className="opacity-70">Assessments:</span> <strong>{quizInfo.assessmentCount}</strong></div>
+                <div><span className="opacity-70">Total Weight:</span> <strong>{quizInfo.assessmentTotalWeight}%</strong></div>
+                <div><span className="opacity-70">Weighted Average:</span> <strong>{quizInfo.avgMark}%</strong></div>
+              </div>
+            </div>
+          )}
 
           {showQuizInfo && quizInfo?.avgMarkSource === 'quiz_attempts' && (
             <div className="mb-4 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300">
