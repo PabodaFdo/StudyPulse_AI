@@ -50,10 +50,10 @@ def calculate_subject_health(data):
         recommendations.append("Use short quizzes to revise this subject regularly")
 
     if data.attendancePercentage >= 80:
-        strengths.append("Attendance is good")
+        strengths.append("Study engagement is strong")
     else:
-        concerns.append("Attendance is affecting subject progress")
-        recommendations.append("Review missed lectures and maintain regular attendance")
+        concerns.append("Study engagement needs improvement")
+        recommendations.append("Increase study activity through quizzes, notes, and focus sessions")
 
     if data.studyHoursThisWeek >= 5:
         strengths.append("Study time is consistent")

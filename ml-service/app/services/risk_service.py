@@ -15,9 +15,9 @@ def predict_academic_risk_rule_based(data):
     recommendations = []
 
     if data.attendancePercentage < 75:
-        risk_score += 2
-        reasons.append("Attendance is below 75%")
-        recommendations.append("Improve class attendance and review missed lessons")
+        risk_score += 20
+        reasons.append("Study engagement is below 75%")
+        recommendations.append("Complete more study activities for this subject")
 
     if data.assignmentAverage < 60:
         risk_score += 2
