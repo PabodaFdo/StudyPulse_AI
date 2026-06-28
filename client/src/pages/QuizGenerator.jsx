@@ -513,10 +513,10 @@ const QuizGenerator = () => {
     let remaining = 100;
     let total = 0;
     try {
-      const res = await assessmentService.getAssessmentSummary(currentQuizSubjectId);
-      if (res && res.data) {
-        remaining = res.data.remainingWeight;
-        total = res.data.totalWeight;
+      const summaryRes = await assessmentService.getAssessmentSummary(currentQuizSubjectId);
+      if (summaryRes && summaryRes.data) {
+        remaining = Number(summaryRes.data.remainingWeight || 0);
+        total = Number(summaryRes.data.totalWeight || 0);
       }
     } catch (err) {
       console.error("Failed to fetch assessment summary", err);
@@ -556,6 +556,113 @@ const QuizGenerator = () => {
       notes: 'Created from saved AI quiz result.\nScore source: This attempt score.'
     });
     setIsAssessmentModalOpen(true);
+  };
+
+  const handleAutoAssessmentMark = async () => {
+    if (!currentQuizSubjectId) {
+      toast.error('Missing subject ID.');
+      return;
+    }
+
+    const totalQuestions = quizResult?.questions?.length || 1;
+    const newMark = Number(((score / totalQuestions) * 100).toFixed(2));
+
+    try {
+      const summaryRes = await assessmentService.getAssessmentSummary(currentQuizSubjectId);
+
+      const remaining = Number(
+        summaryRes?.data?.remainingWeight ??
+        summaryRes?.remainingWeight ??
+        100
+      );
+
+      const total = Number(
+        summaryRes?.data?.totalWeight ??
+        summaryRes?.totalWeight ??
+        0
+      );
+
+      setAssessmentRemainingWeight(remaining);
+      setAssessmentTotalWeight(total);
+
+      if (remaining > 0) {
+        await handleOpenAssessmentModal();
+        return;
+      }
+
+      const assessmentsRes = await assessmentService.getAssessmentsBySubject(currentQuizSubjectId);
+
+      const assessmentList =
+        assessmentsRes?.data?.assessments ||
+        assessmentsRes?.data ||
+        assessmentsRes?.assessments ||
+        assessmentsRes ||
+        [];
+
+      const safeAssessments = Array.isArray(assessmentList) ? assessmentList : [];
+
+      const assessmentQuizTitle = `AI Quiz - ${currentQuizSourceTitle}`;
+
+      const existingAssessmentQuiz =
+        safeAssessments.find((assessment) =>
+          assessment.type === 'Quiz' &&
+          assessment.title === assessmentQuizTitle
+        ) ||
+        safeAssessments.find((assessment) =>
+          assessment.type === 'Quiz' &&
+          assessment.title?.toLowerCase().includes('assessment quiz')
+        );
+
+      if (!existingAssessmentQuiz) {
+        toast.error('This subject already has 100% assessment weight. No AI Assessment Quiz record was found to update.');
+        return;
+      }
+
+      const oldMark = Number(existingAssessmentQuiz.mark);
+
+      if (Number.isNaN(newMark) || newMark < 0 || newMark > 100) {
+        toast.error('Assessment mark must be between 0 and 100.');
+        return;
+      }
+
+      if (newMark <= oldMark) {
+        toast(
+          `Your saved assessment quiz mark is already ${oldMark}%. This new quiz score is ${newMark}%, so no update is needed.`,
+          {
+            icon: 'ℹ️',
+            duration: 4000,
+          }
+        );
+        return;
+      }
+
+      const updatedNotes = `${existingAssessmentQuiz.notes || ''}
+
+Updated from AI Assessment Quiz.
+Previous mark: ${oldMark}%.
+New mark: ${newMark}%.
+Rule: Highest quiz mark kept.
+Updated on: ${new Date().toLocaleDateString()}`;
+
+      await assessmentService.updateAssessment(existingAssessmentQuiz.id, {
+        subjectId: currentQuizSubjectId,
+        title: existingAssessmentQuiz.title,
+        type: existingAssessmentQuiz.type,
+        mark: newMark,
+        weight: Number(existingAssessmentQuiz.weight),
+        assessmentDate:
+          existingAssessmentQuiz.assessmentDate ||
+          existingAssessmentQuiz.date ||
+          null,
+        notes: updatedNotes,
+      });
+
+      toast.success(`Assessment quiz mark updated from ${oldMark}% to ${newMark}%.`);
+      setIsAssessmentAdded(true);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || 'Failed to update assessment mark.');
+    }
   };
 
   const handleScoreSourceChange = (option) => {
@@ -616,6 +723,7 @@ const QuizGenerator = () => {
       setIsSavingAssessment(false);
     }
   };
+
 
   const renderSetup = () => {
     if (loadingSources) {
@@ -858,6 +966,26 @@ const QuizGenerator = () => {
                   <Trophy className="h-3 w-3 mr-1" /> 
                   {isAttemptSaved ? 'Quiz Result Saved' : isSavingAttempt ? 'Saving...' : 'Save Quiz Result'}
                 </Button>
+                {quizMode === 'assessment' && (
+                  <Button
+                    onClick={handleAutoAssessmentMark}
+                    disabled={!isAttemptSaved || isAssessmentAdded || !currentQuizSubjectId}
+                    className={`h-7 text-xs px-3 font-bold ${
+                      isAssessmentAdded
+                        ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300'
+                        : !isAttemptSaved || !currentQuizSubjectId
+                          ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300'
+                          : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                    }`}
+                  >
+                    <Layers className="h-3 w-3 mr-1" />
+                    {isAssessmentAdded
+                      ? 'Assessment Updated'
+                      : !isAttemptSaved
+                        ? 'Save Result First'
+                        : 'Add Assessment Mark'}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -886,44 +1014,19 @@ const QuizGenerator = () => {
 
             {isAttemptSaved && (
               <div className="mt-6 p-5 rounded-xl border border-purple-100 dark:border-slate-700 bg-white/80 dark:bg-slate-900/70 shadow-sm">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-bold text-slate-800 dark:text-white mb-1">
-                      Your quiz result has been saved for analytics.
-                    </h4>
+                <div>
+                  <h4 className="font-bold text-slate-800 dark:text-white mb-1">
+                    Your quiz result has been saved for analytics.
+                  </h4>
 
-                    {quizMode === 'practice' ? (
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        This practice quiz will be used for topic analytics and Weak Topic Radar.
-                      </p>
-                    ) : (
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        You can add this assessment quiz score to your Assessment Tracker if it should count toward your subject mark.
-                      </p>
-                    )}
-                  </div>
-
-                  {quizMode === 'assessment' && (
-                    <div>
-                      {!currentQuizSubjectId ? (
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[250px]">
-                          This quiz cannot be added to Assessment Tracker because no subject is linked to it.
-                        </p>
-                      ) : (
-                        <Button
-                          onClick={handleOpenAssessmentModal}
-                          disabled={isAssessmentAdded}
-                          className={`whitespace-nowrap font-bold ${
-                            isAssessmentAdded
-                              ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300'
-                              : 'bg-cyan-500 hover:bg-cyan-600 text-white'
-                          }`}
-                        >
-                          <Layers className="h-4 w-4 mr-2" />
-                          {isAssessmentAdded ? 'Added to Assessment Tracker' : 'Add to Assessment Tracker'}
-                        </Button>
-                      )}
-                    </div>
+                  {quizMode === 'practice' ? (
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      This practice quiz will be used for topic analytics and Weak Topic Radar.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      This assessment quiz result is ready. Use the Add Assessment Mark button above if it should count toward your subject mark.
+                    </p>
                   )}
                 </div>
               </div>
@@ -974,6 +1077,7 @@ const QuizGenerator = () => {
             <p>This subject already exceeds 100% assessment weight. Please fix existing weights before adding this quiz.</p>
           </div>
         )}
+
         <form onSubmit={handleSaveAssessment} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-slate-700 dark:text-slate-200">Assessment Title</label>
@@ -1107,7 +1211,12 @@ const QuizGenerator = () => {
             <Button type="button" variant="ghost" className="text-slate-700 dark:text-slate-200" onClick={() => setIsAssessmentModalOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={isSavingAssessment || assessmentRemainingWeight === 0} className={`bg-cyan-500 hover:bg-cyan-600 text-white ${assessmentRemainingWeight === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+            <Button 
+              type="submit" 
+              variant="primary" 
+              disabled={isSavingAssessment || assessmentRemainingWeight === 0} 
+              className={`bg-cyan-500 hover:bg-cyan-600 text-white ${assessmentRemainingWeight === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
               {isSavingAssessment ? 'Saving...' : 'Add Assessment'}
             </Button>
           </div>
