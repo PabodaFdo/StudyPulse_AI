@@ -17,6 +17,12 @@ import { assessmentService } from '../services/assessment.service';
 import { getStudyMaterials } from '../services/studyMaterial.service';
 import api from '../services/api';
 
+const cleanOptionText = (option = '') => {
+  return String(option)
+    .replace(/^\s*[A-Da-d][\).\:\-]\s*/i, '')
+    .trim();
+};
+
 const getCorrectAnswerLabel = (question) => {
   const labels = ["A", "B", "C", "D"];
   
@@ -27,7 +33,7 @@ const getCorrectAnswerLabel = (question) => {
   }
 
   const index = question.options?.findIndex(
-    option => option.toLowerCase().trim() === question.correct_answer.toLowerCase().trim()
+    option => cleanOptionText(option).toLowerCase().trim() === cleanOptionText(question.correct_answer).toLowerCase().trim()
   );
 
   return index >= 0 ? labels[index] : question.correct_answer;
@@ -475,7 +481,7 @@ const QuizGenerator = () => {
           wrongAnswers.push({
             question: q.question,
             selectedAnswer: selectedAnswers[idx],
-            correctAnswer: q.correct_answer || getCorrectAnswerLabel(q),
+            correctAnswer: cleanOptionText(q.correct_answer || getCorrectAnswerLabel(q)),
             explanation: q.explanation || ""
           });
         }
@@ -1297,7 +1303,7 @@ const QuestionCard = ({ question, index, selectedAnswer, isChecked, isCorrect, o
                 className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 cursor-pointer disabled:cursor-default flex items-start ${borderClass}`}
               >
                 <span className={labelClass}>{label}.</span>
-                <span className={textClass}>{opt}</span>
+                <span className={textClass}>{cleanOptionText(opt)}</span>
               </button>
             );
           })}
@@ -1317,7 +1323,7 @@ const QuestionCard = ({ question, index, selectedAnswer, isChecked, isCorrect, o
               </span>
               {!isCorrect && (
                 <p className="text-sm font-semibold text-slate-800 dark:text-white">
-                  Correct answer is {correctLabel}. {question.options[labels.indexOf(correctLabel)] || question.correct_answer}
+                  Correct answer is {correctLabel}. {cleanOptionText(question.options[labels.indexOf(correctLabel)] || question.correct_answer)}
                 </p>
               )}
             </div>
