@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
-import { Radar as RadarIcon, AlertTriangle, CheckCircle, Activity, Trash2 } from 'lucide-react';
+import { Radar as RadarIcon, AlertTriangle, CheckCircle, Activity, Trash2, RefreshCw } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ChartCard from '../components/ChartCard';
 import { weakTopicService } from '../services/weakTopic.service';
 import { subjectService } from '../services/subject.service';
 import { noteService } from '../services/note.service';
+import { quizAttemptService } from '../services/quizAttempt.service';
 
 const defaultFormData = {
   topicName: '',
@@ -31,6 +32,8 @@ const WeakTopicRadar = () => {
   const [selectedNoteId, setSelectedNoteId] = useState('');
   
   const [autoFillMessage, setAutoFillMessage] = useState('');
+  const [quizStatsDetails, setQuizStatsDetails] = useState(null);
+  const [fetchingStats, setFetchingStats] = useState(false);
 
   // Dynamic radar topics
   const [radarTopics, setRadarTopics] = useState([]);
@@ -64,6 +67,88 @@ const WeakTopicRadar = () => {
     setSelectedNoteId('');
     setFormData({ ...formData, topicName: '' });
     setAutoFillMessage('');
+    setQuizStatsDetails(null);
+  };
+
+  const fetchAndFillQuizStats = async (noteId, selectedNote) => {
+    if (!noteId || !selectedNote) return;
+    setFetchingStats(true);
+    try {
+      const response = await quizAttemptService.getTopicQuizAttemptStats(noteId);
+      const stats = response.data;
+      
+      const hasAttempts = stats.attemptCount > 0;
+      
+      const quizScore = hasAttempts 
+        ? (stats.latestScore > 0 ? stats.latestScore : stats.averageScore) 
+        : 0;
+        
+      const wrongAnswers = stats.wrongAnswersCount || 0;
+      const attemptCount = stats.attemptCount || 0;
+      
+      let daysSinceStudy = 0;
+      if (stats.lastAttemptDate) {
+        daysSinceStudy = Math.max(0, Math.floor((Date.now() - new Date(stats.lastAttemptDate).getTime()) / (1000 * 60 * 60 * 24)));
+      } else {
+        const noteDate = selectedNote.updatedAt || selectedNote.createdAt;
+        daysSinceStudy = noteDate
+          ? Math.max(0, Math.floor((Date.now() - new Date(noteDate).getTime()) / (1000 * 60 * 60 * 24)))
+          : 0;
+      }
+      
+      let confidenceLevel = 3;
+      if (hasAttempts) {
+        if (stats.averageScore >= 80) confidenceLevel = 5;
+        else if (stats.averageScore >= 65) confidenceLevel = 4;
+        else if (stats.averageScore >= 50) confidenceLevel = 3;
+        else if (stats.averageScore > 0) confidenceLevel = 2;
+      } else {
+        confidenceLevel = selectedNote.revised ? 4 : 3;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        topicName: selectedNote.title || '',
+        quizScore: quizScore,
+        wrongAnswers: wrongAnswers,
+        attemptCount: attemptCount,
+        timeSpentMinutes: prev.timeSpentMinutes || 0,
+        daysSinceLastStudy: daysSinceStudy,
+        confidenceLevel: confidenceLevel,
+        topicDifficulty: prev.topicDifficulty || 3
+      }));
+
+      if (hasAttempts) {
+        setAutoFillMessage('Weak topic data filled from saved quiz attempts.');
+        setQuizStatsDetails(stats);
+      } else {
+        setAutoFillMessage('No saved quiz attempts found for this topic yet. You can enter values manually or save a quiz result first.');
+        setQuizStatsDetails(null);
+      }
+    } catch (err) {
+      console.error('Failed to fetch quiz stats:', err);
+      // Fallback
+      const noteDate = selectedNote.updatedAt || selectedNote.createdAt;
+      const daysSinceStudy = noteDate
+        ? Math.max(0, Math.floor((Date.now() - new Date(noteDate).getTime()) / (1000 * 60 * 60 * 24)))
+        : 0;
+      
+      setFormData(prev => ({
+        ...prev,
+        topicName: selectedNote.title || '',
+        quizScore: 0,
+        wrongAnswers: 0,
+        attemptCount: 0,
+        timeSpentMinutes: prev.timeSpentMinutes || 0,
+        daysSinceLastStudy: daysSinceStudy,
+        confidenceLevel: selectedNote.revised ? 4 : 3,
+        topicDifficulty: prev.topicDifficulty || 3
+      }));
+      setAutoFillMessage('Topic data filled from selected Smart Note. (Failed to fetch quiz data)');
+      setQuizStatsDetails(null);
+    } finally {
+      setFetchingStats(false);
+    }
   };
 
   const handleNoteChange = (e) => {
@@ -74,29 +159,20 @@ const WeakTopicRadar = () => {
       const selectedNote = filteredNotes.find(
         (note) => String(note.id) === String(noteId)
       );
-
-      const noteDate = selectedNote.updatedAt || selectedNote.createdAt;
-      const daysSinceStudy = noteDate
-        ? Math.max(0, Math.floor((Date.now() - new Date(noteDate).getTime()) / (1000 * 60 * 60 * 24)))
-        : 0;
-
-      const confidence = selectedNote.revised ? 4 : 3;
-
-      setFormData({
-        ...formData,
-        topicName: selectedNote?.title || '',
-        quizScore: 0,
-        wrongAnswers: 0,
-        attemptCount: 1,
-        timeSpentMinutes: 0,
-        daysSinceLastStudy: daysSinceStudy,
-        confidenceLevel: confidence,
-        topicDifficulty: 3
-      });
-      setAutoFillMessage('Topic data filled from selected Smart Note.');
+      fetchAndFillQuizStats(noteId, selectedNote);
     } else {
       setFormData({ ...formData, topicName: '' });
       setAutoFillMessage('');
+      setQuizStatsDetails(null);
+    }
+  };
+
+  const handleRefreshStats = () => {
+    if (selectedNoteId) {
+      const selectedNote = filteredNotes.find(
+        (note) => String(note.id) === String(selectedNoteId)
+      );
+      fetchAndFillQuizStats(selectedNoteId, selectedNote);
     }
   };
 
@@ -112,6 +188,7 @@ const WeakTopicRadar = () => {
     setSelectedSubjectId('');
     setSelectedNoteId('');
     setAutoFillMessage('');
+    setQuizStatsDetails(null);
     setResult(null);
     setError(null);
     setLoading(false);
@@ -127,6 +204,36 @@ const WeakTopicRadar = () => {
       setError('Please select a topic.');
       return;
     }
+    
+    if (Number(formData.quizScore) < 0 || Number(formData.quizScore) > 100) {
+      setError('Quiz score must be between 0 and 100.');
+      return;
+    }
+    if (Number(formData.wrongAnswers) < 0) {
+      setError('Wrong answers must be 0 or greater.');
+      return;
+    }
+    if (Number(formData.attemptCount) < 0) {
+      setError('Attempt count must be 0 or greater.');
+      return;
+    }
+    if (Number(formData.timeSpentMinutes) < 0) {
+      setError('Time spent must be 0 or greater.');
+      return;
+    }
+    if (Number(formData.daysSinceLastStudy) < 0) {
+      setError('Days since study must be 0 or greater.');
+      return;
+    }
+    if (Number(formData.confidenceLevel) < 1 || Number(formData.confidenceLevel) > 5) {
+      setError('Confidence level must be between 1 and 5.');
+      return;
+    }
+    if (Number(formData.topicDifficulty) < 1 || Number(formData.topicDifficulty) > 5) {
+      setError('Difficulty must be between 1 and 5.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
@@ -329,13 +436,26 @@ const WeakTopicRadar = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1">Select Topic from Smart Notes</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200">Select Topic from Smart Notes</label>
+              {selectedNoteId && (
+                <button
+                  type="button"
+                  onClick={handleRefreshStats}
+                  disabled={fetchingStats}
+                  className="text-xs flex items-center gap-1 text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 font-medium transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3 h-3 ${fetchingStats ? 'animate-spin' : ''}`} />
+                  Refresh Data
+                </button>
+              )}
+            </div>
             {filteredNotes.length > 0 ? (
               <>
                 <select
                   value={selectedNoteId}
                   onChange={handleNoteChange}
-                  disabled={!selectedSubjectId}
+                  disabled={!selectedSubjectId || fetchingStats}
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 text-slate-900 dark:text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Select a saved note --</option>
@@ -344,7 +464,7 @@ const WeakTopicRadar = () => {
                   ))}
                 </select>
                 {autoFillMessage && (
-                  <p className="mt-2 text-xs text-cyan-400 font-medium">
+                  <p className={`mt-2 text-xs font-medium ${quizStatsDetails ? 'text-emerald-500 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'}`}>
                     {autoFillMessage}
                   </p>
                 )}
@@ -358,6 +478,21 @@ const WeakTopicRadar = () => {
             )}
           </div>
         </div>
+
+        {quizStatsDetails && (
+          <div className="mb-6 p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300">
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="w-4 h-4" />
+              <span className="text-sm font-bold">Using saved quiz attempt data</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-medium">
+              <div>Attempts: {quizStatsDetails.attemptCount}</div>
+              <div>Latest Score: {quizStatsDetails.latestScore}%</div>
+              <div>Average Score: {quizStatsDetails.averageScore}%</div>
+              <div>Wrong Answers: {quizStatsDetails.wrongAnswersCount}</div>
+            </div>
+          </div>
+        )}
 
         <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-4 pt-4 border-t border-slate-700">Topic Assessment</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
