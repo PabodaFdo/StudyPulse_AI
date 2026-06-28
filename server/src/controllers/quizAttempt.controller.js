@@ -127,6 +127,7 @@ const getTopicQuizAttemptStats = asyncHandler(async (req, res) => {
   const attemptCount = attempts.length;
   let averageScore = 0;
   let latestScore = attemptCount > 0 ? attempts[0].percentage : 0;
+  let bestScore = attemptCount > 0 ? Math.max(...attempts.map(a => a.percentage)) : 0;
   let wrongAnswersCount = 0;
   let lastAttemptDate = attemptCount > 0 ? attempts[0].createdAt : null;
 
@@ -148,6 +149,7 @@ const getTopicQuizAttemptStats = asyncHandler(async (req, res) => {
       attemptCount,
       averageScore: Number(averageScore.toFixed(2)),
       latestScore: Number(latestScore.toFixed(2)),
+      bestScore: Number(bestScore.toFixed(2)),
       wrongAnswersCount,
       lastAttemptDate
     }
