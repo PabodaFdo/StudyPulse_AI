@@ -173,8 +173,9 @@ const SubjectHealth = () => {
     if (source === 'quiz_attempts') return <p className="text-[10px] text-cyan-600 dark:text-cyan-400 mt-1">✓ From saved quiz attempts</p>;
     if (source === 'smart_notes') return <p className="text-[10px] text-purple-600 dark:text-purple-400 mt-1">✓ From Smart Notes</p>;
     if (source === 'focus_sessions') return <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1">✓ From Focus Timer</p>;
+    if (source === 'study_engagement') return <p className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-1">✓ Calculated from your activity in StudyPulse AI</p>;
     if (source === 'manual_required' || source === 'none' || !source) {
-      if (sourceKey === 'attendanceSource') return <p className="text-[10px] text-slate-500 mt-1">Enter manually</p>;
+      if (sourceKey === 'attendanceSource') return <p className="text-[10px] text-slate-500 mt-1">Calculated from quiz attempts, focus sessions, smart notes, assessments, and recent study activity.</p>;
       if (sourceKey === 'avgMarkSource' || sourceKey === 'assignmentSource' || sourceKey === 'examMarkSource') {
         if (quizInfo.avgMarkSource === 'assessments') {
           return <p className="text-[10px] text-blue-600 dark:text-blue-400 mt-1">✓ From Assessment Tracker</p>;
@@ -291,10 +292,32 @@ const SubjectHealth = () => {
             </div>
           )}
 
+          {showQuizInfo && quizInfo?.studyEngagementScore !== undefined && (
+            <div className="mb-4 p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-indigo-900 dark:text-indigo-200">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-bold">Study Engagement Breakdown</h4>
+                <span className="text-xs font-bold px-2 py-1 bg-indigo-100 dark:bg-indigo-900 rounded-full">
+                  Level: {quizInfo.studyEngagementLevel}
+                </span>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between"><span className="opacity-80">Quiz Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.quizActivity} / 25</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Focus Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.focusActivity} / 25</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Notes Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.notesActivity} / 20</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Assessment Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.assessmentActivity} / 15</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Recent Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.recentActivity} / 15</strong></div>
+              </div>
+              <div className="mt-3 pt-2 border-t border-indigo-200 dark:border-indigo-800 flex justify-between font-bold">
+                <span>Total Score:</span>
+                <span>{quizInfo.studyEngagementScore} / 100</span>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Attendance (%)</label>
+                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Study Engagement (%)</label>
                 <input 
                   type="number" 
                   name="attendancePercentage" 
