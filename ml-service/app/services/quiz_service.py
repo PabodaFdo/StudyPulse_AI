@@ -100,6 +100,18 @@ Text:
     result_data = extract_json(response.choices[0].message.content)
     questions = result_data.get("questions", [])
     
+    # Clean generated options to remove duplicate labels like A), A., Option A:
+    for q in questions:
+        if q.get("type") == "mcq" and "options" in q and isinstance(q["options"], list):
+            cleaned_options = []
+            for opt in q["options"]:
+                clean_opt = re.sub(r'^\s*(?:Option\s+)?(?:[A-Da-d][\.\:\-\)]|\([A-Da-d]\))\s*', '', str(opt), flags=re.IGNORECASE).strip()
+                cleaned_options.append(clean_opt)
+            q["options"] = cleaned_options
+            
+            if "correct_answer" in q:
+                q["correct_answer"] = re.sub(r'^\s*(?:Option\s+)?(?:[A-Da-d][\.\:\-\)]|\([A-Da-d]\))\s*', '', str(q["correct_answer"]), flags=re.IGNORECASE).strip()
+    
     return {
         "success": True,
         "source": "groq",

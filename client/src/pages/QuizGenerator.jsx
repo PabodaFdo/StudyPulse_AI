@@ -19,7 +19,7 @@ import api from '../services/api';
 
 const cleanOptionText = (option = '') => {
   return String(option)
-    .replace(/^\s*[A-Da-d][\).\:\-]\s*/i, '')
+    .replace(/^(?:\s*(?:Option\s+)?(?:[A-Ea-e][\.\:\-\)]|\([A-Ea-e]\))\s*)+/i, '')
     .trim();
 };
 

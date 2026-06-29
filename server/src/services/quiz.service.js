@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { formatQuizResponse } = require('../utils/quizUtils');
 
 const generateQuiz = async (text, questionCount = 5, difficulty = 'medium') => {
   try {
@@ -8,7 +9,7 @@ const generateQuiz = async (text, questionCount = 5, difficulty = 'medium') => {
       question_count: questionCount,
       difficulty
     });
-    return response.data;
+    return formatQuizResponse(response.data);
   } catch (error) {
     if (error.response) {
       throw new Error(`ML Service Error: ${error.response.data.detail || error.message}`);
