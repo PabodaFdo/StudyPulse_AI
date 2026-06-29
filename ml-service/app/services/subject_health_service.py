@@ -4,13 +4,13 @@ def calculate_subject_health(data):
     Score range: 0 - 100
     """
 
-    mark_component = data.averageMark * 0.30
-    quiz_component = data.quizAverage * 0.20
-    attendance_component = data.attendancePercentage * 0.20
+    mark_component = data.averageMark * 0.35
+    quiz_component = data.quizAverage * 0.25
+    attendance_component = data.attendancePercentage * 0.25
 
-    study_hours_component = min(data.studyHoursThisWeek / 8, 1) * 10
-    focus_component = min(data.focusSessionsCompleted / 5, 1) * 10
-    notes_component = min(data.notesCount / 5, 1) * 10
+    study_hours_component = min(data.studyHoursThisWeek / 5, 1) * 5
+    focus_component = min(data.focusSessionsCompleted / 3, 1) * 5
+    notes_component = min(data.notesCount / 3, 1) * 5
 
     deadline_penalty = min(data.missedDeadlines * 8, 20)
 
@@ -26,12 +26,12 @@ def calculate_subject_health(data):
 
     health_score = max(0, min(100, round(raw_score)))
 
-    if health_score >= 75:
+    if health_score >= 80:
         status = "Healthy"
-    elif health_score >= 50:
-        status = "Needs Attention"
+    elif health_score >= 65:
+        status = "Good"
     else:
-        status = "Critical"
+        status = "Needs Attention"
 
     strengths = []
     concerns = []
@@ -59,13 +59,13 @@ def calculate_subject_health(data):
         strengths.append("Study time is consistent")
     else:
         concerns.append("Study hours are low for this subject")
-        recommendations.append("Schedule at least 5 focused study hours this week")
+        recommendations.append("Schedule more focused study hours this week")
 
     if data.focusSessionsCompleted >= 3:
         strengths.append("Focus sessions are being completed")
     else:
         concerns.append("Focus session count is low")
-        recommendations.append("Complete at least 3 focus sessions for this subject")
+        recommendations.append("Complete more focus sessions for this subject")
 
     if data.notesCount >= 3:
         strengths.append("Study notes are available")

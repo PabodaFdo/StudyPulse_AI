@@ -10,8 +10,7 @@ const defaultFormData = {
   averageMark: "",
   studyHoursThisWeek: "",
   focusSessionsCompleted: "",
-  notesCount: "",
-  missedDeadlines: ""
+  notesCount: ""
 };
 
 const SubjectHealth = () => {
@@ -69,8 +68,7 @@ const SubjectHealth = () => {
           averageMark: calculatedAvgMark,
           studyHoursThisWeek: analytics.studyHours !== null ? analytics.studyHours : (analytics.studyHoursPerWeek !== null ? analytics.studyHoursPerWeek : formData.studyHoursThisWeek),
           focusSessionsCompleted: analytics.focusSessions !== null ? analytics.focusSessions : (analytics.focusSessionsCompleted !== null ? analytics.focusSessionsCompleted : formData.focusSessionsCompleted),
-          notesCount: analytics.notesCount !== null ? analytics.notesCount : formData.notesCount,
-          missedDeadlines: analytics.missedDeadlines !== null ? analytics.missedDeadlines : formData.missedDeadlines,
+          notesCount: analytics.notesCount !== null ? analytics.notesCount : formData.notesCount
         });
         setQuizInfo(analytics);
         setShowQuizInfo(true);
@@ -107,14 +105,12 @@ const SubjectHealth = () => {
     if (formData.studyHoursThisWeek === "") return toast.error('Please enter Study Hours before calculating subject health.');
     if (formData.focusSessionsCompleted === "") return toast.error('Please enter Focus Sessions before calculating subject health.');
     if (formData.notesCount === "") return toast.error('Please enter Notes Count before calculating subject health.');
-    if (formData.missedDeadlines === "") return toast.error('Please enter Missed Deadlines before calculating subject health.');
 
     if (formData.attendancePercentage < 0 || formData.attendancePercentage > 100) return toast.error('Attendance must be between 0 and 100.');
     if (formData.averageMark < 0 || formData.averageMark > 100) return toast.error('Average mark must be between 0 and 100.');
     if (formData.studyHoursThisWeek < 0) return toast.error('Study hours must be 0 or greater.');
     if (formData.focusSessionsCompleted < 0) return toast.error('Focus sessions must be 0 or greater.');
     if (formData.notesCount < 0) return toast.error('Notes count must be 0 or greater.');
-    if (formData.missedDeadlines < 0) return toast.error('Missed deadlines must be 0 or greater.');
 
     setLoading(true);
     setError(null);
@@ -132,7 +128,7 @@ const SubjectHealth = () => {
         studyHoursThisWeek: Number(formData.studyHoursThisWeek),
         focusSessionsCompleted: Number(formData.focusSessionsCompleted),
         notesCount: Number(formData.notesCount),
-        missedDeadlines: Number(formData.missedDeadlines),
+        missedDeadlines: 0,
       };
 
       const data = await subjectHealthService.calculateSubjectHealth(payload);
@@ -148,6 +144,8 @@ const SubjectHealth = () => {
     switch (status) {
       case 'Healthy':
         return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+      case 'Good':
+        return 'text-cyan-500 bg-cyan-500/10 border-cyan-500/20';
       case 'Needs Attention':
         return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
       case 'Critical':
@@ -160,6 +158,7 @@ const SubjectHealth = () => {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Healthy': return <CheckCircle className="w-5 h-5 text-emerald-500" />;
+      case 'Good': return <CheckCircle className="w-5 h-5 text-cyan-500" />;
       case 'Needs Attention': return <AlertTriangle className="w-5 h-5 text-amber-500" />;
       case 'Critical': return <XCircle className="w-5 h-5 text-red-500" />;
       default: return <Activity className="w-5 h-5" />;
@@ -283,12 +282,11 @@ const SubjectHealth = () => {
               b: quizInfo.avgMarkSource,
               d: quizInfo.studyHoursSource,
               e: quizInfo.focusSessionsSource,
-              f: quizInfo.notesCountSource,
-              g: quizInfo.missedDeadlinesSource
+              f: quizInfo.notesCountSource
             }).some(val => val === 'none' || val === 'manual_required')
           ) && (
             <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-              <p className="text-sm font-medium flex items-center gap-1.5">Some fields are not tracked automatically yet. Please enter them manually before calculating subject health.</p>
+              <p className="text-sm font-medium flex items-center gap-1.5">Subject Health is calculated using your real study activity, assessments, quizzes, focus sessions, and notes.</p>
             </div>
           )}
 
@@ -380,19 +378,6 @@ const SubjectHealth = () => {
                   className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
                 />
                 {getSourceLabel('notesCountSource')}
-              </div>
-              <div>
-                <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Missed Deadlines</label>
-                <input 
-                  type="number" 
-                  name="missedDeadlines" 
-                  value={formData.missedDeadlines} 
-                  onChange={handleChange} 
-                  step="1"
-                  min="0"
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400"
-                />
-                {getSourceLabel('missedDeadlinesSource')}
               </div>
             </div>
 
