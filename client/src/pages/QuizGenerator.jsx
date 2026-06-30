@@ -82,6 +82,8 @@ const QuizGenerator = () => {
   const [currentQuizSourceTitle, setCurrentQuizSourceTitle] = useState('');
   const [currentQuizNoteId, setCurrentQuizNoteId] = useState(null);
   
+  const [autoSaveError, setAutoSaveError] = useState(false);
+  
   const [isAssessmentModalOpen, setIsAssessmentModalOpen] = useState(false);
   const [isAssessmentAdded, setIsAssessmentAdded] = useState(false);
   const [isSavingAssessment, setIsSavingAssessment] = useState(false);
@@ -224,6 +226,7 @@ const QuizGenerator = () => {
 
       setIsAttemptSaved(false);
       setIsAssessmentAdded(false);
+      setAutoSaveError(false);
     }
   };
 
@@ -235,6 +238,7 @@ const QuizGenerator = () => {
     setIsAttemptSaved(false);
     setIsAssessmentAdded(false);
     setIsAssessmentModalOpen(false);
+    setAutoSaveError(false);
   };
 
   const handleSourceChange = (newSource) => {
@@ -341,6 +345,7 @@ const QuizGenerator = () => {
       localStorage.setItem("studypulse_quiz_source_updated_at", newIdentity);
       setIsAttemptSaved(false);
       setIsAssessmentAdded(false);
+      setAutoSaveError(false);
 
       toast.success('Quiz generated successfully!');
     } catch (error) {
@@ -361,6 +366,7 @@ const QuizGenerator = () => {
     localStorage.removeItem('studypulse_quiz_source_updated_at');
     setIsAttemptSaved(false);
     setIsAssessmentAdded(false);
+    setAutoSaveError(false);
   };
 
   const handleOpenSaveModal = () => {
@@ -409,6 +415,7 @@ const QuizGenerator = () => {
     localStorage.setItem('studypulse_quiz_checked_questions', JSON.stringify({}));
     setIsAttemptSaved(false);
     setIsAssessmentAdded(false);
+    setAutoSaveError(false);
   };
 
   const handleSelectAnswer = (idx, ans) => {
@@ -435,8 +442,8 @@ const QuizGenerator = () => {
   const totalChecked = Object.keys(checkedQuestions).length;
   const isAllChecked = quizResult && totalChecked === quizResult.questions.length;
 
-  const handleSaveQuizResult = async () => {
-    if (!isAllChecked) return;
+  const handleSaveQuizResult = async (isAutoSave = false) => {
+    if (!isAllChecked || isSavingAttempt || isAttemptSaved) return;
     
     try {
       setIsSavingAttempt(true);
@@ -500,18 +507,34 @@ const QuizGenerator = () => {
       };
 
       await quizAttemptService.saveQuizAttempt(payload);
-      toast.success('Quiz result saved successfully.');
+      if (isAutoSave === true) {
+        toast.success('Quiz result saved automatically.');
+      } else {
+        toast.success('Quiz result saved successfully.');
+      }
       setIsAttemptSaved(true);
+      setAutoSaveError(false);
       setCurrentQuizSubjectId(subjectId);
       setCurrentQuizSourceTitle(sourceTitle);
       setCurrentQuizNoteId(finalNoteId ? String(finalNoteId) : null);
     } catch (error) {
       console.error(error);
-      toast.error('Failed to save quiz result.');
+      if (isAutoSave === true) {
+        setAutoSaveError(true);
+        toast.error('Result could not be saved. Please try again.');
+      } else {
+        toast.error('Failed to save quiz result.');
+      }
     } finally {
       setIsSavingAttempt(false);
     }
   };
+
+  useEffect(() => {
+    if (isAllChecked && !isAttemptSaved && !isSavingAttempt && !autoSaveError) {
+      handleSaveQuizResult(true);
+    }
+  }, [isAllChecked, isAttemptSaved, isSavingAttempt, autoSaveError]);
 
   const handleOpenAssessmentModal = async () => {
     if (!currentQuizSubjectId) return;
@@ -964,14 +987,21 @@ Updated on: ${new Date().toLocaleDateString()}`;
                 >
                   <Save className="h-3 w-3 mr-1" /> Save Quiz to Library
                 </Button>
-                <Button 
-                  onClick={handleSaveQuizResult} 
-                  disabled={!isAllChecked || isAttemptSaved || isSavingAttempt} 
-                  className={`h-7 text-xs px-3 font-bold ${isAttemptSaved ? 'bg-slate-200 text-slate-500 cursor-not-allowed dark:bg-slate-700 dark:text-slate-300' : 'bg-cyan-500 hover:bg-cyan-600 text-white'}`}
-                >
-                  <Trophy className="h-3 w-3 mr-1" /> 
-                  {isAttemptSaved ? 'Quiz Result Saved' : isSavingAttempt ? 'Saving...' : 'Save Quiz Result'}
-                </Button>
+                {!isAttemptSaved && !autoSaveError && isAllChecked && isSavingAttempt && (
+                  <Button disabled className="h-7 text-xs px-3 font-bold bg-cyan-500 text-white opacity-50">
+                    <Trophy className="h-3 w-3 mr-1" /> Saving Result...
+                  </Button>
+                )}
+                
+                {autoSaveError && (
+                  <Button 
+                    onClick={() => handleSaveQuizResult(false)} 
+                    disabled={isSavingAttempt} 
+                    className="h-7 text-xs px-3 font-bold bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    <Trophy className="h-3 w-3 mr-1" /> Save Result Again
+                  </Button>
+                )}
                 {quizMode === 'assessment' && (
                   <Button
                     onClick={handleAutoAssessmentMark}
