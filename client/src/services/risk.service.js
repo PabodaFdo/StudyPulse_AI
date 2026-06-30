@@ -20,9 +20,15 @@ const getLatestRiskPrediction = async (subjectId) => {
   return response.data;
 };
 
+const getRiskSummary = async () => {
+  const response = await api.get('/risk/history/summary');
+  return response.data;
+};
+
 export const riskService = {
   predictRisk,
   saveRiskHistory,
   getRiskHistory,
   getLatestRiskPrediction,
+  getRiskSummary,
 };
