@@ -5,7 +5,7 @@ import {
   Timer, BookOpen, Clock, Flame, LayoutDashboard,
   AlertTriangle, Play, Flower2, RefreshCw, PlusCircle,
   FileText, HelpCircle, Layers, File,
-  BarChart3, Trophy, Target, TrendingUp, Brain
+  BarChart3, Trophy, Target, TrendingUp, Brain, ShieldAlert
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
@@ -16,6 +16,7 @@ import AnimatedCharacter from '../components/AnimatedCharacter';
 import dashboardService from '../services/dashboard.service';
 import questService from '../services/quest.service';
 import { getQuizAttemptStats } from '../services/quizAttempt.service';
+import { riskService } from '../services/risk.service';
 
 // Skeleton Component
 const DashboardSkeleton = () => (
@@ -40,6 +41,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [summary, setSummary] = useState(null);
   const [charts, setCharts] = useState(null);
+  const [riskSummary, setRiskSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,15 +64,17 @@ const Dashboard = () => {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const [summaryData, chartsData, questsData, quizStatsRes] = await Promise.all([
+      const [summaryData, chartsData, questsData, quizStatsRes, riskSummaryData] = await Promise.all([
         dashboardService.getSummary(),
         dashboardService.getCharts(),
         questService.getQuests(),
-        getQuizAttemptStats().catch(() => ({ data: null }))
+        getQuizAttemptStats().catch(() => ({ data: null })),
+        riskService.getRiskSummary().catch(() => null)
       ]);
       setSummary(summaryData);
       setCharts(chartsData);
       setQuests(questsData);
+      setRiskSummary(riskSummaryData);
       
       if (quizStatsRes && (quizStatsRes.data || quizStatsRes.success)) {
         const stats = quizStatsRes.data || quizStatsRes;
@@ -763,6 +767,64 @@ const Dashboard = () => {
               )}
             </div>
           </ChartCard>
+
+          {/* Academic Risk Summary */}
+          <div className="liquid-card p-5">
+            <div className="liquid-card-content space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
+                  <ShieldAlert className="h-4.5 w-4.5 text-red-500" /> Risk Summary
+                </h3>
+                {riskSummary?.hasData && (
+                  <span className={`status-badge ${riskSummary.highRiskCount > 0 ? 'bg-red-500/10 text-red-600 border border-red-500/20 dark:bg-red-500/20 dark:text-red-400' : 'status-success'}`}>
+                    {riskSummary.highRiskCount > 0 ? `${riskSummary.highRiskCount} High Risk` : 'Looking Good'}
+                  </span>
+                )}
+              </div>
+
+              {!riskSummary?.hasData ? (
+                <div className="p-4 text-center rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                  <p className="text-xs font-bold text-text-muted mb-3">No risk predictions yet. Run your first risk prediction to see insights here.</p>
+                  <Button onClick={() => navigate('/risk-prediction')} size="sm" className="w-full text-xs">
+                    Go to Risk Prediction
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10 text-center flex flex-col items-center justify-center">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 mb-1">Latest Risk</span>
+                      <span className={`text-sm font-extrabold ${riskSummary.latestItem?.riskLevel === 'High Risk' ? 'text-red-500' : riskSummary.latestItem?.riskLevel === 'Medium Risk' ? 'text-amber-500' : 'text-emerald-500'}`}>
+                        {riskSummary.latestItem?.riskLevel}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10 text-center flex flex-col items-center justify-center">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 mb-1">Risk Probability</span>
+                      <span className="text-sm font-extrabold text-cyan-500">{Math.round(riskSummary.latestItem?.riskScore || 0)}%</span>
+                    </div>
+                  </div>
+
+                  {riskSummary.needsAttention && riskSummary.needsAttention.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Subjects Needing Attention</p>
+                      <div className="space-y-1.5">
+                        {riskSummary.needsAttention.map((item) => (
+                          <div key={item.id} className="flex justify-between items-center text-xs p-2 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
+                            <span className="font-bold text-slate-700 dark:text-slate-200 truncate pr-2 max-w-[120px]">{item.subject?.name || 'Subject'}</span>
+                            <span className="font-bold text-red-500">{item.riskLevel} ({Math.round(item.riskScore)}%)</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <button onClick={() => navigate('/risk-timeline')} className="w-full text-xs font-bold text-purple hover:underline text-right block pt-2">
+                    View Risk Timeline →
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
