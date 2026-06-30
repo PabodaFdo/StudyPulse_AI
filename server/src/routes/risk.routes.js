@@ -1,10 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { predictRisk } = require('../controllers/risk.controller');
+const { 
+  predictRisk, 
+  saveRiskHistory, 
+  getRiskHistory, 
+  getLatestRiskPrediction, 
+  deleteRiskHistory 
+} = require('../controllers/risk.controller');
 const { protect } = require('../middleware/auth.middleware');
 
 router.use(protect);
 
 router.post('/predict', predictRisk);
+router.post('/history', saveRiskHistory);
+router.get('/history/:subjectId', getRiskHistory);
+router.get('/history/:subjectId/latest', getLatestRiskPrediction);
+router.delete('/history/:id', deleteRiskHistory);
 
 module.exports = router;
