@@ -27,6 +27,7 @@ model User {
   studyMaterials      StudyMaterial[]
   quizAttempts        QuizAttempt[]
   assessments         Assessment[]
+  riskPredictionHistories RiskPredictionHistory[]
 }
 
 model Subject {
@@ -47,6 +48,7 @@ model Subject {
   academicRecords AcademicRecord[]
   quizAttempts    QuizAttempt[]
   assessments     Assessment[]
+  riskPredictionHistories RiskPredictionHistory[]
 }
 
 model Note {
@@ -215,4 +217,24 @@ model Assessment {
 
   user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject        Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model RiskPredictionHistory {
+  id                     Int      @id @default(autoincrement())
+  userId                 Int
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId              Int
+  subject                Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  riskScore              Float
+  riskLevel              String
+  trend                  String
+  trendMessage           String
+  studyEngagement        Float
+  assessmentAverage      Float
+  quizAverage            Float
+  studyHoursPerWeek      Float
+  focusSessionsCompleted Int
+  previousExamMark       Float
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
