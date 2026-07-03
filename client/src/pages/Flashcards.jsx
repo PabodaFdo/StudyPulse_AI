@@ -64,6 +64,10 @@ const Flashcards = () => {
         const isDeckSaved = localStorage.getItem('studypulse_flashcard_deck_saved');
         if (isDeckSaved === 'true') {
           setFlashcardsSaved(true);
+        } else if (parsed.id) {
+          setFlashcardsSaved(true);
+          setSavedFlashcardDeckId(parsed.id);
+          localStorage.setItem('studypulse_flashcard_deck_saved', 'true');
         } else if (parsed.flashcards && parsed.flashcards.length > 0) {
           const firstId = String(parsed.flashcards[0].id || '');
           if (firstId && !firstId.startsWith('gen-')) {
@@ -346,8 +350,11 @@ const Flashcards = () => {
     setFlipped(false);
     setShowCompletion(false);
     setHasSavedAttempt(false);
+    setFlashcardStatuses({});
+    
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
+    localStorage.removeItem('studypulse_flashcard_status');
   };
 
   const handleShuffle = () => {
@@ -468,10 +475,12 @@ const Flashcards = () => {
     setFlipped(false);
     setShowCompletion(false);
     setHasSavedAttempt(false);
+    setFlashcardStatuses({});
     
     localStorage.setItem('studypulse_generated_flashcards', JSON.stringify(newData));
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
+    localStorage.removeItem('studypulse_flashcard_status');
   };
 
   useEffect(() => {
