@@ -396,7 +396,7 @@ const Dashboard = () => {
 
           {/* My AI Library */}
           <div 
-            className="liquid-card p-5 cursor-pointer hover:shadow-md transition-all border border-lavender/30 dark:border-slate-700/50" 
+            className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white cursor-pointer hover:shadow-md transition-all" 
             onClick={() => navigate('/ai-library')}
           >
             <div className="flex justify-between items-center mb-4">
@@ -433,8 +433,8 @@ const Dashboard = () => {
           </div>
 
           {/* Quiz Performance Analytics */}
-          <div className="pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
-            <div className="liquid-card p-5">
+          <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
+            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
                   <Brain className="h-5 w-5 text-purple" /> Quiz Performance
@@ -484,7 +484,7 @@ const Dashboard = () => {
                       <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Recent Attempts</h4>
                       <div className="grid gap-2 sm:grid-cols-3">
                         {quizStats.recentAttempts.slice(0, 3).map((attempt, i) => (
-                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/50 border border-lavender/20 dark:border-white/5">
+                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                             <div className="min-w-0 flex-1 pr-2">
                               <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Quiz Attempt'}</p>
                               <p className="text-[9px] text-text-muted mt-0.5">
@@ -510,7 +510,7 @@ const Dashboard = () => {
             title="Focus Overview"
             subtitle="Minutes spent focusing in study intervals"
             headerAction={
-              <div className="flex bg-[#f8f3ff] dark:bg-slate-800 rounded-lg p-1">
+              <div className="flex bg-slate-50 dark:bg-slate-800/50 rounded-lg p-1 border border-slate-200 dark:border-slate-700/50">
                 <button 
                   className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${chartTab === 'week' ? 'bg-white dark:bg-slate-700 shadow-sm text-text-main dark:text-white' : 'text-text-muted hover:text-text-main'}`}
                   onClick={() => setChartTab('week')}
@@ -559,7 +559,7 @@ const Dashboard = () => {
           </ChartCard>
 
           {/* Recent Activity Timeline */}
-          <div className="liquid-card p-5">
+          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
             <h3 className="font-extrabold text-sm sm:text-base text-text-main mb-4 flex items-center gap-1.5">
               <Clock className="h-4.5 w-4.5 text-purple" /> Recent Activity
             </h3>
@@ -575,7 +575,7 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center p-6 bg-[#f8f3ff] dark:bg-slate-900/50 rounded-xl border border-lavender/20 dark:border-white/5">
+                <div className="text-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/50">
                   <p className="text-xs font-bold text-text-muted">No recent activity yet.</p>
                   <button onClick={() => navigate('/focus-timer')} className="text-purple hover:underline text-xs font-bold mt-2 inline-block">
                     Start a focus session
@@ -590,7 +590,7 @@ const Dashboard = () => {
         {/* Right column - sidebar cards */}
         <div className="space-y-6">
           {/* Study Garden progress with Plant Buddy */}
-          <div className="liquid-card p-5">
+          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
@@ -599,7 +599,7 @@ const Dashboard = () => {
                 <span className="status-badge status-success">Level {summary?.gardenLevel || 1}</span>
               </div>
               
-              <div className="p-3 bg-[#f8f3ff] dark:bg-slate-900/80 rounded-2xl border border-lavender/35 dark:border-white/10 flex items-center gap-3">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
                 <AnimatedCharacter
                   src={gardenStage.image}
                   variant="plant"
@@ -619,14 +619,14 @@ const Dashboard = () => {
               {summary?.gardenProgress === undefined && summary?.growthPoints !== undefined && summary?.nextLevelPoints !== undefined && (
                 <ProgressBar value={Math.round((summary.growthPoints / summary.nextLevelPoints) * 100)} color="green" label="Growth Progress" />
               )}
-              <button onClick={() => navigate('/study-garden')} className="w-full text-xs font-bold text-purple hover:underline text-right block">
+              <button onClick={() => navigate('/study-garden')} className="w-full mt-3 rounded-xl px-3 py-2 text-xs font-extrabold transition liquid-button">
                 Manage Garden →
               </button>
             </div>
           </div>
 
           {/* Today's Study Quests with Quest Mascot */}
-          <div className="liquid-card p-5 relative overflow-hidden">
+          <div className="liquid-card p-5 relative overflow-hidden bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
@@ -644,14 +644,14 @@ const Dashboard = () => {
               <div className="space-y-2 text-xs relative z-10">
                 {quests.map((q) => {
                   let btnText = "Active";
-                  let btnStyle = "bg-[#f8f3ff] dark:bg-slate-900/80 border-lavender/20 dark:border-white/10 cursor-pointer hover:bg-purple/5";
+                  let btnStyle = "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700";
                   let iconColor = "text-text-muted/40";
                   let icon = "○";
                   let isClaimable = false;
                   
                   if (q.completed) {
                     btnText = "Claimed";
-                    btnStyle = "bg-[#f8f3ff]/50 dark:bg-slate-900/40 border-lavender/10 cursor-default";
+                    btnStyle = "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700/50 cursor-default";
                     iconColor = "text-green-500";
                     icon = "●";
                   } else if (q.targetReached) {
@@ -708,9 +708,13 @@ const Dashboard = () => {
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${q.completed ? 'bg-green-500/10 text-green-500' : 'bg-purple/10 text-purple'}`}>
                         +{q.rewardPoints} pts
                       </span>
-                      <span className={`text-[9px] font-bold ${q.completed ? 'text-green-500' : (isClaimable ? 'text-purple dark:text-purple-400' : 'text-text-muted')}`}>
-                        {btnText}
-                      </span>
+                      {q.completed ? (
+                        <span className="text-[10px] font-bold px-2 py-1 rounded-md border bg-green-100 text-green-700 border-green-200 dark:bg-green-500/15 dark:text-green-300 dark:border-green-400/30">{btnText}</span>
+                      ) : isClaimable ? (
+                        <span className="text-[10px] font-bold px-2 py-1 rounded-md border shadow-sm bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-500/20 dark:text-purple-100 dark:border-purple-400/40">{btnText}</span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-1 rounded-md border bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-700/50 dark:text-slate-200 dark:border-slate-600/50">{btnText}</span>
+                      )}
                     </div>
                   </button>
                 )})}
@@ -719,7 +723,7 @@ const Dashboard = () => {
           </div>
 
           {/* Academic Records Summary */}
-          <div className="liquid-card p-5">
+          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
@@ -733,13 +737,13 @@ const Dashboard = () => {
               {academicSummary ? (
                 <div className="space-y-2">
                   {academicSummary.average !== null && (
-                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                       <span className="font-bold text-text-main dark:text-slate-200">Average Score</span>
                       <span className="font-bold text-purple dark:text-cyan-400">{academicSummary.average}%</span>
                     </div>
                   )}
                   {academicSummary.latest && (
-                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                       <span className="font-bold text-text-main dark:text-slate-200">Latest Record</span>
                       <span className="font-bold text-text-muted dark:text-slate-400 truncate max-w-[120px]" title={academicSummary.latest}>
                         {academicSummary.latest}
@@ -748,13 +752,13 @@ const Dashboard = () => {
                   )}
                 </div>
               ) : (
-                <div className="p-3 text-center rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
+                <div className="p-3 text-center rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
                   <p className="text-xs font-bold text-text-muted">No academic records yet. Add your first record to unlock insights.</p>
                 </div>
               )}
               
-              <button onClick={() => navigate('/academic-records')} className="w-full text-xs font-bold text-purple hover:underline text-right block">
-                View Details →
+              <button onClick={() => navigate('/academic-records')} className="w-full mt-3 rounded-xl px-3 py-2 text-xs font-extrabold transition liquid-button">
+                View Academic Records →
               </button>
             </div>
           </div>
