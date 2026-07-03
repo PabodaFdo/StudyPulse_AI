@@ -15,6 +15,7 @@ import Modal from '../components/Modal';
 import { generateFlashcards } from '../services/flashcard.service';
 import { saveFlashcards } from '../services/aiLibrary.service';
 import { getStudyMaterials } from '../services/studyMaterial.service';
+import { saveFlashcardReviewAttempt } from '../services/flashcardReview.service';
 import api from '../services/api';
 
 const Flashcards = () => {
@@ -42,6 +43,7 @@ const Flashcards = () => {
   const [flipped, setFlipped] = useState(false);
   const [flashcardStatuses, setFlashcardStatuses] = useState({});
   const [showCompletion, setShowCompletion] = useState(false);
+  const [hasSavedAttempt, setHasSavedAttempt] = useState(false);
 
   useEffect(() => {
     const text = localStorage.getItem('studypulse_extracted_text');
@@ -155,24 +157,57 @@ const Flashcards = () => {
 
   const stats = useMemo(() => {
     let known = 0;
-    let learning = 0;
-    let important = 0;
+    let needReview = 0;
     
     if (flashcardsData && flashcardsData.flashcards) {
       flashcardsData.flashcards.forEach((c, i) => {
         const id = c.id || i;
         const s = flashcardStatuses[id];
         if (s === 'known') known++;
-        else if (s === 'learning') learning++;
-        else if (s === 'important') important++;
+        else if (s === 'learning' || s === 'need_review') needReview++;
       });
     }
     
     const total = flashcardsData?.flashcards?.length || 0;
-    const remaining = total - (known + learning + important);
+    const reviewed = known + needReview;
+    const remaining = total - reviewed;
+    const accuracy = total > 0 ? (known / total) * 100 : 0;
     
-    return { known, learning, important, remaining, total };
+    return { known, needReview, remaining, total, reviewed, accuracy };
   }, [flashcardsData, flashcardStatuses]);
+
+  useEffect(() => {
+    const saveAttempt = async () => {
+      if (showCompletion && flashcardsData && !hasSavedAttempt) {
+        setHasSavedAttempt(true);
+        try {
+          let sourceTitle = 'Extracted Text';
+          if (source === 'note') {
+            const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
+            if (note) sourceTitle = note.title;
+          } else if (selectedMaterialId) {
+            const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+            if (mat) sourceTitle = mat.title;
+          }
+
+          await saveFlashcardReviewAttempt({
+            subjectId: null,
+            flashcardDeckId: flashcardsData.id || null,
+            sourceTitle,
+            totalCards: stats.total,
+            reviewedCards: stats.reviewed,
+            knownCards: stats.known,
+            needReviewCards: stats.needReview,
+            accuracy: stats.accuracy
+          });
+          toast.success('Review attempt saved successfully.');
+        } catch (error) {
+          console.error('Failed to save review attempt:', error);
+        }
+      }
+    };
+    saveAttempt();
+  }, [showCompletion, flashcardsData, hasSavedAttempt, stats, source, savedNotes, selectedNoteId, savedMaterials, selectedMaterialId]);
 
   const handleGenerate = async () => {
     let textToUse = '';
@@ -231,6 +266,7 @@ const Flashcards = () => {
         setFlipped(false);
         setShowCompletion(false);
         setFlashcardStatuses({});
+        setHasSavedAttempt(false);
 
         localStorage.setItem('studypulse_generated_flashcards', JSON.stringify(finalResponse));
         localStorage.setItem('studypulse_flashcard_current_index', '0');
@@ -277,6 +313,7 @@ const Flashcards = () => {
     setCurrentIdx(0);
     setFlipped(false);
     setShowCompletion(false);
+    setHasSavedAttempt(false);
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
   };
@@ -303,6 +340,7 @@ const Flashcards = () => {
     setFlipped(false);
     setShowCompletion(false);
     setFlashcardStatuses({});
+    setHasSavedAttempt(false);
     
     localStorage.removeItem('studypulse_generated_flashcards');
     localStorage.removeItem('studypulse_flashcard_current_index');
@@ -374,11 +412,11 @@ const Flashcards = () => {
     if (!flashcardsData || !flashcardsData.flashcards) return;
     const learningCards = flashcardsData.flashcards.filter((c, i) => {
       const id = c.id || i;
-      return flashcardStatuses[id] === 'learning';
+      return flashcardStatuses[id] === 'learning' || flashcardStatuses[id] === 'need_review';
     });
     
     if (learningCards.length === 0) {
-      toast.success('No cards marked as Still Learning!');
+      toast.success('No cards marked for review!');
       return;
     }
     
@@ -387,6 +425,7 @@ const Flashcards = () => {
     setCurrentIdx(0);
     setFlipped(false);
     setShowCompletion(false);
+    setHasSavedAttempt(false);
     
     localStorage.setItem('studypulse_generated_flashcards', JSON.stringify(newData));
     localStorage.setItem('studypulse_flashcard_current_index', '0');
@@ -415,11 +454,9 @@ const Flashcards = () => {
           break;
         case 'l':
         case 'L':
-          if (flipped) handleMarkStatus('learning');
-          break;
-        case 'i':
-        case 'I':
-          if (flipped) handleMarkStatus('important');
+        case 'n':
+        case 'N':
+          if (flipped) handleMarkStatus('need_review');
           break;
         default:
           break;
@@ -568,24 +605,28 @@ const Flashcards = () => {
       </div>
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Great job! You reviewed your flashcards.</h2>
       
-      <div className="grid grid-cols-3 gap-4 w-full max-w-md">
+      <div className="grid grid-cols-4 gap-4 w-full max-w-lg">
+        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold text-blue-500">{stats.total}</div>
+          <div className="text-xs text-blue-600/80 uppercase font-semibold">Total Cards</div>
+        </div>
         <div className="bg-success-500/10 border border-success-500/20 p-4 rounded-xl text-center">
           <div className="text-2xl font-bold text-success-500">{stats.known}</div>
           <div className="text-xs text-success-600/80 uppercase font-semibold">Known</div>
         </div>
         <div className="bg-warning-500/10 border border-warning-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-warning-500">{stats.learning}</div>
-          <div className="text-xs text-warning-600/80 uppercase font-semibold">Learning</div>
+          <div className="text-2xl font-bold text-warning-500">{stats.needReview}</div>
+          <div className="text-xs text-warning-600/80 uppercase font-semibold">Need Review</div>
         </div>
         <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-purple-500">{stats.important}</div>
-          <div className="text-xs text-purple-600/80 uppercase font-semibold">Important</div>
+          <div className="text-2xl font-bold text-purple-500">{Math.round(stats.accuracy)}%</div>
+          <div className="text-xs text-purple-600/80 uppercase font-semibold">Accuracy</div>
         </div>
       </div>
 
       <div className="flex flex-wrap justify-center gap-4 mt-8">
         <Button onClick={handleReviewLearning} variant="secondary" className="border-warning-500/30 text-warning-500">
-          <Clock className="h-4 w-4 mr-2" /> Review Still Learning
+          <Clock className="h-4 w-4 mr-2" /> Review Again
         </Button>
         <Button onClick={handleReset} variant="secondary">
           <RefreshCw className="h-4 w-4 mr-2" /> Restart Deck
@@ -613,8 +654,8 @@ const Flashcards = () => {
         {/* Progress Stats */}
         <div className="flex flex-wrap gap-4 items-center justify-center text-xs w-full bg-white/5 p-3 rounded-xl border border-white/10 shadow-sm">
           <span className="text-success-500 font-semibold flex items-center gap-1"><Check className="h-3 w-3" /> Known: {stats.known}</span>
-          <span className="text-warning-500 font-semibold flex items-center gap-1"><Clock className="h-3 w-3" /> Still Learning: {stats.learning}</span>
-          <span className="text-purple-500 font-semibold flex items-center gap-1"><Star className="h-3 w-3" /> Important: {stats.important}</span>
+          <span className="text-warning-500 font-semibold flex items-center gap-1"><Clock className="h-3 w-3" /> Need Review: {stats.needReview}</span>
+          <span className="text-purple-500 font-semibold flex items-center gap-1"><Star className="h-3 w-3" /> Accuracy: {Math.round(stats.accuracy)}%</span>
           <span className="text-gray-400 font-semibold ml-auto border-l border-white/10 pl-4">Remaining: {stats.remaining}</span>
         </div>
 
@@ -660,8 +701,7 @@ const Flashcards = () => {
             const status = flashcardStatuses[id];
             let bgColor = 'bg-gray-300 dark:bg-slate-600';
             if (status === 'known') bgColor = 'bg-success-500';
-            if (status === 'learning') bgColor = 'bg-warning-500';
-            if (status === 'important') bgColor = 'bg-purple-500';
+            if (status === 'learning' || status === 'need_review') bgColor = 'bg-warning-500';
             
             const isCurrent = currentIdx === i;
             
@@ -732,13 +772,10 @@ const Flashcards = () => {
           {flipped ? (
             <div className="flex flex-wrap justify-center gap-3 w-full animate-fade-in">
               <Button onClick={(e) => { e.stopPropagation(); handleMarkStatus('known'); }} variant="ghost" className="border border-success-500/30 text-success-500 hover:bg-success-500/10 flex-1 min-w-[120px] text-xs py-2">
-                <Check className="h-3 w-3" /> I Know This (K)
+                <Check className="h-3 w-3" /> Known (K)
               </Button>
-              <Button onClick={(e) => { e.stopPropagation(); handleMarkStatus('learning'); }} variant="ghost" className="border border-warning-500/30 text-warning-500 hover:bg-warning-500/10 flex-1 min-w-[120px] text-xs py-2">
-                <Clock className="h-3 w-3" /> Still Learning (L)
-              </Button>
-              <Button onClick={(e) => { e.stopPropagation(); handleMarkStatus('important'); }} variant="ghost" className="border border-purple-500/30 text-purple-500 hover:bg-purple-500/10 flex-1 min-w-[120px] text-xs py-2">
-                <Star className="h-3 w-3" /> Mark Important (I)
+              <Button onClick={(e) => { e.stopPropagation(); handleMarkStatus('need_review'); }} variant="ghost" className="border border-warning-500/30 text-warning-500 hover:bg-warning-500/10 flex-1 min-w-[120px] text-xs py-2">
+                <Clock className="h-3 w-3" /> Need Review (N)
               </Button>
             </div>
           ) : (
@@ -769,7 +806,7 @@ const Flashcards = () => {
         )}
 
         <div className="text-center text-xs text-gray-500 dark:text-slate-500 font-medium my-2">
-          Tip: Space to flip, ← → to move, K/L/I to mark cards
+          Tip: Space to flip, ← → to move, K/N to mark cards
         </div>
 
         <div className="w-full mt-4 flex flex-col items-center gap-2">
