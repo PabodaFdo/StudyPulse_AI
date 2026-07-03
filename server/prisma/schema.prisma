@@ -28,6 +28,7 @@ model User {
   quizAttempts        QuizAttempt[]
   assessments         Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
+  flashcardReviewAttempts FlashcardReviewAttempt[]
 }
 
 model Subject {
@@ -49,6 +50,7 @@ model Subject {
   quizAttempts    QuizAttempt[]
   assessments     Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
+  flashcardReviewAttempts FlashcardReviewAttempt[]
 }
 
 model Note {
@@ -237,4 +239,21 @@ model RiskPredictionHistory {
   previousExamMark       Float
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
+}
+
+model FlashcardReviewAttempt {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId         Int?
+  subject           Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  flashcardDeckId   String?
+  sourceTitle       String?
+  totalCards        Int
+  reviewedCards     Int
+  knownCards        Int
+  needReviewCards   Int
+  accuracy          Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
