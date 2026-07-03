@@ -5,7 +5,7 @@ import {
   Timer, BookOpen, Clock, Flame, LayoutDashboard,
   AlertTriangle, Play, Flower2, RefreshCw, PlusCircle,
   FileText, HelpCircle, Layers, File,
-  BarChart3, Trophy, Target, TrendingUp, Brain, ShieldAlert, GraduationCap
+  Target, Brain, ShieldAlert, GraduationCap
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
@@ -375,85 +375,76 @@ const Dashboard = () => {
           </div>
 
           {/* Quiz Performance Analytics */}
-          <div className="space-y-4 pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
-            <h3 className="font-extrabold text-lg text-text-main flex items-center gap-2">
-              <Brain className="h-5 w-5 text-purple" /> Quiz Performance Analytics
-            </h3>
-            
-            {quizStats.totalAttempts === 0 && (
-              <div className="p-4 mb-4 bg-purple/5 dark:bg-purple-900/10 rounded-xl border border-purple/20 dark:border-purple/30 text-center">
-                <p className="text-xs font-bold text-purple dark:text-purple-300">
-                  No quiz attempts saved yet. Complete and save a quiz result to see your quiz analytics here.
-                </p>
+          <div className="pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
+            <div className="liquid-card p-5">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-purple" /> Quiz Performance
+                </h3>
+                <Button onClick={() => navigate('/quiz-generator')} size="sm" variant="outline" className="text-xs py-1.5 h-auto">
+                  Go to Quiz Generator
+                </Button>
               </div>
-            )}
 
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5">
-              <StatCard
-                icon={BarChart3}
-                label="Attempts"
-                value={`${quizStats.totalAttempts}`}
-                badgeText="Total"
-                changeType="neutral"
-                color="purple"
-              />
-              <StatCard
-                icon={Target}
-                label="Avg Score"
-                value={`${Math.round(quizStats.averageQuizScore)}%`}
-                badgeText="Average"
-                changeType="neutral"
-                color="blue"
-              />
-              <StatCard
-                icon={Trophy}
-                label="Best Score"
-                value={`${Math.round(quizStats.bestScore)}%`}
-                badgeText="Highest"
-                changeType="neutral"
-                color="amber"
-              />
-              <StatCard
-                icon={TrendingUp}
-                label="Latest"
-                value={`${Math.round(quizStats.latestScore)}%`}
-                badgeText="Recent"
-                changeType="neutral"
-                color="emerald"
-              />
-              <StatCard
-                icon={AlertTriangle}
-                label="Wrong"
-                value={`${quizStats.totalWrongAnswers}`}
-                badgeText="Total"
-                changeType="neutral"
-                color="red"
-              />
-            </div>
-            
-            {quizStats.recentAttempts && quizStats.recentAttempts.length > 0 && (
-              <div className="liquid-card p-5 mt-4">
-                <h4 className="font-extrabold text-sm text-text-main mb-4 flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 text-purple" /> Recent Quiz Attempts
-                </h4>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {quizStats.recentAttempts.slice(0, 3).map((attempt, i) => (
-                    <div key={attempt.id || i} className="flex justify-between items-center p-3 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
-                      <div className="min-w-0 flex-1 pr-2">
-                        <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Quiz Attempt'}</p>
-                        <p className="text-[10px] text-text-muted mt-0.5">
-                          {new Date(attempt.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end flex-shrink-0 gap-1">
-                        <span className="text-sm font-extrabold text-purple dark:text-cyan-400">{Math.round(attempt.percentage || 0)}%</span>
-                        <span className="text-[10px] font-bold text-text-muted">{attempt.score}/{attempt.totalQuestions}</span>
+              {quizStats.totalAttempts === 0 ? (
+                <div className="p-4 bg-purple/5 dark:bg-purple-900/10 rounded-xl border border-purple/20 dark:border-purple/30 text-center">
+                  <p className="text-xs font-bold text-purple dark:text-purple-300">
+                    No quiz attempts saved yet. Complete a quiz to see analytics here.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex flex-wrap gap-3 sm:gap-5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Avg Score</span>
+                      <span className="text-lg font-extrabold text-blue-500">{Math.round(quizStats.averageQuizScore)}%</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Best Score</span>
+                      <span className="text-lg font-extrabold text-amber-500">{Math.round(quizStats.bestScore)}%</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Latest</span>
+                      <span className="text-lg font-extrabold text-emerald-500">{Math.round(quizStats.latestScore)}%</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Attempts</span>
+                      <span className="text-lg font-extrabold text-purple">{quizStats.totalAttempts}</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Wrong</span>
+                      <span className="text-lg font-extrabold text-red-500">{quizStats.totalWrongAnswers}</span>
+                    </div>
+                  </div>
+
+                  {quizStats.recentAttempts && quizStats.recentAttempts.length > 0 && (
+                    <div className="space-y-2 pt-3 border-t border-lavender/20 dark:border-slate-700/50">
+                      <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Recent Attempts</h4>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {quizStats.recentAttempts.slice(0, 3).map((attempt, i) => (
+                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/50 border border-lavender/20 dark:border-white/5">
+                            <div className="min-w-0 flex-1 pr-2">
+                              <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Quiz Attempt'}</p>
+                              <p className="text-[9px] text-text-muted mt-0.5">
+                                {new Date(attempt.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end flex-shrink-0">
+                              <span className="text-xs font-extrabold text-purple dark:text-cyan-400">{Math.round(attempt.percentage || 0)}%</span>
+                              <span className="text-[9px] font-bold text-text-muted">{attempt.score}/{attempt.totalQuestions}</span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Weekly Focus Chart */}
