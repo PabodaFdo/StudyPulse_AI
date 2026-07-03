@@ -336,50 +336,43 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* AI Library Stats (Hidden for layout cleanup)
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 pt-2">
-            <StatCard
-              icon={FileText}
-              label="AI Summaries"
-              value={`${summary?.savedSummariesCount || 0}`}
-              badgeText="Saved"
-              changeType="neutral"
-              color="indigo"
-              onClick={() => navigate('/ai-library?tab=summaries')}
-              className="cursor-pointer hover:scale-[1.02] transition"
-            />
-            <StatCard
-              icon={HelpCircle}
-              label="AI Quizzes"
-              value={`${summary?.savedQuizzesCount || 0}`}
-              badgeText="Saved"
-              changeType="neutral"
-              color="fuchsia"
-              onClick={() => navigate('/ai-library?tab=quizzes')}
-              className="cursor-pointer hover:scale-[1.02] transition"
-            />
-            <StatCard
-              icon={Layers}
-              label="Flashcard Decks"
-              value={`${summary?.savedFlashcardsCount || 0}`}
-              badgeText="Saved"
-              changeType="neutral"
-              color="amber"
-              onClick={() => navigate('/ai-library?tab=flashcards')}
-              className="cursor-pointer hover:scale-[1.02] transition"
-            />
-            <StatCard
-              icon={File}
-              label="PDF Materials"
-              value={`${summary?.studyMaterialsCount || 0}`}
-              badgeText="Extracted"
-              changeType="neutral"
-              color="cyan"
-              onClick={() => navigate('/ai-library?tab=materials')}
-              className="cursor-pointer hover:scale-[1.02] transition"
-            />
+          {/* My AI Library */}
+          <div 
+            className="liquid-card p-5 cursor-pointer hover:shadow-md transition-all border border-lavender/30 dark:border-slate-700/50" 
+            onClick={() => navigate('/ai-library')}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
+                <Brain className="h-5 w-5 text-indigo-500" /> My AI Library
+              </h3>
+              <Button 
+                onClick={(e) => { e.stopPropagation(); navigate('/ai-library'); }} 
+                size="sm" 
+                variant="outline" 
+                className="text-xs py-1.5 h-auto"
+              >
+                Open AI Library
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                <FileText className="h-3.5 w-3.5" />
+                <span className="text-xs font-bold">Summaries: {summary?.savedSummariesCount || 0}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-500/20">
+                <HelpCircle className="h-3.5 w-3.5" />
+                <span className="text-xs font-bold">Quizzes: {summary?.savedQuizzesCount || 0}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <Layers className="h-3.5 w-3.5" />
+                <span className="text-xs font-bold">Flashcards: {summary?.savedFlashcardsCount || 0}</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                <File className="h-3.5 w-3.5" />
+                <span className="text-xs font-bold">PDF Materials: {summary?.studyMaterialsCount || 0}</span>
+              </div>
+            </div>
           </div>
-          */}
 
           {/* Quiz Performance Analytics */}
           <div className="space-y-4 pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
