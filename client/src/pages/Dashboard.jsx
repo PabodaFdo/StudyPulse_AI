@@ -5,7 +5,7 @@ import {
   Timer, BookOpen, Clock, Flame, LayoutDashboard,
   AlertTriangle, Play, Flower2, RefreshCw, PlusCircle,
   FileText, HelpCircle, Layers, File,
-  BarChart3, Trophy, Target, TrendingUp, Brain, ShieldAlert
+  BarChart3, Trophy, Target, TrendingUp, Brain, ShieldAlert, GraduationCap
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
@@ -272,61 +272,33 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Welcome Card & Quick Actions */}
-          <div className="space-y-3">
-            <div className="liquid-card p-6 bg-gradient-to-r from-purple/10 via-pink/5 to-cream border-2 border-white relative overflow-hidden">
-              <div className="liquid-card-content flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10 w-full">
-                <div className="space-y-2 text-center sm:text-left">
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-text-main flex items-center justify-center sm:justify-start gap-2">
-                    Good Morning, Student 🌱
-                  </h2>
-                  <p className="text-xs sm:text-sm text-text-muted font-bold max-w-sm">
-                    {welcomeMessage}
-                  </p>
-                  <div className="pt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
-                    <Button onClick={() => navigate('/focus-timer')} className="gap-2 text-xs py-1.5 px-3" size="sm">
-                      <Play className="fill-white h-3.5 w-3.5" /> Start Focus
-                    </Button>
-                    <Button onClick={() => navigate('/smart-notes')} variant="outline" className="gap-2 text-xs py-1.5 px-3" size="sm">
-                      <PlusCircle className="h-3.5 w-3.5" /> Add Note
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex-shrink-0">
-                  <AnimatedCharacter src="/src/assets/characters/study-girl-focus.png" variant="focus" size="md" />
+          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border-slate-200 dark:border-slate-700/50 shadow-sm rounded-3xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4 relative z-10 w-full">
+              <AnimatedCharacter src="/src/assets/characters/study-girl-focus.png" variant="focus" size="sm" className="hidden sm:block shrink-0 w-16 h-16" />
+              <div className="flex-1">
+                <h2 className="text-lg sm:text-xl font-extrabold text-text-main flex items-center gap-2">
+                  Good Morning, Student 🌱
+                </h2>
+                <p className="text-xs text-text-muted font-bold max-w-sm mb-3">
+                  {welcomeMessage}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={() => navigate('/focus-timer')} className="gap-1.5 text-xs py-1.5 px-3 rounded-xl" size="sm">
+                    <Play className="fill-white h-3 w-3" /> Start Focus
+                  </Button>
+                  <Button onClick={() => navigate('/smart-notes')} variant="outline" className="gap-1.5 text-xs py-1.5 px-3 rounded-xl" size="sm">
+                    <PlusCircle className="h-3 w-3" /> Add Note
+                  </Button>
+                  <Button onClick={() => navigate('/academic-records')} variant="outline" className="gap-1.5 text-xs py-1.5 px-3 rounded-xl" size="sm">
+                    <GraduationCap className="h-3 w-3" /> Log Grade
+                  </Button>
                 </div>
               </div>
-            </div>
-            {/* Quick action secondary links */}
-            <div className="flex flex-wrap gap-2 justify-end">
-               <button onClick={() => navigate('/academic-records')} className="text-xs font-bold text-text-muted hover:text-purple transition-colors bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-lavender/30 shadow-sm">
-                 + Log Grade
-               </button>
-               <button onClick={() => navigate('/study-garden')} className="text-xs font-bold text-text-muted hover:text-green-500 transition-colors bg-white/50 dark:bg-slate-800/50 px-3 py-1.5 rounded-full border border-lavender/30 shadow-sm">
-                 🌱 View Garden
-               </button>
             </div>
           </div>
 
           {/* Grid Stats */}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-            <StatCard
-              icon={Timer}
-              label="Focus Sessions"
-              value={`${summary?.focusSessionsCount || 0}`}
-              badgeText="This Week"
-              changeType="neutral"
-              color="purple"
-              onClick={() => navigate('/focus-analytics')}
-            />
-            <StatCard
-              icon={BookOpen}
-              label="Total Notes"
-              value={`${summary?.notesCount || 0}`}
-              badgeText="Total"
-              changeType="neutral"
-              color="blue"
-              onClick={() => navigate('/smart-notes')}
-            />
             <StatCard
               icon={Clock}
               label="Study Hours"
@@ -335,6 +307,23 @@ const Dashboard = () => {
               changeType="neutral"
               color="green"
               onClick={() => navigate('/focus-timer')}
+            />
+            <StatCard
+              icon={Timer}
+              label="Focus Sessions"
+              value={`${summary?.focusSessionsCount || 0}`}
+              badgeText="Total"
+              changeType="neutral"
+              color="purple"
+              onClick={() => navigate('/focus-analytics')}
+            />
+            <StatCard
+              icon={Target}
+              label="Quiz Average"
+              value={`${Math.round(quizStats.averageQuizScore)}%`}
+              badgeText="All Time"
+              changeType="neutral"
+              color="blue"
             />
             <StatCard
               icon={Flame}
@@ -347,7 +336,7 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* AI Library Stats */}
+          {/* AI Library Stats (Hidden for layout cleanup)
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 pt-2">
             <StatCard
               icon={FileText}
@@ -390,6 +379,7 @@ const Dashboard = () => {
               className="cursor-pointer hover:scale-[1.02] transition"
             />
           </div>
+          */}
 
           {/* Quiz Performance Analytics */}
           <div className="space-y-4 pt-4 pb-2 border-t border-lavender/30 dark:border-slate-800">
