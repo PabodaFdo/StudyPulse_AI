@@ -64,9 +64,17 @@ const Flashcards = () => {
         const isDeckSaved = localStorage.getItem('studypulse_flashcard_deck_saved');
         if (isDeckSaved === 'true') {
           setFlashcardsSaved(true);
-        } else if (parsed.id) {
+        } else if (
+          parsed.id || 
+          parsed.saved === true || 
+          parsed.isSaved === true || 
+          parsed.source === 'library' || 
+          parsed.fromLibrary === true || 
+          parsed.deckId || 
+          parsed.flashcardDeckId
+        ) {
           setFlashcardsSaved(true);
-          setSavedFlashcardDeckId(parsed.id);
+          setSavedFlashcardDeckId(parsed.id || parsed.deckId || parsed.flashcardDeckId || null);
           localStorage.setItem('studypulse_flashcard_deck_saved', 'true');
         } else if (parsed.flashcards && parsed.flashcards.length > 0) {
           const firstId = String(parsed.flashcards[0].id || '');
@@ -733,15 +741,11 @@ const Flashcards = () => {
             <Button onClick={handleNew} variant="ghost" size="sm" className="gap-2 text-xs">
               <PlusCircle className="h-3 w-3" /> New Flashcards
             </Button>
-            <Button 
-              onClick={handleOpenSaveModal} 
-              disabled={isSaving} 
-              variant="primary" 
-              size="sm" 
-              className="gap-2 text-xs"
-            >
-              <Save className="h-3 w-3" /> {isSaving ? 'Saving...' : 'Save Flashcards'}
-            </Button>
+            {flashcardsSaved && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 border border-brand-200 bg-brand-50 text-brand-700 rounded-lg text-xs font-bold shadow-sm opacity-90 cursor-default dark:bg-brand-900/30 dark:border-brand-500/30 dark:text-brand-300">
+                <Check className="h-3 w-3" /> Already Saved
+              </div>
+            )}
           </div>
           <div className="text-sm font-semibold text-gray-500">
             Card {currentIdx + 1} of {stats.total}
