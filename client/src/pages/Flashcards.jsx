@@ -606,21 +606,21 @@ const Flashcards = () => {
       <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Great job! You reviewed your flashcards.</h2>
       
       <div className="grid grid-cols-4 gap-4 w-full max-w-lg">
-        <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-blue-500">{stats.total}</div>
-          <div className="text-xs text-blue-600/80 uppercase font-semibold">Total Cards</div>
+        <div className="bg-cyan-500/10 border border-cyan-400/30 p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-300">{stats.total}</div>
+          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Total Cards</div>
         </div>
-        <div className="bg-success-500/10 border border-success-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-success-500">{stats.known}</div>
-          <div className="text-xs text-success-600/80 uppercase font-semibold">Known</div>
+        <div className="bg-emerald-500/10 border border-emerald-400/30 p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-300">{stats.known}</div>
+          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Known</div>
         </div>
-        <div className="bg-warning-500/10 border border-warning-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-warning-500">{stats.needReview}</div>
-          <div className="text-xs text-warning-600/80 uppercase font-semibold">Need Review</div>
+        <div className="bg-amber-500/10 border border-amber-400/30 p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold text-amber-600 dark:text-amber-300">{stats.needReview}</div>
+          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Need Review</div>
         </div>
-        <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-purple-500">{Math.round(stats.accuracy)}%</div>
-          <div className="text-xs text-purple-600/80 uppercase font-semibold">Accuracy</div>
+        <div className="bg-violet-500/10 border border-violet-400/30 p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold text-violet-600 dark:text-violet-300">{Math.round(stats.accuracy)}%</div>
+          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Accuracy</div>
         </div>
       </div>
 
