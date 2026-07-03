@@ -45,6 +45,9 @@ const Flashcards = () => {
   const [showCompletion, setShowCompletion] = useState(false);
   const [hasSavedAttempt, setHasSavedAttempt] = useState(false);
 
+  const [flashcardsSaved, setFlashcardsSaved] = useState(false);
+  const [savedFlashcardDeckId, setSavedFlashcardDeckId] = useState(null);
+
   useEffect(() => {
     const text = localStorage.getItem('studypulse_extracted_text');
     if (text) setExtractedText(text);
@@ -54,7 +57,20 @@ const Flashcards = () => {
     const savedCards = localStorage.getItem('studypulse_generated_flashcards');
     if (savedCards) {
       try {
-        setFlashcardsData(JSON.parse(savedCards));
+        const parsed = JSON.parse(savedCards);
+        setFlashcardsData(parsed);
+        
+        // Check if it's already a saved deck from backend or session
+        const isDeckSaved = localStorage.getItem('studypulse_flashcard_deck_saved');
+        if (isDeckSaved === 'true') {
+          setFlashcardsSaved(true);
+        } else if (parsed.flashcards && parsed.flashcards.length > 0) {
+          const firstId = String(parsed.flashcards[0].id || '');
+          if (firstId && !firstId.startsWith('gen-')) {
+            setFlashcardsSaved(true);
+            localStorage.setItem('studypulse_flashcard_deck_saved', 'true');
+          }
+        }
       } catch (e) {
         console.error('Failed to parse saved flashcards');
       }
@@ -267,11 +283,14 @@ const Flashcards = () => {
         setShowCompletion(false);
         setFlashcardStatuses({});
         setHasSavedAttempt(false);
+        setFlashcardsSaved(false);
+        setSavedFlashcardDeckId(null);
 
         localStorage.setItem('studypulse_generated_flashcards', JSON.stringify(finalResponse));
         localStorage.setItem('studypulse_flashcard_current_index', '0');
         localStorage.setItem('studypulse_flashcard_flipped', 'false');
         localStorage.removeItem('studypulse_flashcard_status');
+        localStorage.removeItem('studypulse_flashcard_deck_saved');
 
         toast.success('Flashcards generated successfully!');
       } else {
@@ -354,11 +373,14 @@ const Flashcards = () => {
     setShowCompletion(false);
     setFlashcardStatuses({});
     setHasSavedAttempt(false);
+    setFlashcardsSaved(false);
+    setSavedFlashcardDeckId(null);
     
     localStorage.removeItem('studypulse_generated_flashcards');
     localStorage.removeItem('studypulse_flashcard_current_index');
     localStorage.removeItem('studypulse_flashcard_flipped');
     localStorage.removeItem('studypulse_flashcard_status');
+    localStorage.removeItem('studypulse_flashcard_deck_saved');
   };
 
   const handleOpenSaveModal = () => {
@@ -383,13 +405,20 @@ const Flashcards = () => {
         if (mat) sourceTitle = mat.title;
       }
 
-      await saveFlashcards({
+      const response = await saveFlashcards({
         title: saveTitle.trim(),
         sourceType: source,
         sourceTitle,
         flashcards: flashcardsData.flashcards,
         wordCount: flashcardsData.word_count
       });
+      
+      setFlashcardsSaved(true);
+      if (response && response.id) {
+        setSavedFlashcardDeckId(response.id);
+      }
+      localStorage.setItem('studypulse_flashcard_deck_saved', 'true');
+      
       toast.success('Flashcards saved to My AI Library.');
       setIsModalOpen(false);
     } catch (error) {
@@ -638,6 +667,15 @@ const Flashcards = () => {
       </div>
 
       <div className="flex flex-wrap justify-center gap-4 mt-8">
+        {!flashcardsSaved ? (
+          <Button onClick={handleOpenSaveModal} disabled={isSaving} variant="primary" className="border-brand-500 text-white shadow-lg shadow-brand-500/20">
+            <Save className="h-4 w-4 mr-2" /> {isSaving ? 'Saving...' : 'Save Flashcards'}
+          </Button>
+        ) : (
+          <div className="flex items-center justify-center px-4 py-2 border border-brand-200 bg-brand-50 text-brand-700 rounded-lg text-sm font-bold shadow-sm opacity-90 cursor-default dark:bg-brand-900/30 dark:border-brand-500/30 dark:text-brand-300">
+            <Check className="h-4 w-4 mr-2" /> Already Saved
+          </div>
+        )}
         <Button onClick={handleReviewLearning} variant="secondary" className="border-warning-500/30 text-warning-500">
           <Clock className="h-4 w-4 mr-2" /> Review Again
         </Button>
