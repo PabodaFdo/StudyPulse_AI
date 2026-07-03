@@ -16,6 +16,7 @@ import AnimatedCharacter from '../components/AnimatedCharacter';
 import dashboardService from '../services/dashboard.service';
 import questService from '../services/quest.service';
 import { getQuizAttemptStats } from '../services/quizAttempt.service';
+import { getFlashcardReviewSummary } from '../services/flashcardReview.service';
 import { riskService } from '../services/risk.service';
 
 // Skeleton Component
@@ -59,17 +60,26 @@ const Dashboard = () => {
     recentAttempts: [],
   });
 
+  const [flashcardStats, setFlashcardStats] = useState({
+    totalReviewAttempts: 0,
+    totalReviewedCards: 0,
+    averageAccuracy: 0,
+    totalNeedReviewCards: 0,
+    recentReviewAttempts: [],
+  });
+
   const fetchDashboardData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const [summaryData, chartsData, questsData, quizStatsRes, riskSummaryData] = await Promise.all([
+      const [summaryData, chartsData, questsData, quizStatsRes, riskSummaryData, flashcardStatsRes] = await Promise.all([
         dashboardService.getSummary(),
         dashboardService.getCharts(),
         questService.getQuests(),
         getQuizAttemptStats().catch(() => ({ data: null })),
-        riskService.getRiskSummary().catch(() => null)
+        riskService.getRiskSummary().catch(() => null),
+        getFlashcardReviewSummary().catch(() => ({ data: null }))
       ]);
       setSummary(summaryData);
       setCharts(chartsData);
@@ -85,6 +95,17 @@ const Dashboard = () => {
           bestScore: stats.bestScore || 0,
           latestScore: stats.latestScore || 0,
           recentAttempts: stats.recentAttempts || [],
+        });
+      }
+
+      if (flashcardStatsRes && (flashcardStatsRes.data || flashcardStatsRes.success)) {
+        const stats = flashcardStatsRes.data || flashcardStatsRes;
+        setFlashcardStats({
+          totalReviewAttempts: stats.totalReviewAttempts || 0,
+          totalReviewedCards: stats.totalReviewedCards || 0,
+          averageAccuracy: stats.averageAccuracy || 0,
+          totalNeedReviewCards: stats.totalNeedReviewCards || 0,
+          recentReviewAttempts: stats.recentReviewAttempts || [],
         });
       }
       
@@ -494,6 +515,74 @@ const Dashboard = () => {
                             <div className="flex flex-col items-end flex-shrink-0">
                               <span className="text-xs font-extrabold text-purple dark:text-cyan-400">{Math.round(attempt.percentage || 0)}%</span>
                               <span className="text-[9px] font-bold text-text-muted">{attempt.score}/{attempt.totalQuestions}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Flashcard Activity */}
+          <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
+            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-amber-500" /> Flashcard Activity
+                </h3>
+                <Button onClick={() => navigate('/flashcards')} size="sm" variant="outline" className="text-xs py-1.5 h-auto">
+                  Go to Flashcards
+                </Button>
+              </div>
+
+              {flashcardStats.totalReviewAttempts === 0 ? (
+                <div className="p-4 bg-amber-500/5 dark:bg-amber-900/10 rounded-xl border border-amber-500/20 dark:border-amber-500/30 text-center">
+                  <p className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                    No flashcard reviews yet. Generate and review flashcards to see analytics here.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex flex-wrap gap-3 sm:gap-5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Attempts</span>
+                      <span className="text-lg font-extrabold text-amber-500">{flashcardStats.totalReviewAttempts}</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Cards Reviewed</span>
+                      <span className="text-lg font-extrabold text-blue-500">{flashcardStats.totalReviewedCards}</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Avg Accuracy</span>
+                      <span className="text-lg font-extrabold text-purple">{Math.round(flashcardStats.averageAccuracy)}%</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Need Review</span>
+                      <span className="text-lg font-extrabold text-rose-500">{flashcardStats.totalNeedReviewCards}</span>
+                    </div>
+                  </div>
+
+                  {flashcardStats.recentReviewAttempts && flashcardStats.recentReviewAttempts.length > 0 && (
+                    <div className="space-y-2 pt-3 border-t border-lavender/20 dark:border-slate-700/50">
+                      <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Recent Reviews</h4>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {flashcardStats.recentReviewAttempts.map((attempt, i) => (
+                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                            <div className="min-w-0 flex-1 pr-2">
+                              <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Flashcard Deck'}</p>
+                              <p className="text-[9px] text-text-muted mt-0.5">
+                                {new Date(attempt.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end flex-shrink-0">
+                              <span className="text-xs font-extrabold text-amber-500">{Math.round(attempt.accuracy || 0)}%</span>
+                              <span className="text-[9px] font-bold text-text-muted">{attempt.reviewedCards} cards</span>
                             </div>
                           </div>
                         ))}

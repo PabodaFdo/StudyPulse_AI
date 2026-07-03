@@ -69,17 +69,50 @@ const getReviewSummary = async (userId) => {
   });
 
   if (attempts.length === 0) {
-    return { totalAttempts: 0, averageAccuracy: 0, totalCardsReviewed: 0 };
+    return { 
+      totalReviewAttempts: 0, 
+      totalReviewedCards: 0,
+      totalKnownCards: 0,
+      totalNeedReviewCards: 0,
+      averageAccuracy: 0,
+      recentReviewAttempts: [],
+      subjectSummary: []
+    };
   }
 
-  const totalCardsReviewed = attempts.reduce((acc, curr) => acc + curr.reviewedCards, 0);
+  const totalReviewedCards = attempts.reduce((acc, curr) => acc + curr.reviewedCards, 0);
+  const totalKnownCards = attempts.reduce((acc, curr) => acc + curr.knownCards, 0);
+  const totalNeedReviewCards = attempts.reduce((acc, curr) => acc + curr.needReviewCards, 0);
   const totalAccuracy = attempts.reduce((acc, curr) => acc + curr.accuracy, 0);
   const averageAccuracy = totalAccuracy / attempts.length;
 
+  const recentReviewAttempts = attempts
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 3);
+
+  const subjectMap = {};
+  attempts.forEach(attempt => {
+    if (attempt.subjectId) {
+      if (!subjectMap[attempt.subjectId]) {
+        subjectMap[attempt.subjectId] = {
+          subjectId: attempt.subjectId,
+          attempts: 0,
+          reviewedCards: 0
+        };
+      }
+      subjectMap[attempt.subjectId].attempts += 1;
+      subjectMap[attempt.subjectId].reviewedCards += attempt.reviewedCards;
+    }
+  });
+
   return {
-    totalAttempts: attempts.length,
+    totalReviewAttempts: attempts.length,
+    totalReviewedCards,
+    totalKnownCards,
+    totalNeedReviewCards,
     averageAccuracy: parseFloat(averageAccuracy.toFixed(2)),
-    totalCardsReviewed
+    recentReviewAttempts,
+    subjectSummary: Object.values(subjectMap)
   };
 };
 
