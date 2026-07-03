@@ -297,6 +297,64 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Priority Insight: Academic Risk */}
+          <div className="liquid-card p-4 sm:p-5 bg-white/80 dark:bg-slate-900/70 border-slate-200 dark:border-slate-700/50 shadow-sm rounded-3xl relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className={`shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${riskSummary?.highRiskCount > 0 ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-2">
+                    Academic Risk Summary
+                  </h3>
+                  {!riskSummary?.hasData ? (
+                    <p className="text-xs font-bold text-text-muted mt-0.5">
+                      No risk predictions yet. Run your first risk prediction to see insights here.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                      <span className="text-[11px] sm:text-xs font-bold text-text-muted">
+                        Latest Risk: <span className={riskSummary.latestItem?.riskLevel === 'High Risk' ? 'text-red-500' : riskSummary.latestItem?.riskLevel === 'Medium Risk' ? 'text-amber-500' : 'text-emerald-500'}>{riskSummary.latestItem?.riskLevel}</span>
+                      </span>
+                      <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                      <span className="text-[11px] sm:text-xs font-bold text-text-muted">
+                        Risk Probability: <span className="text-cyan-500">{Math.round(riskSummary.latestItem?.riskScore || 0)}%</span>
+                      </span>
+                      {riskSummary.highRiskCount > 0 && (
+                        <>
+                          <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                          <span className="text-[11px] sm:text-xs font-bold text-red-500">
+                            {riskSummary.highRiskCount} High Risk
+                          </span>
+                        </>
+                      )}
+                      {riskSummary.needsAttention?.length > 0 && (
+                        <>
+                          <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                          <span className="text-[11px] sm:text-xs font-bold text-amber-500">
+                            {riskSummary.needsAttention.length} Needs Attention
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex-shrink-0 w-full sm:w-auto">
+                {!riskSummary?.hasData ? (
+                  <Button onClick={() => navigate('/risk-prediction')} size="sm" className="w-full sm:w-auto text-xs py-1.5">
+                    Go to Risk Prediction
+                  </Button>
+                ) : (
+                  <Button onClick={() => navigate('/risk-timeline')} size="sm" variant="outline" className="w-full sm:w-auto text-xs py-1.5">
+                    View Risk Timeline
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Grid Stats */}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
             <StatCard
@@ -742,63 +800,7 @@ const Dashboard = () => {
             </div>
           </ChartCard>
 
-          {/* Academic Risk Summary */}
-          <div className="liquid-card p-5">
-            <div className="liquid-card-content space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
-                  <ShieldAlert className="h-4.5 w-4.5 text-red-500" /> Risk Summary
-                </h3>
-                {riskSummary?.hasData && (
-                  <span className={`status-badge ${riskSummary.highRiskCount > 0 ? 'bg-red-500/10 text-red-600 border border-red-500/20 dark:bg-red-500/20 dark:text-red-400' : 'status-success'}`}>
-                    {riskSummary.highRiskCount > 0 ? `${riskSummary.highRiskCount} High Risk` : 'Looking Good'}
-                  </span>
-                )}
-              </div>
 
-              {!riskSummary?.hasData ? (
-                <div className="p-4 text-center rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10">
-                  <p className="text-xs font-bold text-text-muted mb-3">No risk predictions yet. Run your first risk prediction to see insights here.</p>
-                  <Button onClick={() => navigate('/risk-prediction')} size="sm" className="w-full text-xs">
-                    Go to Risk Prediction
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10 text-center flex flex-col items-center justify-center">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 mb-1">Latest Risk</span>
-                      <span className={`text-sm font-extrabold ${riskSummary.latestItem?.riskLevel === 'High Risk' ? 'text-red-500' : riskSummary.latestItem?.riskLevel === 'Medium Risk' ? 'text-amber-500' : 'text-emerald-500'}`}>
-                        {riskSummary.latestItem?.riskLevel}
-                      </span>
-                    </div>
-                    <div className="p-2.5 rounded-xl bg-[#f8f3ff] dark:bg-slate-900/80 border border-lavender/20 dark:border-white/10 text-center flex flex-col items-center justify-center">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 mb-1">Risk Probability</span>
-                      <span className="text-sm font-extrabold text-cyan-500">{Math.round(riskSummary.latestItem?.riskScore || 0)}%</span>
-                    </div>
-                  </div>
-
-                  {riskSummary.needsAttention && riskSummary.needsAttention.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Subjects Needing Attention</p>
-                      <div className="space-y-1.5">
-                        {riskSummary.needsAttention.map((item) => (
-                          <div key={item.id} className="flex justify-between items-center text-xs p-2 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
-                            <span className="font-bold text-slate-700 dark:text-slate-200 truncate pr-2 max-w-[120px]">{item.subject?.name || 'Subject'}</span>
-                            <span className="font-bold text-red-500">{item.riskLevel} ({Math.round(item.riskScore)}%)</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <button onClick={() => navigate('/risk-timeline')} className="w-full text-xs font-bold text-purple hover:underline text-right block pt-2">
-                    View Risk Timeline →
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </div>
