@@ -287,6 +287,14 @@ const Flashcards = () => {
 
   const handleNext = () => {
     if (!flashcardsData || !flashcardsData.flashcards) return;
+
+    const currentCard = flashcardsData.flashcards[currentIdx];
+    const currentCardId = currentCard.id || currentIdx;
+    if (!flashcardStatuses[currentCardId]) {
+      toast.error('Please select Known or Need Review before continuing.');
+      return;
+    }
+
     if (currentIdx < flashcardsData.flashcards.length - 1) {
       const newIdx = currentIdx + 1;
       setCurrentIdx(newIdx);
@@ -294,6 +302,11 @@ const Flashcards = () => {
       localStorage.setItem('studypulse_flashcard_current_index', newIdx.toString());
       localStorage.setItem('studypulse_flashcard_flipped', 'false');
     } else {
+      const hasUnreviewed = flashcardsData.flashcards.some((c, i) => !flashcardStatuses[c.id || i]);
+      if (hasUnreviewed) {
+        toast.error('Please review all cards before finishing.');
+        return;
+      }
       setShowCompletion(true);
     }
   };
@@ -648,6 +661,8 @@ const Flashcards = () => {
     }
 
     const currentCard = flashcardsData.flashcards[currentIdx];
+    const currentCardId = currentCard.id || currentIdx;
+    const hasStatus = !!flashcardStatuses[currentCardId];
     
     return (
       <div className="flex flex-col items-center max-w-3xl mx-auto space-y-4">
@@ -786,7 +801,7 @@ const Flashcards = () => {
                <Button onClick={handleFlip} variant="primary" className="w-40 justify-center shadow-lg shadow-brand-500/20">
                  <RotateCw className="h-4 w-4 mr-2" /> Flip Card
                </Button>
-               <Button onClick={handleNext} variant="secondary" className="w-32 justify-center">
+               <Button onClick={handleNext} disabled={!hasStatus} variant="secondary" className={`w-32 justify-center ${!hasStatus ? 'opacity-50 cursor-not-allowed' : ''}`}>
                  Next <ChevronRight className="h-4 w-4 ml-1" />
                </Button>
              </div>
@@ -795,13 +810,18 @@ const Flashcards = () => {
         
         {/* Show next button if flipped, to allow moving on */}
         {flipped && (
-           <div className="flex items-center justify-center gap-4 w-full mt-2">
-             <Button onClick={handlePrev} disabled={currentIdx === 0} variant="secondary" className="w-32 justify-center">
-               <ChevronLeft className="h-4 w-4 mr-1" /> Prev
-             </Button>
-             <Button onClick={handleNext} variant="primary" className="w-40 justify-center">
-               {currentIdx === stats.total - 1 ? 'Finish' : 'Next Card'} <ChevronRight className="h-4 w-4 ml-1" />
-             </Button>
+           <div className="flex flex-col items-center justify-center gap-2 w-full mt-2">
+             <div className="flex items-center justify-center gap-4 w-full">
+               <Button onClick={handlePrev} disabled={currentIdx === 0} variant="secondary" className="w-32 justify-center">
+                 <ChevronLeft className="h-4 w-4 mr-1" /> Prev
+               </Button>
+               <Button onClick={handleNext} disabled={!hasStatus} variant="primary" className={`w-40 justify-center ${!hasStatus ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                 {currentIdx === stats.total - 1 ? 'Finish' : 'Next Card'} <ChevronRight className="h-4 w-4 ml-1" />
+               </Button>
+             </div>
+             {!hasStatus && (
+               <div className="text-xs text-amber-500 font-bold mt-1">Select Known or Need Review before continuing.</div>
+             )}
            </div>
         )}
 
