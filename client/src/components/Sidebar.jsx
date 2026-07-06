@@ -1,9 +1,10 @@
+import { useState, useEffect } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, BookOpen, FileText, Upload, BrainCircuit, HelpCircle,
   Layers, Timer, BarChart3, GraduationCap, AlertTriangle, Clock,
   Flower2, Swords, Album, Radar, HeartPulse, Smile, Flame,
-  Bell, Sparkles, Library, LogOut, ClipboardList
+  Bell, Sparkles, Library, LogOut, ClipboardList, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
@@ -67,6 +68,18 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('studypulse-sidebar-collapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const toggleCollapse = () => {
+    const newState = !isCollapsed;
+    setIsCollapsed(newState);
+    localStorage.setItem('studypulse-sidebar-collapsed', JSON.stringify(newState));
+    window.dispatchEvent(new CustomEvent('sidebar-collapse-change', { detail: { collapsed: newState } }));
+  };
 
   const handleLogout = () => {
     logout();
@@ -74,47 +87,78 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="
-      fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col p-4
-      border-r border-lavender/30 dark:border-white/10
-      bg-[#f4ecff]/95 dark:bg-slate-950/75
-      backdrop-blur-md transition-colors duration-300
+    <aside className={`
+      fixed left-3 top-3 z-40 hidden h-[calc(100vh-24px)] flex-col p-4
+      rounded-[28px] border border-slate-200 dark:border-slate-700/50
+      bg-white/85 dark:bg-slate-950/80
+      shadow-xl dark:shadow-[0_0_40px_rgba(6,182,212,0.1)]
+      backdrop-blur-xl transition-all duration-300 ease-in-out
       lg:flex
-    ">
+      ${isCollapsed ? 'w-[84px]' : 'w-[280px]'}
+    `}>
       {/* Logo + Theme Toggle row */}
-      <div className="flex items-center justify-between h-12 px-3 mb-6 bg-white/60 dark:bg-white/8 border border-white/80 dark:border-white/12 rounded-2xl shadow-sm">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-purple dark:text-cyan-400" />
-          <span className="font-extrabold text-sm tracking-tight text-text-main dark:text-white">
-            StudyPulse AI 🌱
-          </span>
-        </div>
-        <ThemeToggle size="sm" />
+      <div className={`shrink-0 flex items-center mb-6 bg-white/70 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 rounded-2xl shadow-sm transition-all duration-300 ease-in-out ${isCollapsed ? 'justify-center flex-col h-auto py-3 px-0 gap-3' : 'justify-between h-12 px-4'}`}>
+        {!isCollapsed ? (
+          <>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple dark:text-cyan-400" />
+              <span className="font-extrabold text-sm tracking-tight text-text-main dark:text-white">
+                StudyPulse AI 🌱
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle size="sm" />
+              <button
+                onClick={toggleCollapse}
+                aria-label="Collapse sidebar"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <Sparkles className="h-5 w-5 text-purple dark:text-cyan-400 shrink-0" />
+            <ThemeToggle size="sm" />
+            <button
+              onClick={toggleCollapse}
+              aria-label="Expand sidebar"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Links */}
-      <nav className="flex-1 overflow-y-auto space-y-4 pr-1">
+      <nav className={`flex-1 overflow-y-auto space-y-5 ${isCollapsed ? 'pr-0' : 'pr-2'} [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full`}>
         {sections.map((section) => (
-          <div key={section.title} className="space-y-1">
-            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-text-muted/65 dark:text-slate-500">
-              {section.title}
-            </p>
+          <div key={section.title} className="space-y-1.5">
+            {!isCollapsed && (
+              <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 whitespace-nowrap">
+                {section.title}
+              </p>
+            )}
             {section.links.map((link) => {
               const isActive = location.pathname === link.to;
               return (
                 <NavLink
                   key={link.to}
                   to={link.to}
+                  title={isCollapsed ? link.label : undefined}
                   className={`
-                    flex items-center gap-2.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all duration-200
+                    flex items-center transition-all duration-200
+                    ${isCollapsed ? 'justify-center w-11 h-11 mx-auto' : 'gap-3 px-3.5 py-2.5 w-full'}
                     ${isActive
-                      ? 'bg-purple text-white shadow-md dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-400/30'
-                      : 'text-text-muted hover:bg-lavender/15 hover:text-purple dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/8'
+                      ? `bg-gradient-to-r from-cyan-500/10 to-purple-500/10 dark:from-cyan-500/25 dark:to-purple-500/25 border border-cyan-400/40 text-cyan-700 dark:text-cyan-200 shadow-sm rounded-2xl`
+                      : `text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white border border-transparent ${isCollapsed ? 'rounded-xl' : 'rounded-xl'}`
                     }
                   `}
                 >
-                  <link.icon className="h-4 w-4 flex-shrink-0" />
-                  <span>{link.label}</span>
+                  <link.icon className={`h-4.5 w-4.5 flex-shrink-0 transition-colors ${isActive ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
+                  {!isCollapsed && <span className="truncate text-[13px] font-bold">{link.label}</span>}
                 </NavLink>
               );
             })}
@@ -122,34 +166,38 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      {/* Profile */}
-      <NavLink
-        to="/profile"
-        className={`
-          flex items-center gap-3 px-3 py-2.5 mt-4 rounded-2xl border transition-all duration-200
-          ${location.pathname === '/profile'
-            ? 'bg-purple/15 border-purple/30 dark:bg-cyan-500/15 dark:border-cyan-400/25'
-            : 'bg-white/40 border-lavender/10 hover:bg-white/70 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10'
-          }
-        `}
-      >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple text-xs font-bold text-white shadow-sm flex-shrink-0">
-          {user?.name?.charAt(0)?.toUpperCase() || 'S'}
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-xs font-extrabold text-text-main dark:text-white">{user?.name || 'Student Buddy'}</p>
-          <p className="truncate text-[9px] text-text-muted dark:text-slate-400">{user?.email || 'student@studypulse.ai'}</p>
-        </div>
-      </NavLink>
+      <div className={`shrink-0 mt-4 space-y-2 ${isCollapsed ? 'flex flex-col items-center' : ''}`}>
+        {/* Profile */}
+        <NavLink
+          to="/profile"
+          title={isCollapsed ? (user?.name || 'Demo Student') : undefined}
+          className={`flex items-center transition-all duration-200 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/5 hover:bg-slate-100/80 dark:hover:bg-white/10
+            ${isCollapsed ? 'p-2 justify-center w-11 h-11' : 'gap-3 px-3 py-3'}
+          `}
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-purple-500 text-xs font-bold text-white shadow-sm flex-shrink-0">
+            {user?.name?.charAt(0)?.toUpperCase() || 'D'}
+          </div>
+          {!isCollapsed && (
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold text-slate-800 dark:text-white">{user?.name || 'Demo Student'}</p>
+              <p className="truncate text-[10px] text-slate-500 dark:text-slate-400">{user?.email || 'demo@studypulse.ai'}</p>
+            </div>
+          )}
+        </NavLink>
 
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="mt-2 w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 transition-all font-semibold text-xs"
-      >
-        <LogOut className="h-4 w-4 flex-shrink-0" />
-        Logout
-      </button>
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          title={isCollapsed ? 'Logout' : undefined}
+          className={`flex items-center transition-all duration-200 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400
+            ${isCollapsed ? 'justify-center w-11 h-11 p-2' : 'gap-3 px-4 py-3 w-full font-semibold text-xs'}
+          `}
+        >
+          <LogOut className="h-4 w-4 flex-shrink-0" />
+          {!isCollapsed && <span>Logout</span>}
+        </button>
+      </div>
     </aside>
   );
 };
