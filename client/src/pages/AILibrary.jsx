@@ -14,7 +14,8 @@ import {
   Search,
   BookOpen,
   Filter,
-  X
+  X,
+  CheckCircle
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -30,6 +31,7 @@ import {
   deleteSavedFlashcards
 } from '../services/aiLibrary.service';
 import { getStudyMaterials, deleteStudyMaterial } from '../services/studyMaterial.service';
+import { saveSummaryReviewAttempt } from '../services/summaryReview.service';
 
 const TABS = [
   { id: 'summaries', label: 'Summaries', icon: FileText },
@@ -117,6 +119,10 @@ const AILibrary = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [viewStartTime, setViewStartTime] = useState(null);
+  const [isReviewMarked, setIsReviewMarked] = useState(false);
+  const [isMarkingReview, setIsMarkingReview] = useState(false);
+
   // Filter & Sort States
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
@@ -158,6 +164,10 @@ const AILibrary = () => {
   const handleOpenView = (item) => {
     setSelectedItem(item);
     setViewModalOpen(true);
+    if (activeTab === 'summaries') {
+      setViewStartTime(Date.now());
+      setIsReviewMarked(false);
+    }
   };
 
   const handleOpenDelete = (item) => {
@@ -182,6 +192,7 @@ const AILibrary = () => {
         await deleteStudyMaterial(selectedItem.id);
         setMaterials(materials.filter(m => m.id !== selectedItem.id));
       }
+      
       toast.success('Item deleted successfully!');
       setDeleteModalOpen(false);
       setSelectedItem(null);
@@ -190,6 +201,31 @@ const AILibrary = () => {
       toast.error('Failed to delete item.');
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleMarkReviewed = async () => {
+    if (!selectedItem || isReviewMarked || isMarkingReview) return;
+    try {
+      setIsMarkingReview(true);
+      const duration = viewStartTime ? Math.floor((Date.now() - viewStartTime) / 1000) : 0;
+      
+      await saveSummaryReviewAttempt({
+        subjectId: null,
+        summaryId: selectedItem.id,
+        sourceTitle: selectedItem.sourceTitle || selectedItem.title,
+        summaryWordCount: selectedItem.wordCount || 0,
+        readDurationSeconds: duration,
+        completed: true
+      });
+      
+      setIsReviewMarked(true);
+      toast.success('Summary marked as reviewed!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to mark summary as reviewed.');
+    } finally {
+      setIsMarkingReview(false);
     }
   };
 
@@ -726,7 +762,18 @@ const AILibrary = () => {
         <div className="mt-2 mb-6">
           {renderViewModalContent()}
         </div>
-        <div className="flex justify-end border-t border-slate-200 dark:border-slate-700 pt-4">
+        <div className="flex justify-end gap-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+          {activeTab === 'summaries' && (
+            <Button
+              variant={isReviewMarked ? 'secondary' : 'primary'}
+              onClick={handleMarkReviewed}
+              disabled={isReviewMarked || isMarkingReview}
+              className="flex items-center gap-2"
+            >
+              <CheckCircle className={`h-4 w-4 ${isReviewMarked ? 'text-brand-500' : ''}`} />
+              {isReviewMarked ? 'Review Completed' : isMarkingReview ? 'Marking...' : 'Mark as Reviewed'}
+            </Button>
+          )}
           <Button variant="ghost" className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white" onClick={() => setViewModalOpen(false)}>
             Close
           </Button>
