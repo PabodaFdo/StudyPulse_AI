@@ -17,6 +17,7 @@ import dashboardService from '../services/dashboard.service';
 import questService from '../services/quest.service';
 import { getQuizAttemptStats } from '../services/quizAttempt.service';
 import { getFlashcardReviewSummary } from '../services/flashcardReview.service';
+import { getSummaryReviewAnalytics } from '../services/summaryReview.service';
 import { riskService } from '../services/risk.service';
 
 // Skeleton Component
@@ -68,18 +69,24 @@ const Dashboard = () => {
     recentReviewAttempts: [],
   });
 
+  const [summaryReviewStats, setSummaryReviewStats] = useState({
+    totalReviews: 0,
+    totalTimeSeconds: 0
+  });
+
   const fetchDashboardData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       
-      const [summaryData, chartsData, questsData, quizStatsRes, riskSummaryData, flashcardStatsRes] = await Promise.all([
+      const [summaryData, chartsData, questsData, quizStatsRes, riskSummaryData, flashcardStatsRes, summaryReviewRes] = await Promise.all([
         dashboardService.getSummary(),
         dashboardService.getCharts(),
         questService.getQuests(),
         getQuizAttemptStats().catch(() => ({ data: null })),
         riskService.getRiskSummary().catch(() => null),
-        getFlashcardReviewSummary().catch(() => ({ data: null }))
+        getFlashcardReviewSummary().catch(() => ({ data: null })),
+        getSummaryReviewAnalytics().catch(() => ({ data: null }))
       ]);
       setSummary(summaryData);
       setCharts(chartsData);
@@ -106,6 +113,14 @@ const Dashboard = () => {
           averageAccuracy: stats.averageAccuracy || 0,
           totalNeedReviewCards: stats.totalNeedReviewCards || 0,
           recentReviewAttempts: stats.recentReviewAttempts || [],
+        });
+      }
+
+      if (summaryReviewRes && (summaryReviewRes.data || summaryReviewRes.success)) {
+        const stats = summaryReviewRes.data || summaryReviewRes;
+        setSummaryReviewStats({
+          totalReviews: stats.totalReviews || 0,
+          totalTimeSeconds: stats.totalTimeSeconds || 0
         });
       }
       
@@ -589,6 +604,46 @@ const Dashboard = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Summary Activity */}
+          <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
+            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-emerald-500" /> Summary Activity
+                </h3>
+                <Button onClick={() => navigate('/library?tab=summaries')} size="sm" variant="outline" className="text-xs py-1.5 h-auto">
+                  Go to AI Library
+                </Button>
+              </div>
+
+              {summaryReviewStats.totalReviews === 0 ? (
+                <div className="p-4 bg-emerald-500/5 dark:bg-emerald-900/10 rounded-xl border border-emerald-500/20 dark:border-emerald-500/30 text-center">
+                  <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    No summary reviews yet. Generate and review summaries to see analytics here.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex flex-wrap gap-3 sm:gap-5">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Summaries Reviewed</span>
+                      <span className="text-lg font-extrabold text-emerald-500">{summaryReviewStats.totalReviews}</span>
+                    </div>
+                    <div className="w-px bg-lavender/30 dark:bg-slate-700/50"></div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-text-muted uppercase">Total Review Time</span>
+                      <span className="text-lg font-extrabold text-blue-500">
+                        {summaryReviewStats.totalTimeSeconds > 0 && summaryReviewStats.totalTimeSeconds < 60 
+                          ? '< 1 min' 
+                          : `${Math.round(summaryReviewStats.totalTimeSeconds / 60)} min`}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
