@@ -46,7 +46,7 @@ app.use('/api/risk', riskRoutes);
 app.use('/api/subject-health', subjectHealthRoutes);
 app.use('/api/weak-topics', weakTopicRoutes);
 app.use('/api/pdf', pdfRoutes);
-app.use('/api/summary', summaryRoutes);
+app.use('/api/summaries', summaryRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/ai-library', aiLibraryRoutes);
