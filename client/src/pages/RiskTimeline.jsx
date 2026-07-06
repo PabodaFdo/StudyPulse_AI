@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Clock, TrendingDown, TrendingUp, Activity, AlertTriangle, ShieldAlert, Calendar, CheckCircle } from 'lucide-react';
+import { Clock, TrendingDown, TrendingUp, Activity, ShieldAlert, Calendar, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
 import ChartCard from '../components/ChartCard';
@@ -81,7 +81,7 @@ const RiskTimeline = () => {
     <div className="space-y-6">
       <PageHeader
         title="Risk Timeline"
-        subtitle="Review how your predicted academic risk score has evolved over the semester."
+        subtitle="Review how your academic risk probability has changed over time. Higher Risk Probability (%) indicates greater academic risk."
         icon={Clock}
       />
 
@@ -161,7 +161,7 @@ const RiskTimeline = () => {
 
           <div className="grid gap-6 lg:grid-cols-3">
             <ChartCard
-              title="Historical Risk Level Trend"
+              title="Historical Risk Probability Trend"
               subtitle="Higher Risk Probability (%) indicates greater academic risk."
               className="lg:col-span-2"
             >
@@ -209,10 +209,10 @@ const RiskTimeline = () => {
                 {riskHistory.map((evt) => {
                   const subjectName = subjects.find(s => String(s.id) === String(evt.subjectId))?.name || 'Subject';
                   
-                  let title = '';
-                  let icon = null;
-                  let borderColorClass = 'border-slate-200 dark:border-white/5';
-                  let iconBgClass = 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400';
+                  let title;
+                  let icon;
+                  let borderColorClass;
+                  let iconBgClass;
 
                   if (evt.trend === 'Improving') {
                     title = `${subjectName} improved to ${evt.riskLevel} with a ${Math.round(evt.riskScore)}% risk probability.`;

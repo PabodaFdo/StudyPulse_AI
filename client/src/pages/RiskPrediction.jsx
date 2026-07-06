@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShieldAlert, CheckCircle, TrendingUp, AlertTriangle, Download } from 'lucide-react';
+import { ShieldAlert, TrendingUp, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import { riskService } from '../services/risk.service';
@@ -81,18 +81,19 @@ const RiskPrediction = () => {
     setIsAutoFilling(true);
     try {
       const analytics = await subjectService.getSubjectAnalytics(selectedSubjectId);
+      const formatNum = (val, decimals) => val != null && !isNaN(val) ? Number(Number(val).toFixed(decimals)) : null;
       
       setFormData(prev => ({
         ...prev,
-        attendancePercentage: analytics.studyEngagementScore ?? analytics.attendancePercentage ?? prev.attendancePercentage,
-        assignmentAverage: analytics.assessmentWeightedAverage ?? analytics.avgMark ?? prev.assignmentAverage,
-        quizAverage: analytics.quizAttemptAverage ?? analytics.quizAverage ?? prev.quizAverage,
-        studyHoursPerWeek: analytics.studyHours ?? analytics.studyHoursPerWeek ?? prev.studyHoursPerWeek,
-        focusSessionsCompleted: analytics.focusSessions ?? analytics.focusSessionsCompleted ?? prev.focusSessionsCompleted,
-        previousExamMark: analytics.examMark ?? prev.previousExamMark
+        attendancePercentage: formatNum(analytics.studyEngagementScore ?? analytics.attendancePercentage, 1) ?? prev.attendancePercentage,
+        assignmentAverage: formatNum(analytics.assessmentWeightedAverage ?? analytics.avgMark, 1) ?? prev.assignmentAverage,
+        quizAverage: formatNum(analytics.quizAttemptAverage ?? analytics.quizAverage, 1) ?? prev.quizAverage,
+        studyHoursPerWeek: formatNum(analytics.studyHours ?? analytics.studyHoursPerWeek, 2) ?? prev.studyHoursPerWeek,
+        focusSessionsCompleted: formatNum(analytics.focusSessions ?? analytics.focusSessionsCompleted, 0) ?? prev.focusSessionsCompleted,
+        previousExamMark: formatNum(analytics.examMark, 1) ?? prev.previousExamMark
       }));
       toast.success('Risk prediction form filled from your study data.');
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch subject data for auto-fill.');
     } finally {
       setIsAutoFilling(false);

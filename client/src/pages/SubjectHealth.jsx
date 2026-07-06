@@ -74,7 +74,7 @@ const SubjectHealth = () => {
         setShowQuizInfo(true);
         toast.success('Subject health form filled from your study data.');
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch subject data for auto-fill.');
     } finally {
       setIsAutoFilling(false);
