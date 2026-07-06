@@ -29,6 +29,7 @@ model User {
   assessments         Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
   flashcardReviewAttempts FlashcardReviewAttempt[]
+  summaryReviewAttempts   SummaryReviewAttempt[]
 }
 
 model Subject {
@@ -51,6 +52,7 @@ model Subject {
   assessments     Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
   flashcardReviewAttempts FlashcardReviewAttempt[]
+  summaryReviewAttempts   SummaryReviewAttempt[]
 }
 
 model Note {
@@ -256,4 +258,19 @@ model FlashcardReviewAttempt {
   accuracy          Float
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model SummaryReviewAttempt {
+  id                  Int      @id @default(autoincrement())
+  userId              Int
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId           Int?
+  subject             Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  summaryId           String?
+  sourceTitle         String?
+  summaryWordCount    Int
+  readDurationSeconds Int
+  completed           Boolean
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
