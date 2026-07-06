@@ -8,48 +8,49 @@ generator client {
 }
 
 model User {
-  id               Int                @id @default(autoincrement())
-  email            String             @unique
-  password         String
-  name             String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  subjects         Subject[]
-  notes            Note[]
-  focusSessions    FocusSession[]
-  academicRecords  AcademicRecord[]
-  studyGarden      StudyGarden?
-  growthActivities    GrowthActivity[]
-  quests              StudyQuest[]
-  savedSummaries      SavedSummary[]
-  savedQuizzes        SavedQuiz[]
-  savedFlashcardDecks SavedFlashcardDeck[]
-  studyMaterials      StudyMaterial[]
-  quizAttempts        QuizAttempt[]
-  assessments         Assessment[]
+  id                      Int                      @id @default(autoincrement())
+  email                   String                   @unique
+  password                String
+  name                    String
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  subjects                Subject[]
+  notes                   Note[]
+  focusSessions           FocusSession[]
+  academicRecords         AcademicRecord[]
+  studyGarden             StudyGarden?
+  growthActivities        GrowthActivity[]
+  quests                  StudyQuest[]
+  savedSummaries          SavedSummary[]
+  savedQuizzes            SavedQuiz[]
+  savedFlashcardDecks     SavedFlashcardDeck[]
+  studyMaterials          StudyMaterial[]
+  quizAttempts            QuizAttempt[]
+  assessments             Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
   flashcardReviewAttempts FlashcardReviewAttempt[]
   summaryReviewAttempts   SummaryReviewAttempt[]
+  moodCheckIns            MoodCheckIn[]
 }
 
 model Subject {
-  id              Int               @id @default(autoincrement())
-  name            String
-  code            String?
-  credits         Int?
-  gradeTarget     String?
-  currentStanding String?
-  status          String?
-  description     String?
-  userId          Int
-  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  notes           Note[]
-  focusSessions   FocusSession[]
-  academicRecords AcademicRecord[]
-  quizAttempts    QuizAttempt[]
-  assessments     Assessment[]
+  id                      Int                      @id @default(autoincrement())
+  name                    String
+  code                    String?
+  credits                 Int?
+  gradeTarget             String?
+  currentStanding         String?
+  status                  String?
+  description             String?
+  userId                  Int
+  user                    User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  notes                   Note[]
+  focusSessions           FocusSession[]
+  academicRecords         AcademicRecord[]
+  quizAttempts            QuizAttempt[]
+  assessments             Assessment[]
   riskPredictionHistories RiskPredictionHistory[]
   flashcardReviewAttempts FlashcardReviewAttempt[]
   summaryReviewAttempts   SummaryReviewAttempt[]
@@ -69,7 +70,7 @@ model Note {
 
 model FocusSession {
   id        Int      @id @default(autoincrement())
-  duration  Int      // in minutes
+  duration  Int // in minutes
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subjectId Int
@@ -142,7 +143,7 @@ model SavedSummary {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SavedQuiz {
@@ -156,7 +157,7 @@ model SavedQuiz {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SavedFlashcardDeck {
@@ -170,7 +171,7 @@ model SavedFlashcardDeck {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model StudyMaterial {
@@ -184,7 +185,7 @@ model StudyMaterial {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model QuizAttempt {
@@ -202,12 +203,12 @@ model QuizAttempt {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject        Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 }
 
 model Assessment {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   userId         Int
   subjectId      Int
   title          String
@@ -216,11 +217,11 @@ model Assessment {
   weight         Float
   assessmentDate DateTime?
   notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject        Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 }
 
 model RiskPredictionHistory {
@@ -244,20 +245,20 @@ model RiskPredictionHistory {
 }
 
 model FlashcardReviewAttempt {
-  id                Int      @id @default(autoincrement())
-  userId            Int
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subjectId         Int?
-  subject           Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
-  flashcardDeckId   String?
-  sourceTitle       String?
-  totalCards        Int
-  reviewedCards     Int
-  knownCards        Int
-  needReviewCards   Int
-  accuracy          Float
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjectId       Int?
+  subject         Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  flashcardDeckId String?
+  sourceTitle     String?
+  totalCards      Int
+  reviewedCards   Int
+  knownCards      Int
+  needReviewCards Int
+  accuracy        Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model SummaryReviewAttempt {
@@ -273,4 +274,21 @@ model SummaryReviewAttempt {
   completed           Boolean
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
+}
+
+model MoodCheckIn {
+  id          String   @id @default(cuid())
+  userId      Int
+  mood        Int
+  moodLabel   String?
+  energyLevel Int
+  stressLevel Int
+  journalNote String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
