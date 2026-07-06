@@ -12,6 +12,8 @@ import Input from '../components/Input';
 import { generateSummary } from '../services/summary.service';
 import { saveSummary } from '../services/aiLibrary.service';
 import { getStudyMaterials } from '../services/studyMaterial.service';
+import { saveSummaryReviewAttempt } from '../services/summaryReview.service';
+import { CheckCircle } from 'lucide-react';
 import api from '../services/api';
 
 const GenerateSummary = () => {
@@ -33,6 +35,10 @@ const GenerateSummary = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
+
+  const [readStartTime, setReadStartTime] = useState(null);
+  const [isReviewMarked, setIsReviewMarked] = useState(false);
+  const [isMarkingReview, setIsMarkingReview] = useState(false);
 
   useEffect(() => {
     const text = localStorage.getItem('studypulse_extracted_text');
@@ -190,6 +196,9 @@ const GenerateSummary = () => {
       localStorage.setItem('studypulse_generated_summary', JSON.stringify(data));
       localStorage.setItem("studypulse_summary_source_id", newIdentity);
 
+      setReadStartTime(Date.now());
+      setIsReviewMarked(false);
+
       toast.success('Summary generated successfully!');
     } catch (error) {
       console.error('Summary Generation Error:', error);
@@ -240,6 +249,46 @@ const GenerateSummary = () => {
       toast.error('Failed to save summary.');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleMarkReviewed = async () => {
+    if (isReviewMarked || isMarkingReview) return;
+    try {
+      setIsMarkingReview(true);
+      let subjectId = null;
+      let sourceTitle = "Extracted PDF Material";
+      if (source === 'note') {
+        const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
+        if (note) {
+          sourceTitle = note.title;
+          subjectId = note.subjectId || (note.subject && note.subject.id) || null;
+        }
+      } else if (selectedMaterialId) {
+        const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
+        if (mat) {
+          sourceTitle = mat.title;
+          subjectId = mat.subjectId || (mat.subject && mat.subject.id) || null;
+        }
+      }
+
+      const duration = readStartTime ? Math.floor((Date.now() - readStartTime) / 1000) : 0;
+      
+      await saveSummaryReviewAttempt({
+        subjectId,
+        sourceTitle,
+        summaryWordCount: summaryResult.word_count || 0,
+        readDurationSeconds: duration,
+        completed: true
+      });
+      
+      setIsReviewMarked(true);
+      toast.success('Summary marked as reviewed!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to mark summary as reviewed.');
+    } finally {
+      setIsMarkingReview(false);
     }
   };
 
@@ -479,6 +528,19 @@ const GenerateSummary = () => {
                 </div>
               </div>
             )}
+
+            {/* Mark as Reviewed Action */}
+            <div className="flex justify-center mt-6">
+              <Button
+                variant={isReviewMarked ? 'secondary' : 'primary'}
+                onClick={handleMarkReviewed}
+                disabled={isReviewMarked || isMarkingReview}
+                className="w-full sm:w-auto px-8 py-3 rounded-full flex items-center justify-center gap-2 shadow-lg transition-all"
+              >
+                <CheckCircle className={`h-5 w-5 ${isReviewMarked ? 'text-brand-500' : ''}`} />
+                {isReviewMarked ? 'Review Completed' : isMarkingReview ? 'Marking...' : 'Mark as Reviewed'}
+              </Button>
+            </div>
 
             {/* Disclaimer */}
             <div className="flex items-start gap-3 p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 text-blue-800 dark:text-blue-300">
