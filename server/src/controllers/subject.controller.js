@@ -215,6 +215,27 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     }
   }
 
+  let summaryReviewAttempts = await prisma.summaryReviewAttempt.findMany({
+    where: {
+      userId: req.user.id,
+      subjectId: subject.id
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  if (summaryReviewAttempts.length === 0) {
+    const fallbackSummaryAttempts = await prisma.summaryReviewAttempt.findMany({
+      where: {
+        userId: req.user.id,
+        subjectId: null
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    if (fallbackSummaryAttempts.length > 0) {
+      summaryReviewAttempts = fallbackSummaryAttempts;
+    }
+  }
+
   let assessmentTotalWeight = 0;
   let sumProduct = 0;
   assessments.forEach(a => {
@@ -263,8 +284,8 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
   const safeFocusSessionsCount = allFocusSessions.length;
   
   const quizActivity = Math.min(quizAttemptCount / 3, 1) * 20;
-  const focusHoursScore = Math.min(safeStudyHours / 5, 1) * 12;
-  const focusSessionsScore = Math.min(safeFocusSessionsCount / 3, 1) * 8;
+  const focusHoursScore = Math.min(safeStudyHours / 5, 1) * 9;
+  const focusSessionsScore = Math.min(safeFocusSessionsCount / 3, 1) * 6;
   const focusActivity = focusHoursScore + focusSessionsScore;
   const notesActivity = Math.min(notesCount / 3, 1) * 15;
   const assessmentActivity = Math.min(assessmentCount / 2, 1) * 15;
@@ -298,6 +319,32 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
   else if (avgAccuracy > 0) accuracyScore = 2;
 
   const flashcardActivity = attemptsScore + reviewedCardsScore + accuracyScore;
+
+  let summaryAttemptsScore = 0;
+  if (summaryReviewAttempts.length === 1) summaryAttemptsScore = 2;
+  else if (summaryReviewAttempts.length === 2) summaryAttemptsScore = 3;
+  else if (summaryReviewAttempts.length >= 3) summaryAttemptsScore = 4;
+
+  let totalSummaryReviewTime = 0;
+  summaryReviewAttempts.forEach(attempt => {
+    totalSummaryReviewTime += attempt.readDurationSeconds;
+  });
+
+  let summaryTimeScore = 0;
+  if (totalSummaryReviewTime > 0 && totalSummaryReviewTime <= 60) summaryTimeScore = 1;
+  else if (totalSummaryReviewTime > 60 && totalSummaryReviewTime <= 300) summaryTimeScore = 2;
+  else if (totalSummaryReviewTime > 300) summaryTimeScore = 3;
+
+  let summaryRecentScore = 0;
+  if (summaryReviewAttempts.length > 0) {
+    const latestSummaryDate = new Date(summaryReviewAttempts[0].createdAt);
+    const daysSinceSummary = (new Date() - latestSummaryDate) / (1000 * 60 * 60 * 24);
+    if (daysSinceSummary <= 7) summaryRecentScore = 3;
+    else if (daysSinceSummary <= 14) summaryRecentScore = 2;
+    else summaryRecentScore = 1;
+  }
+
+  const summaryActivity = summaryAttemptsScore + summaryTimeScore + summaryRecentScore;
 
   console.log("Subject analytics flashcard debug:", {
     subjectId: subject.id,
@@ -334,6 +381,10 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     dates.push(new Date(flashcardReviewAttempts[0].createdAt));
   }
 
+  if (summaryReviewAttempts.length > 0) {
+    dates.push(new Date(summaryReviewAttempts[0].createdAt));
+  }
+
   if (dates.length > 0) {
     latestActivityDate = new Date(Math.max(...dates));
   }
@@ -342,15 +393,15 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
   if (latestActivityDate) {
     const daysSinceLatestActivity = (new Date() - latestActivityDate) / (1000 * 60 * 60 * 24);
     if (daysSinceLatestActivity <= 7) {
-      recentActivity = 15;
+      recentActivity = 10;
     } else if (daysSinceLatestActivity <= 14) {
-      recentActivity = 8;
+      recentActivity = 5;
     } else {
       recentActivity = 0;
     }
   }
 
-  const studyEngagementScore = Math.round(quizActivity + focusActivity + notesActivity + flashcardActivity + assessmentActivity + recentActivity);
+  const studyEngagementScore = Math.round(quizActivity + focusActivity + notesActivity + flashcardActivity + summaryActivity + assessmentActivity + recentActivity);
   
   let studyEngagementLevel = "Low";
   if (studyEngagementScore >= 75) studyEngagementLevel = "High";
@@ -361,6 +412,7 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     focusActivity: Math.round(focusActivity),
     notesActivity: Math.round(notesActivity),
     flashcardActivity: Math.round(flashcardActivity),
+    summaryActivity: Math.round(summaryActivity),
     assessmentActivity: Math.round(assessmentActivity),
     recentActivity: Math.round(recentActivity)
   };
