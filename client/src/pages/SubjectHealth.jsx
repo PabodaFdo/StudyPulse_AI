@@ -288,6 +288,7 @@ const SubjectHealth = () => {
             <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
               <p className="text-sm font-medium flex items-center gap-1.5">Subject Health is calculated using your real study activity, assessments, quizzes, focus sessions, flashcards, and notes.</p>
               <p className="text-xs text-slate-500 mt-1">Flashcard Activity is calculated from your reviewed cards, review attempts, and accuracy.</p>
+              <p className="text-xs text-slate-500 mt-1">Summary Activity is calculated from reviewed summaries, reading time, and recent review activity.</p>
             </div>
           )}
 
@@ -301,11 +302,12 @@ const SubjectHealth = () => {
               </div>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between"><span className="opacity-80">Quiz Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.quizActivity} / 20</strong></div>
-                <div className="flex justify-between"><span className="opacity-80">Focus Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.focusActivity} / 20</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Focus Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.focusActivity} / 15</strong></div>
                 <div className="flex justify-between"><span className="opacity-80">Notes Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.notesActivity} / 15</strong></div>
                 <div className="flex justify-between"><span className="opacity-80">Flashcard Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.flashcardActivity} / 15</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Summary Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.summaryActivity} / 10</strong></div>
                 <div className="flex justify-between"><span className="opacity-80">Assessment Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.assessmentActivity} / 15</strong></div>
-                <div className="flex justify-between"><span className="opacity-80">Recent Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.recentActivity} / 15</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Recent Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.recentActivity} / 10</strong></div>
               </div>
               <div className="mt-3 pt-2 border-t border-indigo-200 dark:border-indigo-800 flex justify-between font-bold">
                 <span>Total Score:</span>
