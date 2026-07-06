@@ -21,6 +21,7 @@ const studyMaterialRoutes = require('./routes/studyMaterial.routes');
 const quizAttemptRoutes = require('./routes/quizAttempt.routes');
 const assessmentRoutes = require('./routes/assessment.routes');
 const moodRoutes = require('./routes/mood.routes');
+const burnoutRoutes = require('./routes/burnout.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
@@ -55,6 +56,7 @@ app.use('/api/study-materials', studyMaterialRoutes);
 app.use('/api/quiz-attempts', quizAttemptRoutes);
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/mood', moodRoutes);
+app.use('/api/burnout', burnoutRoutes);
 // Error Handler
 app.use(errorHandler);
 
