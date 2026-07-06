@@ -106,6 +106,16 @@ const Flashcards = () => {
         console.error('Failed to parse saved statuses');
       }
     }
+
+    const savedCompletion = localStorage.getItem('studypulse_flashcard_show_completion');
+    if (savedCompletion === 'true') {
+      setShowCompletion(true);
+    }
+
+    const savedAttempt = localStorage.getItem('studypulse_flashcard_has_saved_attempt');
+    if (savedAttempt === 'true') {
+      setHasSavedAttempt(true);
+    }
   }, []);
 
   const fetchSources = async () => {
@@ -208,18 +218,31 @@ const Flashcards = () => {
     const saveAttempt = async () => {
       if (showCompletion && flashcardsData && !hasSavedAttempt) {
         setHasSavedAttempt(true);
+        localStorage.setItem('studypulse_flashcard_has_saved_attempt', 'true');
         try {
           let sourceTitle = 'Extracted Text';
+          let subjectId = null;
+
+          if (flashcardsData && flashcardsData.subjectId) {
+            subjectId = flashcardsData.subjectId;
+          }
+
           if (source === 'note') {
             const note = savedNotes.find(n => n.id.toString() === selectedNoteId.toString());
-            if (note) sourceTitle = note.title;
+            if (note) {
+              sourceTitle = note.title;
+              if (!subjectId) subjectId = note.subjectId || (note.subject && note.subject.id) || null;
+            }
           } else if (selectedMaterialId) {
             const mat = savedMaterials.find(m => m.id.toString() === selectedMaterialId.toString());
-            if (mat) sourceTitle = mat.title;
+            if (mat) {
+              sourceTitle = mat.title;
+              if (!subjectId) subjectId = mat.subjectId || (mat.subject && mat.subject.id) || null;
+            }
           }
 
           await saveFlashcardReviewAttempt({
-            subjectId: null,
+            subjectId: subjectId,
             flashcardDeckId: flashcardsData.id || null,
             sourceTitle,
             totalCards: stats.total,
@@ -236,6 +259,15 @@ const Flashcards = () => {
     };
     saveAttempt();
   }, [showCompletion, flashcardsData, hasSavedAttempt, stats, source, savedNotes, selectedNoteId, savedMaterials, selectedMaterialId]);
+
+  useEffect(() => {
+    if (flashcardsData && flashcardsData.flashcards && flashcardsData.flashcards.length > 0) {
+      if (stats.remaining === 0 && stats.total > 0 && !showCompletion) {
+        setShowCompletion(true);
+        localStorage.setItem('studypulse_flashcard_show_completion', 'true');
+      }
+    }
+  }, [stats, flashcardsData, showCompletion]);
 
   const handleGenerate = async () => {
     let textToUse = '';
@@ -303,6 +335,8 @@ const Flashcards = () => {
         localStorage.setItem('studypulse_flashcard_flipped', 'false');
         localStorage.removeItem('studypulse_flashcard_status');
         localStorage.removeItem('studypulse_flashcard_deck_saved');
+        localStorage.removeItem('studypulse_flashcard_show_completion');
+        localStorage.removeItem('studypulse_flashcard_has_saved_attempt');
 
         toast.success('Flashcards generated successfully!');
       } else {
@@ -339,6 +373,7 @@ const Flashcards = () => {
         return;
       }
       setShowCompletion(true);
+      localStorage.setItem('studypulse_flashcard_show_completion', 'true');
     }
   };
 
@@ -363,6 +398,8 @@ const Flashcards = () => {
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
     localStorage.removeItem('studypulse_flashcard_status');
+    localStorage.removeItem('studypulse_flashcard_show_completion');
+    localStorage.removeItem('studypulse_flashcard_has_saved_attempt');
   };
 
   const handleShuffle = () => {
@@ -379,6 +416,8 @@ const Flashcards = () => {
     localStorage.setItem('studypulse_generated_flashcards', JSON.stringify(newData));
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
+    localStorage.removeItem('studypulse_flashcard_show_completion');
+    localStorage.removeItem('studypulse_flashcard_has_saved_attempt');
   };
 
   const handleNew = () => {
@@ -396,6 +435,8 @@ const Flashcards = () => {
     localStorage.removeItem('studypulse_flashcard_flipped');
     localStorage.removeItem('studypulse_flashcard_status');
     localStorage.removeItem('studypulse_flashcard_deck_saved');
+    localStorage.removeItem('studypulse_flashcard_show_completion');
+    localStorage.removeItem('studypulse_flashcard_has_saved_attempt');
   };
 
   const handleOpenSaveModal = () => {
@@ -489,6 +530,8 @@ const Flashcards = () => {
     localStorage.setItem('studypulse_flashcard_current_index', '0');
     localStorage.setItem('studypulse_flashcard_flipped', 'false');
     localStorage.removeItem('studypulse_flashcard_status');
+    localStorage.removeItem('studypulse_flashcard_show_completion');
+    localStorage.removeItem('studypulse_flashcard_has_saved_attempt');
   };
 
   useEffect(() => {
