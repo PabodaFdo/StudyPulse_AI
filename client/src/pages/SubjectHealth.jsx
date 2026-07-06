@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HeartPulse, Activity, AlertTriangle, CheckCircle, XCircle, Download } from 'lucide-react';
+import { HeartPulse, Activity, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
 import { subjectHealthService } from '../services/subjectHealth.service';
@@ -286,7 +286,8 @@ const SubjectHealth = () => {
             }).some(val => val === 'none' || val === 'manual_required')
           ) && (
             <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-              <p className="text-sm font-medium flex items-center gap-1.5">Subject Health is calculated using your real study activity, assessments, quizzes, focus sessions, and notes.</p>
+              <p className="text-sm font-medium flex items-center gap-1.5">Subject Health is calculated using your real study activity, assessments, quizzes, focus sessions, flashcards, and notes.</p>
+              <p className="text-xs text-slate-500 mt-1">Flashcard Activity is calculated from your reviewed cards, review attempts, and accuracy.</p>
             </div>
           )}
 
@@ -299,9 +300,10 @@ const SubjectHealth = () => {
                 </span>
               </div>
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between"><span className="opacity-80">Quiz Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.quizActivity} / 25</strong></div>
-                <div className="flex justify-between"><span className="opacity-80">Focus Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.focusActivity} / 25</strong></div>
-                <div className="flex justify-between"><span className="opacity-80">Notes Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.notesActivity} / 20</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Quiz Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.quizActivity} / 20</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Focus Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.focusActivity} / 20</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Notes Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.notesActivity} / 15</strong></div>
+                <div className="flex justify-between"><span className="opacity-80">Flashcard Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.flashcardActivity} / 15</strong></div>
                 <div className="flex justify-between"><span className="opacity-80">Assessment Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.assessmentActivity} / 15</strong></div>
                 <div className="flex justify-between"><span className="opacity-80">Recent Activity:</span> <strong>{quizInfo.studyEngagementBreakdown?.recentActivity} / 15</strong></div>
               </div>

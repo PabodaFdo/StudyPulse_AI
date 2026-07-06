@@ -194,6 +194,27 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     }
   });
 
+  let flashcardReviewAttempts = await prisma.flashcardReviewAttempt.findMany({
+    where: {
+      userId: req.user.id,
+      subjectId: subject.id
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  if (flashcardReviewAttempts.length === 0) {
+    const fallbackAttempts = await prisma.flashcardReviewAttempt.findMany({
+      where: {
+        userId: req.user.id,
+        subjectId: null
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    if (fallbackAttempts.length > 0) {
+      flashcardReviewAttempts = fallbackAttempts;
+    }
+  }
+
   let assessmentTotalWeight = 0;
   let sumProduct = 0;
   assessments.forEach(a => {
@@ -237,16 +258,52 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     quizAverageSource = "academic_records";
   }
 
-  // Study Engagement Calculation (Version 1)
+  // Study Engagement Calculation (Version 2 with Flashcards)
   const safeStudyHours = studyHours || 0;
   const safeFocusSessionsCount = allFocusSessions.length;
   
-  const quizActivity = Math.min(quizAttemptCount / 3, 1) * 25;
-  const focusHoursScore = Math.min(safeStudyHours / 5, 1) * 15;
-  const focusSessionsScore = Math.min(safeFocusSessionsCount / 3, 1) * 10;
+  const quizActivity = Math.min(quizAttemptCount / 3, 1) * 20;
+  const focusHoursScore = Math.min(safeStudyHours / 5, 1) * 12;
+  const focusSessionsScore = Math.min(safeFocusSessionsCount / 3, 1) * 8;
   const focusActivity = focusHoursScore + focusSessionsScore;
-  const notesActivity = Math.min(notesCount / 3, 1) * 20;
+  const notesActivity = Math.min(notesCount / 3, 1) * 15;
   const assessmentActivity = Math.min(assessmentCount / 2, 1) * 15;
+
+  let attemptsScore = 0;
+  if (flashcardReviewAttempts.length === 1) attemptsScore = 2;
+  else if (flashcardReviewAttempts.length === 2) attemptsScore = 4;
+  else if (flashcardReviewAttempts.length >= 3) attemptsScore = 5;
+
+  let totalReviewedCards = 0;
+  let totalAccuracySum = 0;
+  flashcardReviewAttempts.forEach(attempt => {
+    totalReviewedCards += attempt.reviewedCards;
+    totalAccuracySum += attempt.accuracy;
+  });
+
+  let reviewedCardsScore = 0;
+  if (totalReviewedCards >= 1 && totalReviewedCards <= 5) reviewedCardsScore = 2;
+  else if (totalReviewedCards >= 6 && totalReviewedCards <= 15) reviewedCardsScore = 4;
+  else if (totalReviewedCards >= 16) reviewedCardsScore = 5;
+
+  let avgAccuracy = 0;
+  if (flashcardReviewAttempts.length > 0) {
+    avgAccuracy = totalAccuracySum / flashcardReviewAttempts.length;
+  }
+
+  let accuracyScore = 0;
+  if (avgAccuracy >= 80) accuracyScore = 5;
+  else if (avgAccuracy >= 60) accuracyScore = 4;
+  else if (avgAccuracy >= 40) accuracyScore = 3;
+  else if (avgAccuracy > 0) accuracyScore = 2;
+
+  const flashcardActivity = attemptsScore + reviewedCardsScore + accuracyScore;
+
+  console.log("Subject analytics flashcard debug:", {
+    subjectId: subject.id,
+    flashcardReviewAttemptsCount: flashcardReviewAttempts.length,
+    flashcardActivityScore: flashcardActivity
+  });
 
   let latestActivityDate = null;
   const dates = [];
@@ -273,6 +330,10 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     dates.push(latestAsst.updatedAt ? new Date(latestAsst.updatedAt) : new Date(latestAsst.createdAt));
   }
 
+  if (flashcardReviewAttempts.length > 0) {
+    dates.push(new Date(flashcardReviewAttempts[0].createdAt));
+  }
+
   if (dates.length > 0) {
     latestActivityDate = new Date(Math.max(...dates));
   }
@@ -289,7 +350,7 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     }
   }
 
-  const studyEngagementScore = Math.round(quizActivity + focusActivity + notesActivity + assessmentActivity + recentActivity);
+  const studyEngagementScore = Math.round(quizActivity + focusActivity + notesActivity + flashcardActivity + assessmentActivity + recentActivity);
   
   let studyEngagementLevel = "Low";
   if (studyEngagementScore >= 75) studyEngagementLevel = "High";
@@ -299,6 +360,7 @@ const getSubjectAnalytics = asyncHandler(async (req, res) => {
     quizActivity: Math.round(quizActivity),
     focusActivity: Math.round(focusActivity),
     notesActivity: Math.round(notesActivity),
+    flashcardActivity: Math.round(flashcardActivity),
     assessmentActivity: Math.round(assessmentActivity),
     recentActivity: Math.round(recentActivity)
   };
