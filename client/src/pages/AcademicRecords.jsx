@@ -302,8 +302,8 @@ const AcademicRecords = () => {
       {/* GPA Summary Section */}
       {records.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 flex flex-col justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Current GPA</span>
+          <div className="app-soft-card p-4 rounded-xl card-title flex flex-col justify-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider card-muted mb-1">Current GPA</span>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-black">{gpaStats.gpa.toFixed(2)}</span>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-300">
@@ -311,30 +311,30 @@ const AcademicRecords = () => {
               </span>
             </div>
           </div>
-          <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 flex flex-col justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Total Credits</span>
+          <div className="app-soft-card p-4 rounded-xl card-title flex flex-col justify-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider card-muted mb-1">Total Credits</span>
             <span className="text-2xl font-black">{gpaStats.totalCredits}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 flex flex-col justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Quality Points</span>
+          <div className="app-soft-card p-4 rounded-xl card-title flex flex-col justify-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider card-muted mb-1">Quality Points</span>
             <span className="text-2xl font-black">{gpaStats.totalQualityPoints.toFixed(2)}</span>
           </div>
-          <div className="p-4 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 flex flex-col justify-center">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Completed Courses</span>
+          <div className="app-soft-card p-4 rounded-xl card-title flex flex-col justify-center">
+            <span className="text-[10px] font-bold uppercase tracking-wider card-muted mb-1">Completed Courses</span>
             <span className="text-2xl font-black">{gpaStats.completedCourses}</span>
           </div>
         </div>
       ) : !isLoading ? (
-        <div className="p-6 rounded-xl bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-center text-slate-500 dark:text-slate-400 text-sm">
+        <div className="app-soft-card p-6 rounded-xl text-center card-muted text-sm">
           No GPA calculated yet. Add academic records to calculate your GPA.
         </div>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Table of Records */}
-        <div className="lg:col-span-2 glass-card p-5 border border-white/5 bg-white/[0.02] space-y-4">
+        <div className="lg:col-span-2 app-panel p-5 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-bold text-white text-base">Current Term Courses</h3>
+            <h3 className="font-bold card-title text-base">Current Term Courses</h3>
 
             <Button onClick={handleOpenCreateModal} className="gap-2 px-3 py-1.5 text-xs font-semibold">
               <Plus className="h-4 w-4" />
@@ -348,13 +348,13 @@ const AcademicRecords = () => {
                 <Loader2 className="h-8 w-8 animate-spin" />
               </div>
             ) : records.length === 0 ? (
-              <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-center py-8 text-sm card-muted">
                 No academic records found. Add one to get started!
               </div>
             ) : (
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead>
-                  <tr className="border-b border-lavender/30 dark:border-white/5 text-[#6b6388] dark:text-slate-300 font-semibold">
+                  <tr className="border-b border-lavender/30 dark:border-white/5 card-muted font-semibold">
                     <th className="pb-3 px-2">Course Code</th>
                     <th className="pb-3 px-2">Course Title</th>
                     <th className="pb-3 px-2">Credits</th>
@@ -363,7 +363,7 @@ const AcademicRecords = () => {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-lavender/30 dark:divide-white/5 text-[#241b4b] dark:text-white">
+                <tbody className="divide-y divide-lavender/30 dark:divide-white/5 card-title">
                   {records.map((record) => (
                     <tr key={record.id} className="hover:bg-white/5 transition">
                       <td className="py-3.5 px-2 font-bold font-mono text-brand-600 dark:text-brand-300">
@@ -447,9 +447,9 @@ const AcademicRecords = () => {
         </div>
 
         {/* GPA Calculator / Future Course Planner */}
-        <div className="glass-card p-5 border border-white/5 bg-white/[0.02] space-y-5">
+        <div className="app-panel p-5 space-y-5">
           <div className="flex justify-between items-start lg:items-center flex-col lg:flex-row gap-3 lg:gap-0">
-            <h3 className="font-bold text-[#241b4b] dark:text-white text-base flex items-center gap-2">
+            <h3 className="font-bold card-title text-base flex items-center gap-2">
               <Calculator className="h-[18px] w-[18px] text-brand-500 dark:text-brand-400" />
               Future Course Planner
             </h3>
@@ -468,7 +468,7 @@ const AcademicRecords = () => {
             </Button>
           </div>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed bg-brand-500/5 p-3 rounded-lg border border-brand-500/10">
+          <p className="text-xs card-muted leading-relaxed bg-brand-500/5 p-3 rounded-lg border border-brand-500/10">
             Use this to estimate your GPA by adding expected grades for future courses. These guesses are not saved to your records.
           </p>
 
@@ -476,10 +476,10 @@ const AcademicRecords = () => {
             {futureCourses.map((fc, index) => (
               <div
                 key={fc.id}
-                className="grid grid-cols-[1fr_1fr_40px] gap-2 items-end bg-black/5 dark:bg-white/5 p-3 rounded-xl border border-white/10 dark:border-white/5"
+                className="grid grid-cols-[1fr_1fr_40px] gap-2 items-end app-card p-3 rounded-xl"
               >
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#6b6388] dark:text-slate-400 uppercase tracking-wider">
+                  <label className="text-[10px] font-bold card-muted uppercase tracking-wider">
                     Future Course Credits
                   </label>
 
@@ -490,7 +490,7 @@ const AcademicRecords = () => {
                       newArr[index].credits = e.target.value;
                       setFutureCourses(newArr);
                     }}
-                    className="w-full rounded-xl border border-lavender/40 bg-white/90 px-3 py-2.5 text-sm text-[#241b4b] outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                    className="w-full rounded-xl app-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
                       <option key={num} value={num}>
@@ -501,7 +501,7 @@ const AcademicRecords = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-[#6b6388] dark:text-slate-400 uppercase tracking-wider">
+                  <label className="text-[10px] font-bold card-muted uppercase tracking-wider">
                     Expected Letter Grade
                   </label>
 
@@ -512,7 +512,7 @@ const AcademicRecords = () => {
                       newArr[index].expectedGrade = e.target.value;
                       setFutureCourses(newArr);
                     }}
-                    className="w-full rounded-xl border border-lavender/40 bg-white/90 px-3 py-2.5 text-sm text-[#241b4b] outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                    className="w-full rounded-xl app-input px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                   >
                     {gradeOptions.map((g) => (
                       <option key={g.value} value={g.value}>
@@ -539,7 +539,7 @@ const AcademicRecords = () => {
             ))}
 
             {futureCourses.length === 0 && (
-              <div className="text-center py-4 text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-center py-4 text-xs card-muted">
                 No future courses added. GPA will be calculated based only on existing records.
               </div>
             )}
@@ -552,11 +552,11 @@ const AcademicRecords = () => {
           </div>
 
           <div className="p-4 rounded-xl bg-brand-500/5 border border-brand-500/20 text-center">
-            <span className="text-[10px] text-gray-500 uppercase tracking-wider block font-semibold">
+            <span className="text-[10px] card-muted uppercase tracking-wider block font-semibold">
               PROJECTED CUMULATIVE GPA
             </span>
 
-            <span className="text-4xl font-extrabold text-[#241b4b] dark:text-white block mt-2">
+            <span className="text-4xl font-extrabold card-title block mt-2">
               {gpaResult}
             </span>
           </div>
@@ -566,23 +566,23 @@ const AcademicRecords = () => {
       {/* Create / Edit Record Modal */}
       {openRecordModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl rounded-3xl border border-lavender/30 bg-[#f1e7ff] p-6 shadow-2xl dark:border-white/10 dark:bg-slate-900 dark:text-white">
+          <div className="relative w-full max-w-xl rounded-3xl app-card p-6 shadow-2xl">
             <button
               type="button"
               onClick={() => setOpenRecordModal(false)}
-              className="absolute right-5 top-5 rounded-full p-2 text-[#241b4b] transition hover:bg-white/60 dark:text-white dark:hover:bg-white/10"
+              className="absolute right-5 top-5 rounded-full p-2 card-title transition hover:bg-black/10 dark:hover:bg-white/10"
               aria-label="Close record modal"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <h2 className="mb-6 text-2xl font-bold text-[#241b4b] dark:text-white">
+            <h2 className="mb-6 text-2xl font-bold card-title">
               {editingRecord ? 'Edit Record' : 'Add Record'}
             </h2>
 
             <form onSubmit={handleSaveRecord} className="space-y-5 text-left">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#6b6388] dark:text-slate-200">
+                <label className="text-sm font-semibold card-title">
                   Subject / Module
                 </label>
 
@@ -590,7 +590,7 @@ const AcademicRecords = () => {
                   value={form.subjectId}
                   onChange={handleSubjectChange}
                   required
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                  className="w-full rounded-2xl app-input px-5 py-4 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                 >
                   <option value="" disabled>
                     Select a Subject
@@ -605,7 +605,7 @@ const AcademicRecords = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#6b6388] dark:text-slate-200">
+                <label className="text-sm font-semibold card-title">
                   Course Code
                 </label>
 
@@ -614,12 +614,12 @@ const AcademicRecords = () => {
                   placeholder="e.g. CS 101"
                   value={form.courseCode}
                   onChange={(e) => setForm({ ...form, courseCode: e.target.value })}
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                  className="w-full rounded-2xl app-input px-5 py-4 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#6b6388] dark:text-slate-200">
+                <label className="text-sm font-semibold card-title">
                   Course Title
                 </label>
 
@@ -629,13 +629,13 @@ const AcademicRecords = () => {
                   value={form.courseName}
                   onChange={(e) => setForm({ ...form, courseName: e.target.value })}
                   required
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                  className="w-full rounded-2xl app-input px-5 py-4 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#6b6388] dark:text-slate-200">
+                  <label className="text-sm font-semibold card-title">
                     Credits
                   </label>
 
@@ -646,12 +646,12 @@ const AcademicRecords = () => {
                     required
                     value={form.credits}
                     onChange={(e) => setForm({ ...form, credits: e.target.value })}
-                    className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                    className="w-full rounded-2xl app-input px-5 py-4 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#6b6388] dark:text-slate-200">
+                  <label className="text-sm font-semibold card-title">
                     Final Letter Grade
                   </label>
 
@@ -659,7 +659,7 @@ const AcademicRecords = () => {
                     value={form.grade}
                     onChange={(e) => setForm({ ...form, grade: e.target.value })}
                     required
-                    className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+                    className="w-full rounded-2xl app-input px-5 py-4 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
                   >
                     {gradeOptions.map((g) => (
                       <option key={g.value} value={g.value}>
@@ -694,24 +694,24 @@ const AcademicRecords = () => {
       {/* Custom Delete Confirmation Modal */}
       {openDeleteModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-md rounded-3xl border border-lavender/30 bg-[#f1e7ff] p-6 shadow-2xl dark:border-white/10 dark:bg-slate-900 dark:text-white">
+          <div className="relative w-full max-w-md rounded-3xl app-card p-6 shadow-2xl">
             <button
               type="button"
               onClick={() => setOpenDeleteModal(false)}
-              className="absolute right-5 top-5 rounded-full p-2 text-[#241b4b] transition hover:bg-white/60 dark:text-white dark:hover:bg-white/10"
+              className="absolute right-5 top-5 rounded-full p-2 card-title transition hover:bg-black/10 dark:hover:bg-white/10"
               aria-label="Close delete modal"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <h2 className="mb-4 text-2xl font-bold text-[#241b4b] dark:text-white">
+            <h2 className="mb-4 text-2xl font-bold card-title">
               Delete Record?
             </h2>
 
             <div className="space-y-5 text-left">
-              <p className="text-sm text-[#6b6388] dark:text-slate-300 leading-relaxed">
+              <p className="text-sm app-readable-text leading-relaxed">
                 Are you sure you want to delete the academic record for{' '}
-                <span className="font-bold text-[#241b4b] dark:text-white">
+                <span className="font-bold card-title">
                   {recordToDelete?.courseCode || recordToDelete?.courseName || 'this subject'}
                 </span>
                 ? This action cannot be undone.
