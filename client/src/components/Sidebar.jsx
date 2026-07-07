@@ -89,10 +89,8 @@ const Sidebar = () => {
   return (
     <aside className={`
       fixed left-3 top-3 z-40 hidden h-[calc(100vh-24px)] flex-col p-4
-      rounded-[28px] border border-slate-200 dark:border-slate-700/50
-      bg-white/85 dark:bg-slate-950/80
-      shadow-xl dark:shadow-[0_0_40px_rgba(6,182,212,0.1)]
-      backdrop-blur-xl transition-all duration-300 ease-in-out
+      rounded-[28px] bg-white/58 backdrop-blur-2xl border border-white/55 shadow-xl shadow-slate-300/20 dark:bg-slate-950/58 dark:border-slate-600/45 dark:shadow-none
+      transition-all duration-300 ease-in-out
       lg:flex
       ${isCollapsed ? 'w-[84px]' : 'w-[280px]'}
     `}>
@@ -102,7 +100,7 @@ const Sidebar = () => {
           <>
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple dark:text-cyan-400" />
-              <span className="font-extrabold text-sm tracking-tight text-text-main dark:text-white">
+              <span className="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white">
                 StudyPulse AI 🌱
               </span>
             </div>
@@ -137,7 +135,7 @@ const Sidebar = () => {
         {sections.map((section) => (
           <div key={section.title} className="space-y-1.5">
             {!isCollapsed && (
-              <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2 whitespace-nowrap">
+              <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 whitespace-nowrap">
                 {section.title}
               </p>
             )}
@@ -149,16 +147,20 @@ const Sidebar = () => {
                   to={link.to}
                   title={isCollapsed ? link.label : undefined}
                   className={`
-                    flex items-center transition-all duration-200
-                    ${isCollapsed ? 'justify-center w-11 h-11 mx-auto' : 'gap-3 px-3.5 py-2.5 w-full'}
+                    group flex items-center transition-all duration-200 font-semibold
+                    ${isCollapsed ? 'justify-center w-11 h-11 mx-auto rounded-2xl' : 'gap-3 px-4 py-3 w-full rounded-2xl'}
                     ${isActive
-                      ? `bg-gradient-to-r from-cyan-500/10 to-purple-500/10 dark:from-cyan-500/25 dark:to-purple-500/25 border border-cyan-400/40 text-cyan-700 dark:text-cyan-200 shadow-sm rounded-2xl`
-                      : `text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white border border-transparent ${isCollapsed ? 'rounded-xl' : 'rounded-xl'}`
+                      ? isCollapsed
+                        ? 'bg-cyan-100/75 border border-cyan-300/70 text-cyan-700 shadow-md shadow-cyan-200/40 dark:bg-cyan-950/40 dark:border-cyan-500/40 dark:text-cyan-300'
+                        : 'bg-cyan-100/70 border border-cyan-300/70 text-cyan-800 shadow-sm shadow-cyan-200/40 dark:bg-cyan-950/40 dark:border-cyan-500/40 dark:text-cyan-300'
+                      : isCollapsed
+                        ? 'text-slate-600 hover:text-cyan-700 hover:bg-white/45 border border-transparent dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-cyan-300'
+                        : 'text-slate-700 hover:text-cyan-700 hover:bg-white/40 border border-transparent dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-cyan-300'
                     }
                   `}
                 >
-                  <link.icon className={`h-4.5 w-4.5 flex-shrink-0 transition-colors ${isActive ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} />
-                  {!isCollapsed && <span className="truncate text-[13px] font-bold">{link.label}</span>}
+                  <link.icon className={`h-5 w-5 flex-shrink-0 transition-colors ${isActive ? 'text-cyan-700 dark:text-cyan-300' : 'text-slate-500 group-hover:text-cyan-600 dark:text-slate-400 dark:group-hover:text-cyan-300'}`} />
+                  {!isCollapsed && <span className="truncate text-[13px]">{link.label}</span>}
                 </NavLink>
               );
             })}
@@ -190,11 +192,11 @@ const Sidebar = () => {
         <button
           onClick={handleLogout}
           title={isCollapsed ? 'Logout' : undefined}
-          className={`flex items-center transition-all duration-200 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-500 dark:hover:text-red-400
+          className={`group flex items-center transition-all duration-200 rounded-xl text-slate-600 hover:text-red-500 hover:bg-white/40 dark:text-slate-300 dark:hover:text-red-400 dark:hover:bg-white/10
             ${isCollapsed ? 'justify-center w-11 h-11 p-2' : 'gap-3 px-4 py-3 w-full font-semibold text-xs'}
           `}
         >
-          <LogOut className="h-4 w-4 flex-shrink-0" />
+          <LogOut className="h-4 w-4 flex-shrink-0 transition-colors group-hover:text-red-500 dark:group-hover:text-red-400" />
           {!isCollapsed && <span>Logout</span>}
         </button>
       </div>
