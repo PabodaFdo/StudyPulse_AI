@@ -165,7 +165,7 @@ const StudyGarden = () => {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="liquid-card p-8 max-w-sm w-full bg-gradient-to-br from-[#2a2139]/95 to-[#1a1525]/95 border border-purple/40 text-center relative overflow-hidden shadow-2xl"
+              className="app-panel p-8 max-w-sm w-full text-center relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-purple/20 blur-[80px] rounded-full pointer-events-none"></div>
               
@@ -225,7 +225,7 @@ const StudyGarden = () => {
 
       <div className="grid gap-6 lg:grid-cols-3 z-10 relative">
         {/* Garden Visual Card */}
-        <div className="liquid-card p-6 min-h-[380px] bg-gradient-to-br from-white/90 to-[#f4ecff]/80 dark:from-dark-bg dark:to-[#2a2139] border border-lavender/20 dark:border-purple/20 relative shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col justify-center">
+        <div className="app-panel p-6 min-h-[380px] relative transition-all hover:shadow-md overflow-hidden flex flex-col justify-center">
           <div className="absolute inset-0 bg-gradient-to-b from-purple/5 to-transparent pointer-events-none"></div>
           
           <div className="liquid-card-content flex flex-col items-center justify-center h-full w-full relative z-10">
@@ -247,7 +247,7 @@ const StudyGarden = () => {
                   />
                 </div>
               </motion.div>
-              <span className="text-[10px] text-text-muted font-bold mt-6 tracking-wider z-10 px-3 py-1 bg-white/50 dark:bg-black/30 rounded-full border border-lavender/20 dark:border-white/5 shadow-sm">
+              <span className="text-[10px] text-text-muted font-bold mt-6 tracking-wider z-10 px-3 py-1 app-soft-card rounded-full">
                 STUDY GARDEN
               </span>
             </div>
@@ -255,7 +255,7 @@ const StudyGarden = () => {
         </div>
 
         {/* Growth Status & Actions */}
-        <div className="liquid-card p-6 relative border border-lavender/20 dark:border-purple/20 shadow-sm transition-all hover:shadow-md">
+        <div className="app-panel p-6 relative transition-all hover:shadow-md">
           <div className="liquid-card-content flex flex-col justify-between h-full space-y-6">
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-lavender/20 dark:border-purple/20 pb-4">
@@ -268,7 +268,7 @@ const StudyGarden = () => {
                 </div>
               </div>
 
-              <div className="space-y-4 bg-white/50 dark:bg-black/20 p-5 rounded-xl border border-lavender/10 dark:border-white/5 shadow-inner">
+              <div className="space-y-4 app-card p-5 shadow-inner">
                 <div className="flex justify-between items-end">
                   <div className="space-y-1">
                     <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider block">Total Growth</span>
@@ -323,7 +323,7 @@ const StudyGarden = () => {
         </div>
 
         {/* Recent Activities Log */}
-        <div className="liquid-card p-6 relative border border-lavender/20 dark:border-purple/20 shadow-sm transition-all hover:shadow-md">
+        <div className="app-panel p-6 relative transition-all hover:shadow-md flex flex-col">
           <div className="liquid-card-content flex flex-col h-full">
             <div className="flex items-center justify-between border-b border-lavender/20 dark:border-purple/20 pb-4 mb-4">
               <h3 className="text-xl font-extrabold text-text-main dark:text-white">Recent Log</h3>
@@ -338,9 +338,9 @@ const StudyGarden = () => {
                   {recentActivities.map((activity) => (
                     <div 
                       key={activity.id} 
-                      className="flex items-start gap-3 p-3 rounded-xl bg-white/40 dark:bg-black/20 border border-lavender/10 dark:border-white/5 hover:bg-white/60 dark:hover:bg-black/30 transition-all shadow-sm hover:shadow"
+                      className="flex items-start gap-3 p-3 rounded-xl app-soft-card transition-all shadow-sm hover:shadow"
                     >
-                      <div className="mt-0.5 p-2 bg-white dark:bg-dark-bg rounded-lg shadow-sm border border-lavender/10 dark:border-white/5">
+                      <div className="mt-0.5 p-2 app-soft-card rounded-lg shadow-sm">
                         {getActivityIcon(activity.activity)}
                       </div>
                       <div className="flex-1">
