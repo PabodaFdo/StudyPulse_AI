@@ -33,9 +33,9 @@ const RevisionReminders = () => {
         icon={Bell}
       />
 
-      <div className="max-w-2xl mx-auto glass-card p-5 border border-white/5 bg-white/[0.02] space-y-4">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
-          <span className="text-xs font-semibold text-gray-400">UPCOMING REVISIONS</span>
+      <div className="max-w-2xl mx-auto app-panel p-5 space-y-4">
+        <div className="flex justify-between items-center border-b border-slate-200 dark:border-white/5 pb-2">
+          <span className="text-xs font-semibold card-muted">UPCOMING REVISIONS</span>
           <Badge color="purple">{reminders.length} Active</Badge>
         </div>
 
@@ -43,7 +43,7 @@ const RevisionReminders = () => {
           {reminders.map((r) => (
             <div
               key={r.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.01]"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl app-card"
             >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 p-2 bg-brand-500/10 rounded-lg">
@@ -51,11 +51,11 @@ const RevisionReminders = () => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-brand-300 font-mono">{r.subject}</span>
+                    <span className="text-xs font-bold text-brand-600 dark:text-brand-300 font-mono">{r.subject}</span>
                     <Badge color={r.color}>{r.priority}</Badge>
                   </div>
-                  <h4 className="text-xs font-semibold text-gray-200 mt-1">{r.topic}</h4>
-                  <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1">
+                  <h4 className="text-xs font-semibold card-title mt-1">{r.topic}</h4>
+                  <p className="text-[10px] card-muted mt-0.5 flex items-center gap-1">
                     <Clock className="h-3 w-3" /> {r.date}
                   </p>
                 </div>
