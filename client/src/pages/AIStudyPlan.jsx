@@ -42,9 +42,9 @@ const AIStudyPlan = () => {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Progress summary */}
-        <div className="glass-card p-5 border border-white/5 bg-white/[0.02] space-y-4 h-fit">
-          <h3 className="font-bold text-white text-base">Plan Overview</h3>
-          <p className="text-xs text-gray-400 leading-relaxed">
+        <div className="app-card p-5 space-y-4 h-fit">
+          <h3 className="font-bold card-title text-base">Plan Overview</h3>
+          <p className="text-xs card-muted leading-relaxed">
             This study plan has been tailored by your StudyPulse AI assistant based on your midterm timeline and subject standings.
           </p>
 
@@ -52,22 +52,22 @@ const AIStudyPlan = () => {
             <ProgressBar value={percentage} color="purple" label="Today's Progress" />
           </div>
 
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5 text-center text-xs">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-white/5 text-center text-xs">
             <div>
-              <p className="text-gray-500 font-semibold uppercase">Completed</p>
-              <p className="text-lg font-bold text-white mt-0.5">{completedCount} / {tasks.length}</p>
+              <p className="card-muted font-semibold uppercase">Completed</p>
+              <p className="text-lg font-bold card-title mt-0.5">{completedCount} / {tasks.length}</p>
             </div>
             <div>
-              <p className="text-gray-500 font-semibold uppercase">Daily XP</p>
+              <p className="card-muted font-semibold uppercase">Daily XP</p>
               <p className="text-lg font-bold text-success-400 mt-0.5">+{completedCount * 10} XP</p>
             </div>
           </div>
         </div>
 
         {/* Task List */}
-        <div className="lg:col-span-2 glass-card p-5 border border-white/5 bg-white/[0.02] space-y-4">
-          <div className="flex items-center justify-between border-b border-white/5 pb-2">
-            <span className="text-sm font-semibold text-white">TODAY'S STUDY PATH</span>
+        <div className="lg:col-span-2 app-panel p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
+            <span className="text-sm font-semibold section-title">TODAY'S STUDY PATH</span>
             <Badge color="purple">Active Goals</Badge>
           </div>
 
@@ -76,10 +76,10 @@ const AIStudyPlan = () => {
               <button
                 key={t.id}
                 onClick={() => toggleTask(t.id)}
-                className={`w-full flex items-start justify-between gap-4 p-4 rounded-xl border transition text-left cursor-pointer ${
+                className={`w-full flex items-start justify-between gap-4 p-4 rounded-xl transition text-left cursor-pointer ${
                   t.completed
-                    ? 'border-success-500/20 bg-success-500/5'
-                    : 'border-white/5 bg-white/[0.01] hover:bg-white/[0.03]'
+                    ? 'pastel-mint-card'
+                    : 'pastel-blue-card'
                 }`}
               >
                 <div className="flex items-start gap-3 flex-1">
@@ -87,16 +87,16 @@ const AIStudyPlan = () => {
                     {t.completed ? (
                       <CheckCircle2 className="h-5 w-5 text-success-400" />
                     ) : (
-                      <Circle className="h-5 w-5 text-gray-500 hover:text-brand-400" />
+                      <Circle className="h-5 w-5 card-muted hover:text-brand-400" />
                     )}
                   </div>
                   <div>
-                    <p className={`text-xs font-semibold ${t.completed ? 'text-gray-500 line-through' : 'text-gray-200'}`}>
+                    <p className={`text-xs font-semibold ${t.completed ? 'card-muted line-through' : 'card-title'}`}>
                       {t.text}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[9px] font-bold text-brand-300 uppercase">{t.subject}</span>
-                      <span className="text-[9px] text-gray-500">• {t.duration}</span>
+                      <span className="text-[9px] font-bold text-brand-500 dark:text-brand-300 uppercase">{t.subject}</span>
+                      <span className="text-[9px] card-muted">• {t.duration}</span>
                     </div>
                   </div>
                 </div>
