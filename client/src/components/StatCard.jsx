@@ -1,21 +1,28 @@
-const StatCard = ({ icon: Icon, label, value, badgeText, change, changeType = 'positive', onClick }) => {
+const StatCard = ({ icon: Icon, label, value, badgeText, change, changeType = 'positive', onClick, color }) => {
   const isClickable = !!onClick;
   
+  let cardBgClass = "app-card";
+  if (color === 'purple') cardBgClass = "pastel-purple-card";
+  else if (color === 'pink' || color === 'red') cardBgClass = "pastel-pink-card";
+  else if (color === 'blue') cardBgClass = "pastel-blue-card";
+  else if (color === 'green' || color === 'mint') cardBgClass = "pastel-mint-card";
+  else if (color === 'yellow' || color === 'amber') cardBgClass = "pastel-yellow-card";
+
   const CardWrapper = isClickable ? 'button' : 'div';
   const clickableProps = isClickable 
     ? { 
         onClick, 
-        className: "liquid-card liquid-card-hover p-6 w-full text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] focus:outline-none focus:ring-2 focus:ring-purple cursor-pointer",
+        className: `${cardBgClass} p-6 w-full text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] focus:outline-none focus:ring-2 focus:ring-purple cursor-pointer`,
         "aria-label": `Navigate to ${label}`
       } 
-    : { className: "liquid-card liquid-card-hover p-6 w-full text-left" };
+    : { className: `${cardBgClass} p-6 w-full text-left` };
 
   return (
     <CardWrapper {...clickableProps}>
-      <div className="liquid-card-content space-y-4">
+      <div className="relative z-10 space-y-4">
         <div className="flex items-start justify-between">
-          <div className="liquid-icon">
-            <Icon className="h-5 w-5 text-purple dark:text-cyan-400" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-white/50 dark:bg-slate-900/50 shadow-sm">
+            <Icon className="h-5 w-5 text-slate-700 dark:text-slate-300" />
           </div>
           {(badgeText || change !== undefined) && (
             <span
@@ -32,8 +39,8 @@ const StatCard = ({ icon: Icon, label, value, badgeText, change, changeType = 'p
           )}
         </div>
         <div>
-          <p className="text-2xl sm:text-3xl font-extrabold text-text-main dark:text-white tracking-tight">{value}</p>
-          <p className="mt-1 text-xs sm:text-sm font-bold text-text-muted dark:text-slate-300">{label}</p>
+          <p className="text-2xl sm:text-3xl font-extrabold card-title tracking-tight">{value}</p>
+          <p className="mt-1 text-xs sm:text-sm font-bold card-muted">{label}</p>
         </div>
       </div>
     </CardWrapper>
