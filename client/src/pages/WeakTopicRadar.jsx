@@ -361,7 +361,7 @@ const WeakTopicRadar = () => {
         </ChartCard>
 
         {/* Action Panel / Vulnerability Alert */}
-        <div className="glass-card p-5 border border-white/5 bg-white/[0.02] flex flex-col">
+        <div className="app-panel p-5 flex flex-col">
           <div className="space-y-4 flex-1">
             <h3 className="font-semibold text-slate-900 dark:text-slate-900 dark:text-white text-base">Vulnerability Alert</h3>
             
@@ -415,7 +415,7 @@ const WeakTopicRadar = () => {
       </div>
 
       {/* Prediction Form Section */}
-      <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none p-6 rounded-2xl">
+      <div className="app-panel p-6">
         <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-6">Subject & Topic</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -425,7 +425,7 @@ const WeakTopicRadar = () => {
               value={selectedSubjectId}
               onChange={handleSubjectChange}
               required
-              className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full px-4 py-3 rounded-xl app-input text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400"
             >
               <option value="">Select a subject...</option>
               {subjects.map((subject) => (
@@ -456,7 +456,7 @@ const WeakTopicRadar = () => {
                   value={selectedNoteId}
                   onChange={handleNoteChange}
                   disabled={!selectedSubjectId || fetchingStats}
-                  className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 text-slate-900 dark:text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 text-slate-900 dark:text-white placeholder-slate-400 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <option value="">-- Select a saved note --</option>
                   {filteredNotes.map((note) => (
@@ -499,31 +499,31 @@ const WeakTopicRadar = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Quiz Score (%)</label>
-              <input type="number" name="quizScore" value={formData.quizScore} onChange={handleChange} required min="0" max="100" step="any" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="quizScore" value={formData.quizScore} onChange={handleChange} required min="0" max="100" step="any" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Wrong Answers</label>
-              <input type="number" name="wrongAnswers" value={formData.wrongAnswers} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="wrongAnswers" value={formData.wrongAnswers} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Attempt Count</label>
-              <input type="number" name="attemptCount" value={formData.attemptCount} onChange={handleChange} required min="1" step="1" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="attemptCount" value={formData.attemptCount} onChange={handleChange} required min="1" step="1" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Time Spent (mins)</label>
-              <input type="number" name="timeSpentMinutes" value={formData.timeSpentMinutes} onChange={handleChange} required min="0" step="any" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="timeSpentMinutes" value={formData.timeSpentMinutes} onChange={handleChange} required min="0" step="any" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Days Since Study</label>
-              <input type="number" name="daysSinceLastStudy" value={formData.daysSinceLastStudy} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="daysSinceLastStudy" value={formData.daysSinceLastStudy} onChange={handleChange} required min="0" step="1" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Confidence (1-5)</label>
-              <input type="number" name="confidenceLevel" value={formData.confidenceLevel} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="confidenceLevel" value={formData.confidenceLevel} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
             <div>
               <label className="block text-sm text-slate-700 dark:text-slate-200 mb-1">Difficulty (1-5)</label>
-              <input type="number" name="topicDifficulty" value={formData.topicDifficulty} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
+              <input type="number" name="topicDifficulty" value={formData.topicDifficulty} onChange={handleChange} required min="1" max="5" step="1" className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-slate-900 dark:text-white placeholder-slate-400" />
             </div>
           </div>
 
