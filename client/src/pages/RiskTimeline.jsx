@@ -85,13 +85,13 @@ const RiskTimeline = () => {
         icon={Clock}
       />
 
-      <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white shadow-sm p-6 rounded-2xl space-y-4">
+      <div className="app-panel p-6 space-y-4">
         <div className="max-w-md">
           <label className="block text-sm text-slate-700 dark:text-slate-200 mb-2">Select Subject to View Timeline</label>
           <select
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400"
+            className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400"
           >
             <option value="">Select a subject...</option>
             {subjects.map((subject) => (
@@ -104,17 +104,17 @@ const RiskTimeline = () => {
       </div>
 
       {!selectedSubjectId ? (
-        <div className="p-10 text-center bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-sm">
+        <div className="app-card p-10 text-center">
           <Calendar className="w-12 h-12 text-slate-400 dark:text-slate-500 mx-auto mb-3 opacity-50" />
           <p className="text-slate-500 dark:text-slate-400 text-sm">Please select a subject to view its risk timeline.</p>
         </div>
       ) : loading ? (
-        <div className="p-10 text-center bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-sm">
+        <div className="app-card p-10 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-3"></div>
           <p className="text-slate-500 dark:text-slate-400 text-sm">Loading history...</p>
         </div>
       ) : riskHistory.length === 0 ? (
-        <div className="p-10 text-center bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 rounded-2xl shadow-sm">
+        <div className="app-card p-10 text-center">
           <ShieldAlert className="w-12 h-12 text-violet-400 dark:text-violet-400/70 mx-auto mb-3 opacity-80" />
           <p className="text-slate-700 dark:text-slate-300 font-medium mb-2">No risk history found for this subject yet.</p>
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Go to Risk Prediction and run your first prediction.</p>
@@ -128,7 +128,7 @@ const RiskTimeline = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="app-card p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Latest Risk Level</span>
               <span className={`text-lg font-extrabold ${
                 latestPrediction?.riskLevel === 'High Risk' ? 'text-red-500' :
@@ -138,11 +138,11 @@ const RiskTimeline = () => {
                 {latestPrediction?.riskLevel}
               </span>
             </div>
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="app-card p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Risk Probability</span>
               <span className="text-lg font-extrabold text-cyan-500">{Math.round(latestPrediction?.riskScore || 0)}%</span>
             </div>
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="app-card p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Latest Trend</span>
               <span className={`text-sm font-bold px-2 py-1 rounded-md mt-1 ${
                 latestPrediction?.trend === 'Improving' ? 'bg-emerald-500/20 text-emerald-400' :
@@ -153,7 +153,7 @@ const RiskTimeline = () => {
                 {latestPrediction?.trend}
               </span>
             </div>
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="app-card p-4 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Total Predictions</span>
               <span className="text-lg font-extrabold text-purple-400">{riskHistory.length}</span>
             </div>
@@ -201,7 +201,7 @@ const RiskTimeline = () => {
               </div>
             </ChartCard>
 
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl shadow-sm backdrop-blur-xl flex flex-col">
+            <div className="app-panel p-5 flex flex-col">
               <h3 className="font-semibold text-slate-900 dark:text-white text-base mb-4 flex items-center gap-2">
                 <Activity className="w-5 h-5 text-cyan-500" /> Timeline Events
               </h3>
