@@ -36,7 +36,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen liquid-page-bg overflow-hidden relative">
+    <div className="min-h-screen bg-transparent overflow-hidden relative">
       <FloatingDecorations />
 
       <main className="relative mx-auto grid min-h-[calc(100vh-80px)] max-w-7xl grid-cols-1 items-center gap-10 px-6 py-10 lg:grid-cols-2 z-10">
@@ -47,7 +47,7 @@ const Login = () => {
           icons={["📚", "🧠", "⏱️", "🌱", "✨"]}
         />
 
-        <div className="w-full max-w-md mx-auto liquid-card p-8 md:p-10 relative text-center border-2 border-white/40">
+        <div className="w-full max-w-md mx-auto rounded-[28px] bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl dark:bg-slate-950/70 dark:border-slate-700/60 p-8 md:p-10 relative text-center">
           <div className="liquid-card-content space-y-6">
             <div>
               <h2 className="text-xl font-extrabold tracking-tight text-text-main">Continue your learning journey</h2>
