@@ -143,20 +143,20 @@ const FocusAnalytics = () => {
         </ChartCard>
 
         {/* Breakdown Panel */}
-        <div className="glass-card p-5 space-y-4">
-          <h3 className="font-semibold text-white text-base">Session Allocation</h3>
+        <div className="app-card p-5 space-y-4">
+          <h3 className="font-semibold card-title text-base">Session Allocation</h3>
           <div className="space-y-4 pt-2">
             {[
               { label: 'Deep Focus Mode', percentage: analytics.totalMinutes > 0 ? 100 : 0, minutes: analytics.totalMinutes, color: 'text-brand-400' },
               { label: 'Short Breaks', percentage: 0, minutes: 0, color: 'text-accent-400' },
               { label: 'Long Breaks', percentage: 0, minutes: 0, color: 'text-success-400' },
             ].map((item, idx) => (
-              <div key={idx} className="p-3 bg-white/[0.02] border border-white/5 rounded-xl space-y-1.5">
+              <div key={idx} className="p-3 app-soft-card rounded-xl space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-300 font-medium">{item.label}</span>
+                  <span className="app-readable-text font-medium">{item.label}</span>
                   <span className={`font-bold ${item.color}`}>{item.percentage}%</span>
                 </div>
-                <div className="flex justify-between text-[10px] text-gray-500">
+                <div className="flex justify-between text-[10px] card-muted">
                   <span>{item.minutes} minutes logged</span>
                 </div>
               </div>
