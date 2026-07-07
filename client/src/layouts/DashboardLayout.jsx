@@ -18,7 +18,7 @@ const DashboardLayout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen text-text-main dark:text-white transition-colors duration-300">
+    <div className="app-page-bg min-h-screen text-text-main dark:text-white transition-colors duration-300">
       {/* Desktop Sidebar */}
       <Sidebar />
 
