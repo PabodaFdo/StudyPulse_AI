@@ -239,7 +239,7 @@ const RiskPrediction = () => {
         icon={ShieldAlert}
       />
 
-      <form onSubmit={handleSubmit} className="bg-white/85 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 shadow-sm text-slate-800 dark:text-white p-6 rounded-2xl space-y-4">
+      <form onSubmit={handleSubmit} className="app-panel p-6 space-y-4">
         <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
           Risk Prediction is calculated using your real study activity, assessments, quizzes, focus sessions, and notes.
         </p>
@@ -250,7 +250,7 @@ const RiskPrediction = () => {
             <select
               value={selectedSubjectId}
               onChange={(e) => setSelectedSubjectId(e.target.value)}
-              className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400 disabled:opacity-50"
+              className="w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400 disabled:opacity-50"
               disabled={isManualMode}
             >
               <option value="">Select a subject...</option>
@@ -309,7 +309,7 @@ const RiskPrediction = () => {
                   value={formData[key]} 
                   onChange={handleChange}
                   step={['focusSessionsCompleted'].includes(key) ? "1" : "any"}
-                  className={`w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400 ${!isManualMode ? 'bg-slate-50 opacity-70 cursor-not-allowed dark:bg-slate-950/60' : ''}`}
+                  className={`w-full px-4 py-3 app-input rounded-xl focus:outline-none focus:border-cyan-400 text-slate-800 dark:text-white placeholder-slate-400 ${!isManualMode ? 'bg-slate-50 opacity-70 cursor-not-allowed dark:bg-slate-950/60' : ''}`}
                   required
                   readOnly={!isManualMode}
                 />
@@ -332,7 +332,7 @@ const RiskPrediction = () => {
       {prediction ? (
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main Risk Card */}
-          <div className={`rounded-2xl border p-6 text-center shadow-sm backdrop-blur-xl space-y-4 ${
+          <div className={`app-card p-6 text-center space-y-4 ${
             prediction.riskLevel === 'High Risk'
               ? 'border-red-300 bg-red-50/90 dark:border-red-500/30 dark:bg-red-500/10'
               : prediction.riskLevel === 'Medium Risk'
@@ -365,7 +365,7 @@ const RiskPrediction = () => {
 
           {/* Trend Card */}
           {currentTrend && (
-            <div className={`lg:col-span-3 rounded-2xl border p-5 shadow-sm backdrop-blur-xl flex flex-col sm:flex-row items-center gap-4 ${
+            <div className={`lg:col-span-3 app-card p-5 flex flex-col sm:flex-row items-center gap-4 ${
               currentTrend.trend === 'Improving' 
                 ? 'border-emerald-300 bg-emerald-50/90 dark:border-emerald-500/30 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-200'
                 : currentTrend.trend === 'Declining'
@@ -386,11 +386,11 @@ const RiskPrediction = () => {
           )}
 
           {/* Factors Breakdown */}
-          <div className="lg:col-span-2 rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+          <div className="lg:col-span-2 app-panel p-6 space-y-4">
             <h3 className="font-bold text-slate-900 dark:text-white text-base">Key Academic Indicators (Reasons)</h3>
             <div className="space-y-3">
               {prediction.reasons && prediction.reasons.length > 0 ? prediction.reasons.map((reason, idx) => (
-                <div key={idx} className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/80 p-3.5 shadow-sm dark:border-white/5 dark:bg-white/[0.01]">
+                <div key={idx} className="flex items-center justify-between rounded-xl app-soft-card p-3.5">
                   <div>
                     <h4 className="text-sm font-semibold text-slate-800 dark:text-white">{reason}</h4>
                   </div>
@@ -403,11 +403,11 @@ const RiskPrediction = () => {
           </div>
 
           {/* Recommendations */}
-          <div className="lg:col-span-3 rounded-2xl border border-slate-200/70 bg-white/80 p-5 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+          <div className="lg:col-span-3 app-panel p-5 space-y-4">
             <h3 className="font-bold text-slate-900 dark:text-white text-base">AI Correction Strategy</h3>
             <div className="grid gap-4 sm:grid-cols-3 text-xs">
               {prediction.recommendations && prediction.recommendations.length > 0 ? prediction.recommendations.map((rec, i) => (
-                <div key={i} className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white/90 p-4 shadow-sm transition-all hover:border-brand-300 hover:bg-brand-50 dark:border-white/5 dark:bg-white/5 dark:hover:border-white/20 dark:hover:bg-white/10">
+                <div key={i} className="group flex flex-col justify-between rounded-xl app-soft-card p-4 transition-all hover:border-brand-300 hover:bg-brand-50 dark:hover:border-white/20 dark:hover:bg-white/10">
                   <div>
                     <h4 className="font-semibold text-slate-800 dark:text-white">{rec}</h4>
                   </div>
@@ -426,7 +426,7 @@ const RiskPrediction = () => {
       ) : (
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Default/Placeholder before prediction */}
-          <div className="rounded-2xl bg-white/85 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 p-6 text-center space-y-4 shadow-sm">
+          <div className="app-card p-6 text-center space-y-4">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/15 text-purple-500 dark:text-purple-300">
               <AlertTriangle className="h-6 w-6" />
             </div>
@@ -437,10 +437,10 @@ const RiskPrediction = () => {
             </div>
           </div>
 
-          <div className="lg:col-span-2 rounded-2xl border border-slate-200/70 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-white/5 dark:bg-white/[0.02] space-y-4">
+          <div className="lg:col-span-2 app-panel p-6 space-y-4">
             <h3 className="font-bold text-slate-900 dark:text-white text-base">Key Academic Indicators</h3>
             <div className="space-y-3">
-              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/80 p-3.5 shadow-sm dark:border-white/5 dark:bg-white/[0.01]">
+              <div className="flex items-center justify-between rounded-xl app-soft-card p-3.5">
                 <div>
                   <h4 className="text-sm font-semibold text-slate-800 dark:text-white">Awaiting prediction data...</h4>
                 </div>
@@ -457,7 +457,7 @@ const RiskPrediction = () => {
             <TrendingUp className="w-6 h-6 text-purple-500" />
             Risk History
           </h3>
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+          <div className="app-panel overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-700">
