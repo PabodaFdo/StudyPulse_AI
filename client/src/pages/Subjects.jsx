@@ -160,12 +160,12 @@ const Subjects = () => {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {subjects.map((sub) => (
-          <div key={sub.id} className="liquid-card p-6 text-[#241b4b] dark:text-white flex flex-col justify-between">
+          <div key={sub.id} className="app-card p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <span className={`status-badge ${sub.health === 'red' ? 'status-danger' : sub.health === 'yellow' ? 'status-warning' : 'status-success'}`}>{sub.code}</span>
-                  <h3 className="font-bold text-white text-lg mt-1">{sub.name}</h3>
+                  <h3 className="card-title text-xl mt-2">{sub.name}</h3>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => openEdit(sub)} className="p-2 rounded-lg !text-slate-600 dark:!text-slate-300 hover:!text-purple-600 dark:hover:!text-purple-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
@@ -177,14 +177,14 @@ const Subjects = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4 text-xs mt-4 py-3 border-y border-white/5">
+              <div className="grid grid-cols-2 gap-4 text-xs mt-4 py-3 border-y border-slate-200 dark:border-white/5">
                 <div>
-                  <p className="text-[#6b6388] dark:text-slate-400 uppercase font-semibold">Credits</p>
-                  <p className="text-sm text-[#6b6388] dark:text-slate-300 mt-0.5">{sub.credits} Units</p>
+                  <p className="card-muted text-[10px] uppercase font-semibold">Credits</p>
+                  <p className="text-sm app-readable-text mt-0.5">{sub.credits} Units</p>
                 </div>
                 <div>
-                  <p className="text-[#6b6388] dark:text-slate-400 uppercase font-semibold">Grade Target</p>
-                  <p className="text-sm text-[#6b6388] dark:text-slate-300 mt-0.5 flex items-center gap-1">
+                  <p className="card-muted text-[10px] uppercase font-semibold">Grade Target</p>
+                  <p className="text-sm app-readable-text mt-0.5 flex items-center gap-1">
                     <Target className="h-3.5 w-3.5 text-brand-400" /> {sub.target}
                   </p>
                 </div>
@@ -193,8 +193,8 @@ const Subjects = () => {
 
             <div className="flex items-center justify-between mt-4">
               <div>
-                <span className="text-[10px] text-[#6b6388] dark:text-slate-400 uppercase font-semibold">Current Standings</span>
-                <p className="text-sm font-bold text-[#241b4b] dark:text-white">{sub.current}</p>
+                <span className="text-[10px] card-muted uppercase font-semibold">Current Standings</span>
+                <p className="text-sm font-bold app-readable-text">{sub.current}</p>
               </div>
               <span className={`status-badge ${sub.health === 'red' ? 'status-danger' : sub.health === 'yellow' ? 'status-warning' : 'status-success'}`}>
                 {sub.health === 'red' ? 'Needs Attention' : 'On Track'}
