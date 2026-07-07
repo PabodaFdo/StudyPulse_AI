@@ -792,13 +792,13 @@ Updated on: ${new Date().toLocaleDateString()}`;
     if (safeNotes.length > 0) sourceOptions.push({ label: 'Saved Smart Note', value: 'note' });
 
     return (
-      <div className="glass-card max-w-xl mx-auto p-6 md:p-8 space-y-6">
+      <div className="app-panel max-w-xl mx-auto p-6 md:p-8 space-y-6">
         <div className="text-center">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-500/10 mb-4">
             <HelpCircle className="h-8 w-8 text-brand-400" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">Quiz Setup</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
+          <h2 className="text-xl font-bold card-title">Quiz Setup</h2>
+          <p className="text-sm card-muted mt-2">
             Configure how you want your quiz generated from your study material.
           </p>
         </div>
@@ -806,30 +806,30 @@ Updated on: ${new Date().toLocaleDateString()}`;
         <div className="space-y-6">
           
           <div className="space-y-3">
-            <label className="text-sm font-bold text-slate-700 dark:text-slate-200">Quiz Mode</label>
+            <label className="text-sm font-bold section-title">Quiz Mode</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div 
                 onClick={() => handleQuizModeChange('practice')}
-                className={`cursor-pointer border p-4 rounded-xl transition-all ${quizMode === 'practice' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                className={`cursor-pointer p-4 rounded-xl transition-all ${quizMode === 'practice' ? 'pastel-blue-card' : 'app-soft-card'}`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-4 h-4 rounded-full border-[4px] ${quizMode === 'practice' ? 'border-cyan-500 bg-white' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}></div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Practice Quiz</h3>
+                  <h3 className="font-bold card-title text-sm">Practice Quiz</h3>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 pl-6 leading-relaxed">
+                <p className="text-xs card-muted pl-6 leading-relaxed">
                   Generate quizzes from a selected Smart Note for revision and weak topic detection.
                 </p>
               </div>
 
               <div 
                 onClick={() => handleQuizModeChange('assessment')}
-                className={`cursor-pointer border p-4 rounded-xl transition-all ${quizMode === 'assessment' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40 shadow-sm' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                className={`cursor-pointer p-4 rounded-xl transition-all ${quizMode === 'assessment' ? 'pastel-lavender-card' : 'app-soft-card'}`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <div className={`w-4 h-4 rounded-full border-[4px] ${quizMode === 'assessment' ? 'border-cyan-500 bg-white' : 'border-slate-300 dark:border-slate-600 bg-transparent'}`}></div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">Assessment Quiz</h3>
+                  <h3 className="font-bold card-title text-sm">Assessment Quiz</h3>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 pl-6 leading-relaxed">
+                <p className="text-xs card-muted pl-6 leading-relaxed">
                   Generate a subject-level quiz that can be added to your Assessment Tracker.
                 </p>
               </div>
@@ -948,9 +948,9 @@ Updated on: ${new Date().toLocaleDateString()}`;
         {!quizResult && !isLoading && renderSetup()}
 
         {isLoading && (
-          <div className="glass-card p-12 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-sm flex flex-col items-center justify-center space-y-4">
+          <div className="app-card p-12 shadow-sm flex flex-col items-center justify-center space-y-4">
             <LoadingSpinner size="lg" />
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 animate-pulse">
+            <p className="text-sm font-medium card-muted animate-pulse">
               Analyzing text and generating quiz...
             </p>
           </div>
@@ -958,11 +958,11 @@ Updated on: ${new Date().toLocaleDateString()}`;
 
         {quizResult && !isLoading && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 glass-card p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 app-card p-4 rounded-xl shadow-sm">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-brand-500" />
-                  <h3 className="font-bold text-slate-800 dark:text-white">Interactive Quiz</h3>
+                  <h3 className="font-bold card-title">Interactive Quiz</h3>
                 </div>
                 <div className="text-sm font-bold text-brand-600 dark:text-brand-400">
                   Score: {score} / {quizResult.questions.length}
@@ -1049,18 +1049,18 @@ Updated on: ${new Date().toLocaleDateString()}`;
             </div>
 
             {isAttemptSaved && (
-              <div className="mt-6 p-5 rounded-xl border border-purple-100 dark:border-slate-700 bg-white/80 dark:bg-slate-900/70 shadow-sm">
+              <div className="mt-6 p-5 rounded-xl app-card">
                 <div>
-                  <h4 className="font-bold text-slate-800 dark:text-white mb-1">
+                  <h4 className="font-bold card-title mb-1">
                     Your quiz result has been saved for analytics.
                   </h4>
 
                   {quizMode === 'practice' ? (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                    <p className="text-sm card-muted">
                       This practice quiz will be used for topic analytics and Weak Topic Radar.
                     </p>
                   ) : (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                    <p className="text-sm card-muted">
                       This assessment quiz result is ready. Use the Add Assessment Mark button above if it should count toward your subject mark.
                     </p>
                   )}
@@ -1081,7 +1081,7 @@ Updated on: ${new Date().toLocaleDateString()}`;
             onChange={(e) => setSaveTitle(e.target.value)} 
             placeholder="Enter a title for this quiz"
             autoFocus
-            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-4 py-3 rounded-xl app-input text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <div className="flex justify-end gap-3 mt-6">
             <Button variant="ghost" className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white" onClick={() => setIsModalOpen(false)}>
@@ -1169,7 +1169,7 @@ Updated on: ${new Date().toLocaleDateString()}`;
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'current' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'current' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'app-soft-card hover:bg-purple-50 dark:hover:bg-slate-800'}`}>
                   <input type="radio" name="scoreSource" value="current" checked={scoreSourceOption === 'current'} onChange={() => handleScoreSourceChange('current')} className="mt-1 accent-cyan-500" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">This attempt score</p>
@@ -1177,7 +1177,7 @@ Updated on: ${new Date().toLocaleDateString()}`;
                   </div>
                 </label>
                 
-                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'best' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'best' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'app-soft-card hover:bg-purple-50 dark:hover:bg-slate-800'}`}>
                   <input type="radio" name="scoreSource" value="best" checked={scoreSourceOption === 'best'} onChange={() => handleScoreSourceChange('best')} className="mt-1 accent-cyan-500" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">Best topic score</p>
@@ -1185,7 +1185,7 @@ Updated on: ${new Date().toLocaleDateString()}`;
                   </div>
                 </label>
                 
-                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'average' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'average' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'app-soft-card hover:bg-purple-50 dark:hover:bg-slate-800'}`}>
                   <input type="radio" name="scoreSource" value="average" checked={scoreSourceOption === 'average'} onChange={() => handleScoreSourceChange('average')} className="mt-1 accent-cyan-500" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">Average topic score</p>
@@ -1193,7 +1193,7 @@ Updated on: ${new Date().toLocaleDateString()}`;
                   </div>
                 </label>
 
-                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'latest' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                <label className={`cursor-pointer p-3 border rounded-xl flex items-start gap-3 transition-colors ${scoreSourceOption === 'latest' ? 'border-cyan-400 dark:border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40' : 'app-soft-card hover:bg-purple-50 dark:hover:bg-slate-800'}`}>
                   <input type="radio" name="scoreSource" value="latest" checked={scoreSourceOption === 'latest'} onChange={() => handleScoreSourceChange('latest')} className="mt-1 accent-cyan-500" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">Latest topic score</p>
@@ -1280,7 +1280,7 @@ const QuestionCard = ({ question, index, selectedAnswer, isChecked, isCorrect, o
   };
 
   return (
-    <div className="glass-card p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg">
+    <div className="app-card p-6 rounded-2xl shadow-lg">
       <div className="flex items-center gap-2 mb-4">
         <Badge color="purple">Question {index + 1}</Badge>
         {question.type === 'mcq' ? (
