@@ -88,7 +88,7 @@ const StudyQuests = () => {
       />
 
       {/* Top Banner with Mascot */}
-      <div className="liquid-card p-6 bg-gradient-to-r from-purple/10 to-pink/5 mb-6">
+      <div className="app-panel p-6 bg-gradient-to-r from-purple/10 to-pink/5 mb-6">
         <div className="liquid-card-content flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1.5 text-center sm:text-left">
             <h3 className="text-base font-extrabold text-text-main">Complete today's quests to help your Study Garden bloom</h3>
@@ -108,7 +108,7 @@ const StudyQuests = () => {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Daily Quests */}
-        <div className="liquid-card p-5">
+        <div className="app-panel p-5">
           <div className="liquid-card-content space-y-4">
             <div className="flex justify-between items-center border-b border-lavender/10 pb-2">
               <h3 className="font-extrabold text-sm sm:text-base text-text-main">Daily Missions</h3>
@@ -178,7 +178,7 @@ const StudyQuests = () => {
         </div>
 
         {/* Weekly Quests */}
-        <div className="liquid-card p-5">
+        <div className="app-panel p-5">
           <div className="liquid-card-content space-y-4">
             <div className="flex justify-between items-center border-b border-lavender/10 pb-2">
               <h3 className="font-extrabold text-sm sm:text-base text-text-main">Weekly Milestones</h3>
