@@ -32,7 +32,7 @@ const DashboardSkeleton = () => (
         </div>
         <div className="h-72 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
       </div>
-      <div className="space-y-6">
+      <div className="app-page-bg min-h-screen p-6 space-y-6">
         {[1,2,3,4].map(i => <div key={i} className="h-48 w-full bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>)}
       </div>
     </div>
@@ -308,7 +308,7 @@ const Dashboard = () => {
         <div className="lg:col-span-2 space-y-6">
           
           {/* Welcome Card & Quick Actions */}
-          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border-slate-200 dark:border-slate-700/50 shadow-sm rounded-3xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="app-panel p-5 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4 relative z-10 w-full">
               <AnimatedCharacter src="/src/assets/characters/study-girl-focus.png" variant="focus" size="sm" className="hidden sm:block shrink-0 w-16 h-16" />
               <div className="flex-1">
@@ -334,7 +334,7 @@ const Dashboard = () => {
           </div>
 
           {/* Priority Insight: Academic Risk */}
-          <div className="liquid-card p-4 sm:p-5 bg-white/80 dark:bg-slate-900/70 border-slate-200 dark:border-slate-700/50 shadow-sm rounded-3xl relative overflow-hidden">
+          <div className="app-card p-4 sm:p-5 relative overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className={`shrink-0 flex items-center justify-center w-10 h-10 rounded-full ${riskSummary?.highRiskCount > 0 ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>
@@ -432,7 +432,7 @@ const Dashboard = () => {
 
           {/* My AI Library */}
           <div 
-            className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white cursor-pointer hover:shadow-md transition-all" 
+            className="app-card p-5 cursor-pointer hover:-translate-y-1 transition-all" 
             onClick={() => navigate('/ai-library')}
           >
             <div className="flex justify-between items-center mb-4">
@@ -470,7 +470,7 @@ const Dashboard = () => {
 
           {/* Quiz Performance Analytics */}
           <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
-            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+            <div className="app-panel p-5">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
                   <Brain className="h-5 w-5 text-purple" /> Quiz Performance
@@ -520,7 +520,7 @@ const Dashboard = () => {
                       <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Recent Attempts</h4>
                       <div className="grid gap-2 sm:grid-cols-3">
                         {quizStats.recentAttempts.slice(0, 3).map((attempt, i) => (
-                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl app-soft-card border border-slate-200 dark:border-slate-700/50">
                             <div className="min-w-0 flex-1 pr-2">
                               <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Quiz Attempt'}</p>
                               <p className="text-[9px] text-text-muted mt-0.5">
@@ -543,7 +543,7 @@ const Dashboard = () => {
 
           {/* Flashcard Activity */}
           <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
-            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+            <div className="app-panel p-5">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
                   <Layers className="h-5 w-5 text-amber-500" /> Flashcard Activity
@@ -588,7 +588,7 @@ const Dashboard = () => {
                       <h4 className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Recent Reviews</h4>
                       <div className="grid gap-2 sm:grid-cols-3">
                         {flashcardStats.recentReviewAttempts.map((attempt, i) => (
-                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                          <div key={attempt.id || i} className="flex justify-between items-center p-2.5 rounded-xl app-soft-card border border-slate-200 dark:border-slate-700/50">
                             <div className="min-w-0 flex-1 pr-2">
                               <p className="text-xs font-bold text-text-main truncate">{attempt.sourceTitle || 'Flashcard Deck'}</p>
                               <p className="text-[9px] text-text-muted mt-0.5">
@@ -611,7 +611,7 @@ const Dashboard = () => {
 
           {/* Summary Activity */}
           <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
-            <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+            <div className="app-panel p-5">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
                   <FileText className="h-5 w-5 text-emerald-500" /> Summary Activity
@@ -654,7 +654,7 @@ const Dashboard = () => {
             title="Focus Overview"
             subtitle="Minutes spent focusing in study intervals"
             headerAction={
-              <div className="flex bg-slate-50 dark:bg-slate-800/50 rounded-lg p-1 border border-slate-200 dark:border-slate-700/50">
+              <div className="flex app-soft-card rounded-lg p-1 border border-slate-200 dark:border-slate-700/50">
                 <button 
                   className={`px-3 py-1 text-xs font-bold rounded-md transition-colors ${chartTab === 'week' ? 'bg-white dark:bg-slate-700 shadow-sm text-text-main dark:text-white' : 'text-text-muted hover:text-text-main'}`}
                   onClick={() => setChartTab('week')}
@@ -703,7 +703,7 @@ const Dashboard = () => {
           </ChartCard>
 
           {/* Recent Activity Timeline */}
-          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+          <div className="app-panel p-5">
             <h3 className="font-extrabold text-sm sm:text-base text-text-main mb-4 flex items-center gap-1.5">
               <Clock className="h-4.5 w-4.5 text-purple" /> Recent Activity
             </h3>
@@ -719,7 +719,7 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                <div className="text-center p-6 app-soft-card rounded-xl border border-slate-200 dark:border-slate-700/50">
                   <p className="text-xs font-bold text-text-muted">No recent activity yet.</p>
                   <button onClick={() => navigate('/focus-timer')} className="text-purple hover:underline text-xs font-bold mt-2 inline-block">
                     Start a focus session
@@ -734,7 +734,7 @@ const Dashboard = () => {
         {/* Right column - sidebar cards */}
         <div className="space-y-6">
           {/* Study Garden progress with Plant Buddy */}
-          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+          <div className="app-panel p-5">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
@@ -743,7 +743,7 @@ const Dashboard = () => {
                 <span className="status-badge status-success">Level {summary?.gardenLevel || 1}</span>
               </div>
               
-              <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
+              <div className="p-3 app-soft-card rounded-2xl border border-slate-200 dark:border-slate-700/50 flex items-center gap-3">
                 <AnimatedCharacter
                   src={gardenStage.image}
                   variant="plant"
@@ -770,7 +770,7 @@ const Dashboard = () => {
           </div>
 
           {/* Today's Study Quests with Quest Mascot */}
-          <div className="liquid-card p-5 relative overflow-hidden bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+          <div className="app-panel p-5 relative overflow-hidden">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
@@ -788,7 +788,7 @@ const Dashboard = () => {
               <div className="space-y-2 text-xs relative z-10">
                 {quests.map((q) => {
                   let btnText = "Active";
-                  let btnStyle = "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700";
+                  let btnStyle = "app-soft-card border-slate-200 dark:border-slate-700/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700";
                   let iconColor = "text-text-muted/40";
                   let icon = "○";
                   let isClaimable = false;
@@ -867,7 +867,7 @@ const Dashboard = () => {
           </div>
 
           {/* Academic Records Summary */}
-          <div className="liquid-card p-5 bg-white/80 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-white">
+          <div className="app-panel p-5">
             <div className="liquid-card-content space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="font-extrabold text-sm sm:text-base text-text-main flex items-center gap-1.5">
@@ -881,13 +881,13 @@ const Dashboard = () => {
               {academicSummary ? (
                 <div className="space-y-2">
                   {academicSummary.average !== null && (
-                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl app-soft-card border border-slate-200 dark:border-slate-700/50">
                       <span className="font-bold text-text-main dark:text-slate-200">Average Score</span>
                       <span className="font-bold text-purple dark:text-cyan-400">{academicSummary.average}%</span>
                     </div>
                   )}
                   {academicSummary.latest && (
-                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                    <div className="flex justify-between items-center text-xs p-2.5 rounded-xl app-soft-card border border-slate-200 dark:border-slate-700/50">
                       <span className="font-bold text-text-main dark:text-slate-200">Latest Record</span>
                       <span className="font-bold text-text-muted dark:text-slate-400 truncate max-w-[120px]" title={academicSummary.latest}>
                         {academicSummary.latest}
@@ -896,7 +896,7 @@ const Dashboard = () => {
                   )}
                 </div>
               ) : (
-                <div className="p-3 text-center rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50">
+                <div className="p-3 text-center rounded-xl app-soft-card border border-slate-200 dark:border-slate-700/50">
                   <p className="text-xs font-bold text-text-muted">No academic records yet. Add your first record to unlock insights.</p>
                 </div>
               )}
