@@ -163,13 +163,13 @@ const Assessments = () => {
         icon={ClipboardList}
       />
 
-      <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 p-6 rounded-2xl">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">Select Subject</label>
+      <div className="app-panel p-6">
+        <label className="block text-sm font-semibold card-title mb-2">Select Subject</label>
         <div className="flex gap-4 items-center">
           <select
             value={selectedSubjectId}
             onChange={(e) => setSelectedSubjectId(e.target.value)}
-            className="flex-1 max-w-md px-4 py-2.5 rounded-xl bg-white dark:bg-slate-950/60 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple"
+            className="flex-1 max-w-md px-4 py-2.5 rounded-xl app-input focus:outline-none focus:ring-2 focus:ring-purple"
           >
             <option value="">Select a subject...</option>
             {subjects.map(sub => (
@@ -209,11 +209,11 @@ const Assessments = () => {
         </div>
       </div>
 
-      {loading && <div className="text-center py-10 text-slate-500">Loading data...</div>}
+      {loading && <div className="text-center py-10 card-muted">Loading data...</div>}
 
       {!loading && !selectedSubjectId && (
-        <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 p-10 rounded-2xl text-center">
-          <p className="text-slate-500 dark:text-slate-400">Select a subject to view assessment analytics.</p>
+        <div className="app-soft-card p-10 rounded-2xl text-center">
+          <p className="card-muted">Select a subject to view assessment analytics.</p>
         </div>
       )}
 
@@ -221,27 +221,27 @@ const Assessments = () => {
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 p-5 rounded-2xl">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 font-semibold">Total Assessments</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{summary?.totalAssessments || 0}</p>
+            <div className="app-soft-card p-5 rounded-2xl">
+              <p className="text-sm card-muted mb-1 font-semibold">Total Assessments</p>
+              <p className="text-2xl font-bold card-title">{summary?.totalAssessments || 0}</p>
             </div>
             
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 p-5 rounded-2xl">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 font-semibold">Total Weight</p>
+            <div className="app-soft-card p-5 rounded-2xl">
+              <p className="text-sm card-muted mb-1 font-semibold">Total Weight</p>
               <div className="flex items-center gap-2">
-                <p className={`text-2xl font-bold ${summary?.totalWeight > 100 ? 'text-red-500' : 'text-slate-900 dark:text-white'}`}>
+                <p className={`text-2xl font-bold ${summary?.totalWeight > 100 ? 'text-red-500' : 'card-title'}`}>
                   {summary?.totalWeight || 0}%
                 </p>
                 {summary?.totalWeight > 100 && <AlertTriangle className="w-5 h-5 text-red-500" />}
               </div>
             </div>
 
-            <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 p-5 rounded-2xl">
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1 font-semibold">Remaining Weight</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{summary?.remainingWeight || 0}%</p>
+            <div className="app-soft-card p-5 rounded-2xl">
+              <p className="text-sm card-muted mb-1 font-semibold">Remaining Weight</p>
+              <p className="text-2xl font-bold card-title">{summary?.remainingWeight || 0}%</p>
             </div>
 
-            <div className="bg-purple/10 dark:bg-cyan-900/20 border border-purple/30 dark:border-cyan-800 p-5 rounded-2xl">
+            <div className="pastel-purple-card p-5 rounded-2xl">
               <p className="text-sm text-purple-700 dark:text-cyan-300 mb-1 font-semibold">Weighted Average</p>
               <p className={`text-3xl font-extrabold ${summary?.weightedAverage !== null ? 'text-purple-900 dark:text-cyan-100' : 'text-slate-500 dark:text-slate-400 text-lg'}`}>
                 {summary?.weightedAverage !== null ? `${summary?.weightedAverage}%` : 'No data'}
@@ -251,7 +251,7 @@ const Assessments = () => {
 
           {/* Warnings / Infos */}
           {summary?.assessments?.length === 0 && (
-            <div className="flex items-center gap-3 p-4 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-600 dark:text-slate-400 font-medium text-sm">
+            <div className="flex items-center gap-3 p-4 app-soft-card rounded-xl card-muted font-medium text-sm">
               <Info className="w-5 h-5" />
               No assessments added yet. Add your first assessment to calculate weighted average.
             </div>
@@ -272,52 +272,52 @@ const Assessments = () => {
           {/* Form Modal/Overlay */}
           {showForm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-              <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg p-6 md:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
+              <div className="app-card rounded-3xl w-full max-w-lg p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-xl font-bold card-title">
                     {editingId ? 'Edit Assessment' : 'Add Assessment'}
                   </h3>
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+                  <span className="text-sm font-medium card-muted bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">
                     Remaining: {summary?.remainingWeight || 0}%
                   </span>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Title</label>
-                    <input required name="title" value={formData.title} onChange={handleInputChange} placeholder="e.g. Quiz 1" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white" />
+                    <label className="block text-sm font-semibold card-title mb-1">Title</label>
+                    <input required name="title" value={formData.title} onChange={handleInputChange} placeholder="e.g. Quiz 1" className="w-full px-4 py-2.5 rounded-xl app-input" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Type</label>
-                      <select name="type" value={formData.type} onChange={handleInputChange} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white">
+                      <label className="block text-sm font-semibold card-title mb-1">Type</label>
+                      <select name="type" value={formData.type} onChange={handleInputChange} className="w-full px-4 py-2.5 rounded-xl app-input">
                         {assessmentTypes.map(type => <option key={type} value={type}>{type}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Date (Optional)</label>
-                      <input type="date" name="assessmentDate" value={formData.assessmentDate} onChange={handleInputChange} className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white" />
+                      <label className="block text-sm font-semibold card-title mb-1">Date (Optional)</label>
+                      <input type="date" name="assessmentDate" value={formData.assessmentDate} onChange={handleInputChange} className="w-full px-4 py-2.5 rounded-xl app-input" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Mark (%)</label>
-                      <input required type="number" step="0.1" name="mark" value={formData.mark} onChange={handleInputChange} placeholder="0-100" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white" />
+                      <label className="block text-sm font-semibold card-title mb-1">Mark (%)</label>
+                      <input required type="number" step="0.1" name="mark" value={formData.mark} onChange={handleInputChange} placeholder="0-100" className="w-full px-4 py-2.5 rounded-xl app-input" />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Weight (%)</label>
-                      <input required type="number" step="0.01" name="weight" value={formData.weight} onChange={handleInputChange} disabled={!editingId && summary?.remainingWeight === 0} placeholder="e.g. 20" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white disabled:opacity-50" />
+                      <label className="block text-sm font-semibold card-title mb-1">Weight (%)</label>
+                      <input required type="number" step="0.01" name="weight" value={formData.weight} onChange={handleInputChange} disabled={!editingId && summary?.remainingWeight === 0} placeholder="e.g. 20" className="w-full px-4 py-2.5 rounded-xl app-input disabled:opacity-50" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Notes</label>
-                    <textarea name="notes" value={formData.notes} onChange={handleInputChange} rows={3} placeholder="Any notes or feedback..." className="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"></textarea>
+                    <label className="block text-sm font-semibold card-title mb-1">Notes</label>
+                    <textarea name="notes" value={formData.notes} onChange={handleInputChange} rows={3} placeholder="Any notes or feedback..." className="w-full px-4 py-2.5 rounded-xl app-input"></textarea>
                   </div>
 
                   <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors">Cancel</button>
+                    <button type="button" onClick={() => setShowForm(false)} className="px-5 py-2.5 rounded-xl card-muted hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-colors">Cancel</button>
                     <button type="submit" className="px-5 py-2.5 rounded-xl bg-purple hover:bg-purple-dark text-white font-bold transition-colors">
                       {editingId ? 'Save Changes' : 'Add Assessment'}
                     </button>
@@ -328,23 +328,23 @@ const Assessments = () => {
           )}
 
           {/* Table */}
-          <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 rounded-2xl overflow-hidden mt-6">
+          <div className="app-panel overflow-hidden mt-6">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-700">
+                <thead className="border-b border-slate-200 dark:border-slate-700">
                   <tr>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">Title</th>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">Type</th>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">Mark</th>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">Weight</th>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300">Date</th>
-                    <th className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-300 text-right">Actions</th>
+                    <th className="px-6 py-4 font-semibold card-title">Title</th>
+                    <th className="px-6 py-4 font-semibold card-title">Type</th>
+                    <th className="px-6 py-4 font-semibold card-title">Mark</th>
+                    <th className="px-6 py-4 font-semibold card-title">Weight</th>
+                    <th className="px-6 py-4 font-semibold card-title">Date</th>
+                    <th className="px-6 py-4 font-semibold card-title text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {assessments.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+                      <td colSpan="6" className="px-6 py-8 text-center card-muted">
                         No assessments recorded for this subject yet.
                       </td>
                     </tr>
@@ -352,15 +352,15 @@ const Assessments = () => {
                     assessments.map(item => (
                       <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                         <td className="px-6 py-4">
-                          <p className="font-semibold text-slate-900 dark:text-white">{item.title}</p>
-                          {item.notes && <p className="text-xs text-slate-500 mt-0.5 truncate max-w-[200px]">{item.notes}</p>}
+                          <p className="font-semibold card-title">{item.title}</p>
+                          {item.notes && <p className="text-xs card-muted mt-0.5 truncate max-w-[200px]">{item.notes}</p>}
                         </td>
-                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
-                          <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-medium">{item.type}</span>
+                        <td className="px-6 py-4 card-muted">
+                          <span className="px-2.5 py-1 app-soft-card rounded-lg text-xs font-medium">{item.type}</span>
                         </td>
-                        <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{item.mark}%</td>
-                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">{item.weight}%</td>
-                        <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                        <td className="px-6 py-4 font-bold card-title">{item.mark}%</td>
+                        <td className="px-6 py-4 card-muted">{item.weight}%</td>
+                        <td className="px-6 py-4 card-muted">
                           {item.assessmentDate ? new Date(item.assessmentDate).toLocaleDateString() : '--'}
                         </td>
                         <td className="px-6 py-4 text-right">
