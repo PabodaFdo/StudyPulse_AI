@@ -608,13 +608,13 @@ const Flashcards = () => {
     if (safeNotes.length > 0) sourceOptions.push({ label: 'Saved Smart Note', value: 'note' });
 
     return (
-      <div className="glass-card max-w-xl mx-auto p-6 md:p-8 space-y-6">
+      <div className="app-panel max-w-xl mx-auto p-6 md:p-8 space-y-6">
         <div className="text-center">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-brand-500/10 mb-4">
             <Layers className="h-8 w-8 text-brand-400" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">Flashcard Setup</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-2">
+          <h2 className="text-xl font-bold card-title">Flashcard Setup</h2>
+          <p className="text-sm card-muted mt-2">
             Configure how you want your flashcards generated from your study material.
           </p>
         </div>
@@ -701,28 +701,28 @@ const Flashcards = () => {
   };
 
   const renderCompletion = () => (
-    <div className="flex flex-col items-center justify-center max-w-2xl mx-auto py-12 space-y-8 glass-card p-8 text-center animate-fade-in">
+    <div className="flex flex-col items-center justify-center max-w-2xl mx-auto py-12 space-y-8 app-panel p-8 text-center animate-fade-in">
       <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-success-500/10 mb-2">
         <Check className="h-10 w-10 text-success-500" />
       </div>
-      <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Great job! You reviewed your flashcards.</h2>
+      <h2 className="text-2xl font-bold card-title">Great job! You reviewed your flashcards.</h2>
       
       <div className="grid grid-cols-4 gap-4 w-full max-w-lg">
-        <div className="bg-cyan-500/10 border border-cyan-400/30 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-300">{stats.total}</div>
-          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Total Cards</div>
+        <div className="pastel-blue-card p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold card-title">{stats.total}</div>
+          <div className="text-xs card-muted uppercase font-semibold">Total Cards</div>
         </div>
-        <div className="bg-emerald-500/10 border border-emerald-400/30 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-300">{stats.known}</div>
-          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Known</div>
+        <div className="pastel-mint-card p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold card-title">{stats.known}</div>
+          <div className="text-xs card-muted uppercase font-semibold">Known</div>
         </div>
-        <div className="bg-amber-500/10 border border-amber-400/30 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-amber-600 dark:text-amber-300">{stats.needReview}</div>
-          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Need Review</div>
+        <div className="pastel-yellow-card p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold card-title">{stats.needReview}</div>
+          <div className="text-xs card-muted uppercase font-semibold">Need Review</div>
         </div>
-        <div className="bg-violet-500/10 border border-violet-400/30 p-4 rounded-xl text-center">
-          <div className="text-2xl font-bold text-violet-600 dark:text-violet-300">{Math.round(stats.accuracy)}%</div>
-          <div className="text-xs text-slate-600 dark:text-slate-300 uppercase font-semibold">Accuracy</div>
+        <div className="pastel-purple-card p-4 rounded-xl text-center">
+          <div className="text-2xl font-bold card-title">{Math.round(stats.accuracy)}%</div>
+          <div className="text-xs card-muted uppercase font-semibold">Accuracy</div>
         </div>
       </div>
 
@@ -765,11 +765,11 @@ const Flashcards = () => {
     return (
       <div className="flex flex-col items-center max-w-3xl mx-auto space-y-4">
         {/* Progress Stats */}
-        <div className="flex flex-wrap gap-4 items-center justify-center text-xs w-full bg-white/5 p-3 rounded-xl border border-white/10 shadow-sm">
+        <div className="flex flex-wrap gap-4 items-center justify-center text-xs w-full app-soft-card p-3">
           <span className="text-success-500 font-semibold flex items-center gap-1"><Check className="h-3 w-3" /> Known: {stats.known}</span>
           <span className="text-warning-500 font-semibold flex items-center gap-1"><Clock className="h-3 w-3" /> Need Review: {stats.needReview}</span>
           <span className="text-purple-500 font-semibold flex items-center gap-1"><Star className="h-3 w-3" /> Accuracy: {Math.round(stats.accuracy)}%</span>
-          <span className="text-gray-400 font-semibold ml-auto border-l border-white/10 pl-4">Remaining: {stats.remaining}</span>
+          <span className="card-muted font-semibold ml-auto border-l border-slate-300 dark:border-white/10 pl-4">Remaining: {stats.remaining}</span>
         </div>
 
         {/* Top controls */}
@@ -790,7 +790,7 @@ const Flashcards = () => {
               </div>
             )}
           </div>
-          <div className="text-sm font-semibold text-gray-500">
+          <div className="text-sm font-semibold card-muted">
             Card {currentIdx + 1} of {stats.total}
           </div>
         </div>
@@ -836,7 +836,7 @@ const Flashcards = () => {
           className="w-full h-80 relative perspective-1000 cursor-pointer group mt-2"
         >
           <div
-            className={`w-full h-full rounded-2xl border border-white/70 dark:border-white/10 bg-white/80 dark:bg-slate-900/85 text-[#241b4b] dark:text-white p-8 shadow-2xl flex flex-col items-center justify-center text-center transition-all duration-500 preserve-3d ${
+            className={`w-full h-full app-card flex flex-col items-center justify-center text-center transition-all duration-500 preserve-3d ${
               flipped ? 'rotate-y-180' : ''
             }`}
           >
@@ -849,10 +849,10 @@ const Flashcards = () => {
                   <Badge color="purple">{currentCard.category}</Badge>
                 </div>
               </div>
-              <p className="text-lg sm:text-xl md:text-2xl font-semibold text-[#241b4b] dark:text-white my-auto px-4">
+              <p className="text-lg sm:text-xl md:text-2xl font-semibold card-title my-auto px-4">
                 {currentCard.front}
               </p>
-              <div className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <div className="text-xs card-muted flex items-center justify-center gap-1">
                 <RotateCw className="h-3 w-3" /> Click card or press Space to flip
               </div>
             </div>
@@ -866,10 +866,10 @@ const Flashcards = () => {
                   <Badge color="purple">{currentCard.category}</Badge>
                 </div>
               </div>
-              <p className="text-base sm:text-lg md:text-xl font-medium text-[#6b6388] dark:text-slate-200 my-auto leading-relaxed px-4">
+              <p className="text-base sm:text-lg md:text-xl font-medium app-readable-text my-auto leading-relaxed px-4">
                 {currentCard.back}
               </p>
-              <div className="text-xs text-gray-500 flex items-center justify-center gap-1">
+              <div className="text-xs card-muted flex items-center justify-center gap-1">
                 <RotateCw className="h-3 w-3" /> Click card or press Space to flip
               </div>
             </div>
@@ -919,7 +919,7 @@ const Flashcards = () => {
            </div>
         )}
 
-        <div className="text-center text-xs text-gray-500 dark:text-slate-500 font-medium my-2">
+        <div className="text-center text-xs card-muted font-medium my-2">
           Tip: Space to flip, ← → to move, K/N to mark cards
         </div>
 
@@ -930,7 +930,7 @@ const Flashcards = () => {
            </div>
            
            {flashcardsData.word_count && (
-              <div className="text-xs text-gray-500 dark:text-slate-400">
+              <div className="text-xs card-muted">
                  Source Length: {flashcardsData.word_count} words
               </div>
            )}
@@ -966,7 +966,7 @@ const Flashcards = () => {
             onChange={(e) => setSaveTitle(e.target.value)} 
             placeholder="Enter a title for these flashcards"
             autoFocus
-            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full px-4 py-3 rounded-xl app-input focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <div className="flex justify-end gap-3 mt-6">
             <Button variant="ghost" className="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white" onClick={() => setIsModalOpen(false)}>
