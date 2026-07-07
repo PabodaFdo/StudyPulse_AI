@@ -205,7 +205,7 @@ const SubjectHealth = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Form Section */}
-        <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 shadow-xl shadow-purple-100/40 dark:shadow-none p-6 rounded-2xl">
+        <div className="app-panel p-6">
           <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-6">Calculate Score</h3>
           
           <div className="mb-6 space-y-3">
@@ -413,7 +413,7 @@ const SubjectHealth = () => {
         </div>
 
         {/* Results Section */}
-        <div className="bg-white/80 dark:bg-slate-900/70 border border-purple-100 dark:border-slate-700 text-slate-900 dark:text-slate-900 dark:text-white p-6 rounded-2xl flex flex-col">
+        <div className="app-panel p-6 flex flex-col">
           <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-900 dark:text-white mb-4">Analysis Results</h3>
           
           {!result ? (
