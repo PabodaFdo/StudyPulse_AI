@@ -3,7 +3,7 @@ import Badge from '../components/Badge';
 
 const About = () => {
   return (
-    <div className="pastel-page text-text-main py-16 px-6 lg:px-8 max-w-5xl mx-auto">
+    <div className="bg-transparent min-h-screen text-text-main py-16 px-6 lg:px-8 max-w-5xl mx-auto">
       <div className="text-center mb-16">
         <Badge color="purple" className="mb-4">
           <GraduationCap className="h-4 w-4" /> Academic Excellence
