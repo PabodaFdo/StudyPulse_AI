@@ -237,7 +237,7 @@ const FocusTimer = () => {
       />
 
       <div className="max-w-md mx-auto">
-        <div className="glass-card p-8 border border-white/5 bg-white/[0.02] text-center space-y-8">
+        <div className="app-card p-8 text-center space-y-8">
           <div className="flex gap-2 justify-center items-center">
             {[
               { id: 'focus', label: `Focus (${modeTimes.focus}m)` },
@@ -289,7 +289,7 @@ const FocusTimer = () => {
           <div className="relative inline-flex items-center justify-center">
             <div className="absolute inset-0 rounded-full bg-brand-500/5 blur-xl" />
 
-            <div className="relative flex h-56 w-56 flex-col items-center justify-center rounded-full border-4 border-white/70 bg-white/70 dark:border-white/10 dark:bg-slate-900/80">
+            <div className="relative flex h-56 w-56 flex-col items-center justify-center rounded-full border-4 app-soft-card rounded-full">
               <span className="font-mono text-4xl font-bold tracking-widest text-[#241b4b] dark:text-white sm:text-5xl">
                 {formatTime(secondsLeft)}
               </span>
@@ -358,7 +358,7 @@ const FocusTimer = () => {
                     setSettingsForm({ ...settingsForm, focus: e.target.value })
                   }
                   required
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                  className="w-full rounded-2xl app-input px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
 
@@ -374,7 +374,7 @@ const FocusTimer = () => {
                     setSettingsForm({ ...settingsForm, shortBreak: e.target.value })
                   }
                   required
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                  className="w-full rounded-2xl app-input px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
 
@@ -390,7 +390,7 @@ const FocusTimer = () => {
                     setSettingsForm({ ...settingsForm, longBreak: e.target.value })
                   }
                   required
-                  className="w-full rounded-2xl border border-lavender/40 bg-white/90 px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
+                  className="w-full rounded-2xl app-input px-5 py-4 text-[#241b4b] outline-none transition placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-400"
                 />
               </div>
 
