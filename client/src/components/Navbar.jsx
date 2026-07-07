@@ -12,7 +12,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-lavender/30 dark:border-white/10 bg-[#f8f3ff]/85 dark:bg-slate-950/70 backdrop-blur-md transition-colors duration-300">
+    <nav className="sticky top-0 z-50 border-b border-white/50 dark:border-slate-700/50 bg-white/55 dark:bg-slate-950/55 backdrop-blur-xl transition-colors duration-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 text-base sm:text-lg font-extrabold tracking-tight">
           <Sparkles className="h-5 w-5 text-purple dark:text-cyan-400" />
