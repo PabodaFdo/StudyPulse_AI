@@ -104,19 +104,19 @@ const MoodCheckIn = () => {
 
       {summary && (
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="glass-card p-4 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 flex flex-col items-center justify-center">
+          <div className="app-card p-4 flex flex-col items-center justify-center">
             <span className="text-slate-500 dark:text-slate-400 text-xs mb-1">Avg Mood (7d)</span>
             <span className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Smile className="h-5 w-5 text-blue-400" /> {summary.averageMood || 0}
             </span>
           </div>
-          <div className="glass-card p-4 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 flex flex-col items-center justify-center">
+          <div className="app-card p-4 flex flex-col items-center justify-center">
             <span className="text-slate-500 dark:text-slate-400 text-xs mb-1">Avg Energy (7d)</span>
             <span className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Zap className="h-5 w-5 text-yellow-400" /> {summary.averageEnergy || 0}
             </span>
           </div>
-          <div className="glass-card p-4 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 flex flex-col items-center justify-center">
+          <div className="app-card p-4 flex flex-col items-center justify-center">
             <span className="text-slate-500 dark:text-slate-400 text-xs mb-1">Avg Stress (7d)</span>
             <span className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Activity className="h-5 w-5 text-red-400" /> {summary.averageStress || 0}
@@ -127,7 +127,7 @@ const MoodCheckIn = () => {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Form log */}
-        <div className="lg:col-span-2 glass-card p-5 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 space-y-6">
+        <div className="lg:col-span-2 app-panel p-5 space-y-6">
           <h3 className="font-bold text-slate-900 dark:text-white text-base">How are you feeling today?</h3>
           
           <div className="grid grid-cols-5 gap-3">
@@ -138,7 +138,7 @@ const MoodCheckIn = () => {
                 className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
                   mood?.value === m.value
                     ? 'border-brand-500 bg-brand-500/10'
-                    : 'border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-white/[0.01] hover:bg-slate-100 dark:hover:bg-white/[0.03]'
+                    : 'app-soft-card hover:bg-purple-100/50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <span className="text-3xl">{m.emoji}</span>
@@ -184,7 +184,7 @@ const MoodCheckIn = () => {
                 rows={3}
                 value={journalNote}
                 onChange={(e) => setJournalNote(e.target.value)}
-                className="w-full p-3 rounded-xl bg-white/80 dark:bg-slate-950/60 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                className="w-full p-3 rounded-xl app-input text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
 
@@ -195,7 +195,7 @@ const MoodCheckIn = () => {
         </div>
 
         {/* History Panel */}
-        <div className="glass-card p-5 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 space-y-4">
+        <div className="app-panel p-5 space-y-4">
           <h3 className="font-semibold text-slate-900 dark:text-white text-base">Recent Check-ins</h3>
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
             {history.length === 0 ? (
@@ -207,7 +207,7 @@ const MoodCheckIn = () => {
                 const mEmoji = moods.find(m => m.value === h.mood)?.emoji || '😶';
                 
                 return (
-                  <div key={h.id} className="p-3.5 bg-slate-50 dark:bg-white/[0.01] border border-slate-200 dark:border-slate-700 rounded-xl space-y-2 relative group">
+                  <div key={h.id} className="p-3.5 app-soft-card rounded-xl space-y-2 relative group">
                     <button 
                       onClick={() => handleDelete(h.id)}
                       className="absolute top-2 right-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"
