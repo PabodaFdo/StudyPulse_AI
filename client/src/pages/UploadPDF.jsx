@@ -255,7 +255,7 @@ const UploadPDF = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Upload Card */}
-        <div className="glass-card p-6 md:p-8 border border-white/10 bg-white/[0.02] dark:bg-slate-900/40 rounded-2xl shadow-xl space-y-6">
+        <div className="app-panel p-6 md:p-8 space-y-6">
           
           {/* Empty State Instructions */}
           {!file && !analysisResult && (
@@ -274,7 +274,7 @@ const UploadPDF = () => {
             onDrop={handleDrop}
             className={`relative overflow-hidden border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 flex flex-col items-center justify-center
               ${isDragging ? 'border-brand-500 bg-brand-500/10 scale-[1.01]' : ''}
-              ${file ? 'border-brand-500/40 bg-brand-500/5' : 'border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 hover:bg-white/80 dark:hover:bg-slate-800/80'}
+              ${file ? 'border-brand-500/40 bg-brand-500/5' : 'app-soft-card hover:bg-purple-100/50 dark:hover:bg-slate-800/80'}
             `}
           >
             <input
@@ -304,7 +304,7 @@ const UploadPDF = () => {
 
           {/* Selected File Details */}
           {file && (
-            <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl app-card gap-4">
               <div className="flex items-center gap-4 w-full sm:w-auto overflow-hidden">
                 <div className="bg-red-100 dark:bg-red-500/20 p-3 rounded-lg text-red-500 shrink-0">
                   <FileText className="h-6 w-6" />
@@ -352,7 +352,7 @@ const UploadPDF = () => {
               type="button"
               onClick={handleReset}
               disabled={uploading}
-              className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white/80 px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:!text-cyan-300 dark:hover:bg-white/10 dark:hover:!text-cyan-200"
+              className="inline-flex items-center justify-center rounded-xl app-input px-5 py-3 text-sm font-bold text-slate-700 transition-colors hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:!text-cyan-200"
             >
               Reset
             </button>
@@ -372,7 +372,7 @@ const UploadPDF = () => {
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             
             {/* Success Banner & Stats */}
-            <div className="glass-card p-6 border border-success-500/30 bg-success-500/5 rounded-2xl shadow-lg space-y-6">
+            <div className="app-panel p-6 border border-success-500/30 bg-success-500/5 shadow-lg space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-success-100 dark:bg-success-500/20 p-2 rounded-full text-success-600 dark:text-success-400">
@@ -392,15 +392,15 @@ const UploadPDF = () => {
 
               {/* Stat Cards */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                <div className="app-soft-card p-4 rounded-xl flex flex-col items-center justify-center text-center">
                   <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1 uppercase tracking-wider">Pages</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">{analysisResult.pageCount}</p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center">
+                <div className="app-soft-card p-4 rounded-xl flex flex-col items-center justify-center text-center">
                   <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1 uppercase tracking-wider">Characters</p>
                   <p className="text-2xl font-bold text-slate-800 dark:text-white">{analysisResult.characterCount.toLocaleString()}</p>
                 </div>
-                <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center text-center col-span-2 md:col-span-1">
+                <div className="app-soft-card p-4 rounded-xl flex flex-col items-center justify-center text-center col-span-2 md:col-span-1">
                   <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mb-1 uppercase tracking-wider">Status</p>
                   <p className="text-lg font-bold text-success-500 dark:text-success-400">Ready for AI</p>
                 </div>
@@ -409,7 +409,7 @@ const UploadPDF = () => {
 
             {/* Extracted Text Preview */}
             {analysisResult.text && (
-              <div className="glass-card border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 rounded-2xl overflow-hidden shadow-lg">
+              <div className="app-panel overflow-hidden">
                 <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
                   <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                     <FileText className="h-5 w-5 text-brand-500" />
@@ -454,7 +454,7 @@ const UploadPDF = () => {
                     <div 
                       key={idx} 
                       onClick={() => hasText && handleNavigate(step.route)}
-                      className={`glass-card p-5 border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 rounded-xl transition-all ${
+                      className={`app-soft-card p-5 rounded-xl transition-all ${
                         hasText 
                           ? 'cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-95 group' 
                           : 'opacity-50 cursor-not-allowed'
@@ -480,7 +480,7 @@ const UploadPDF = () => {
       {/* Smart Note Modal */}
       {isNoteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-lg shadow-xl overflow-hidden flex flex-col">
+          <div className="app-panel w-full max-w-lg overflow-hidden flex flex-col">
             <div className="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
               <h3 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-brand-500" /> Save as Smart Note
@@ -496,7 +496,7 @@ const UploadPDF = () => {
                 <select 
                   value={noteSubjectId} 
                   onChange={(e) => setNoteSubjectId(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-4 py-2.5 rounded-xl app-input text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-400"
                 >
                   <option value="">Select a subject...</option>
                   {subjects.map(s => (
@@ -512,7 +512,7 @@ const UploadPDF = () => {
                   value={noteTitle} 
                   onChange={(e) => setNoteTitle(e.target.value)}
                   placeholder="e.g. Operating Systems Lecture 1"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400"
+                  className="w-full px-4 py-2.5 rounded-xl app-input text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-400"
                 />
               </div>
 
