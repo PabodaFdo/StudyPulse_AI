@@ -24,7 +24,7 @@ const MobileNav = () => {
       <div className="fixed left-0 right-0 top-0 z-50 flex h-14 items-center justify-between border-b border-lavender/30 dark:border-white/10 bg-[#f4ecff]/95 dark:bg-slate-950/75 px-4 backdrop-blur-md transition-colors duration-300">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-purple dark:text-cyan-400" />
-          <span className="font-extrabold text-sm text-text-main dark:text-white">
+          <span className="font-extrabold text-sm text-slate-900 dark:text-white">
             StudyPulse AI 🌱
           </span>
         </div>
@@ -59,7 +59,7 @@ const MobileNav = () => {
             >
               {sections.map((section) => (
                 <div key={section.title} className="mb-4">
-                  <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-text-muted/60 dark:text-slate-500">
+                  <p className="mb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {section.title}
                   </p>
                   {section.links.map((link) => {
@@ -72,7 +72,7 @@ const MobileNav = () => {
                         className={`flex items-center gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition
                           ${isActive
                             ? 'bg-purple text-white shadow-md dark:bg-cyan-500/20 dark:text-cyan-300'
-                            : 'text-text-muted hover:bg-lavender/10 hover:text-purple dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-purple dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white'
                           }`}
                       >
                         <link.icon className="h-4 w-4 flex-shrink-0" />
@@ -89,7 +89,7 @@ const MobileNav = () => {
                 className={`mt-2 flex items-center gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition
                   ${location.pathname === '/profile'
                     ? 'bg-purple text-white dark:bg-cyan-500/20 dark:text-cyan-300'
-                    : 'text-text-muted hover:bg-lavender/10 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-white'
                   }`}
               >
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple text-white text-[10px] font-bold flex-shrink-0">
