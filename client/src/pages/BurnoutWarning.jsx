@@ -42,8 +42,8 @@ const BurnoutWarning = () => {
           subtitle="Understand stress triggers analyzed from your activity logs."
           icon={Flame}
         />
-        <div className="glass-card p-8 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 text-center">
-          <p className="text-slate-500 dark:text-slate-400">
+        <div className="app-card p-8 text-center">
+          <p className="card-muted">
             Not enough data yet. Complete Mood Check-ins and Focus Sessions to improve burnout analysis.
           </p>
         </div>
@@ -93,7 +93,7 @@ const BurnoutWarning = () => {
           <>
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Burnout Score */}
-              <div className={`glass-card p-6 border text-center space-y-4 ${getRiskClasses(riskLevel)}`}>
+              <div className={`app-card p-6 border text-center space-y-4 ${getRiskClasses(riskLevel)}`}>
                 <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${getIconBgClass(riskLevel)}`}>
                   {riskLevel === 'High' ? (
                     <ShieldAlert className="h-6 w-6 animate-pulse" />
@@ -102,9 +102,9 @@ const BurnoutWarning = () => {
                   )}
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase tracking-wider block">BURNOUT RISK STATUS</span>
+                  <span className="text-[10px] card-muted font-bold uppercase tracking-wider block">BURNOUT RISK STATUS</span>
                   <h3 className="text-2xl font-extrabold mt-1">{riskLevel} Risk ({burnoutRisk}%)</h3>
-                  <p className="text-xs text-slate-500 dark:text-gray-500 mt-0.5">Calculated: {new Date(generatedAt).toLocaleString()}</p>
+                  <p className="text-xs card-muted mt-0.5">Calculated: {new Date(generatedAt).toLocaleString()}</p>
                 </div>
                 <div className="pt-2">
                   <ProgressBar value={burnoutRisk} color={getRiskColor(riskLevel)} label="Risk Index" />
@@ -112,34 +112,34 @@ const BurnoutWarning = () => {
               </div>
 
               {/* Detailed Breakdown */}
-              <div className="lg:col-span-2 glass-card p-6 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 space-y-4">
-                <h3 className="font-bold text-slate-900 dark:text-white text-base">Key Indicators (Last 7 Days)</h3>
+              <div className="lg:col-span-2 app-panel p-6 space-y-4">
+                <h3 className="font-bold card-title text-base">Key Indicators (Last 7 Days)</h3>
                 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase block">Weekly Focus</span>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white">{weeklyFocusHours} Hours</p>
-                    <p className="text-[10px] text-slate-500 dark:text-gray-400">{weeklyFocusSessions} sessions</p>
+                  <div className="app-soft-card p-4 rounded-xl space-y-2">
+                    <span className="text-[10px] card-muted font-bold uppercase block">Weekly Focus</span>
+                    <p className="text-lg font-bold card-title">{weeklyFocusHours} Hours</p>
+                    <p className="text-[10px] card-muted">{weeklyFocusSessions} sessions</p>
                   </div>
-                  <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase block flex items-center gap-1"><Activity className="w-3 h-3"/> Avg Stress</span>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white">{averageStress}/5</p>
-                    <p className="text-[10px] text-slate-500 dark:text-gray-400">{summary?.recentMoodCheckIns ?? 0} check-ins</p>
+                  <div className="app-soft-card p-4 rounded-xl space-y-2">
+                    <span className="text-[10px] card-muted font-bold uppercase block flex items-center gap-1"><Activity className="w-3 h-3"/> Avg Stress</span>
+                    <p className="text-lg font-bold card-title">{averageStress}/5</p>
+                    <p className="text-[10px] card-muted">{summary?.recentMoodCheckIns ?? 0} check-ins</p>
                   </div>
-                  <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase block flex items-center gap-1"><Zap className="w-3 h-3"/> Avg Energy</span>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white">{averageEnergy}/5</p>
+                  <div className="app-soft-card p-4 rounded-xl space-y-2">
+                    <span className="text-[10px] card-muted font-bold uppercase block flex items-center gap-1"><Zap className="w-3 h-3"/> Avg Energy</span>
+                    <p className="text-lg font-bold card-title">{averageEnergy}/5</p>
                   </div>
-                  <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5 space-y-2">
-                    <span className="text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase block flex items-center gap-1"><Smile className="w-3 h-3"/> Avg Mood</span>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white">{averageMood}/5</p>
-                    <p className="text-[10px] text-slate-500 dark:text-gray-400">mood check-in average</p>
+                  <div className="app-soft-card p-4 rounded-xl space-y-2">
+                    <span className="text-[10px] card-muted font-bold uppercase block flex items-center gap-1"><Smile className="w-3 h-3"/> Avg Mood</span>
+                    <p className="text-lg font-bold card-title">{averageMood}/5</p>
+                    <p className="text-[10px] card-muted">mood check-in average</p>
                   </div>
                 </div>
 
                 <div className="pt-2">
-                  <h4 className="font-semibold text-sm text-slate-800 dark:text-gray-200 mb-2">Main Reasons</h4>
-                  <ul className="list-disc pl-5 text-sm text-slate-600 dark:text-gray-400 space-y-1">
+                  <h4 className="font-semibold text-sm card-title mb-2">Main Reasons</h4>
+                  <ul className="list-disc pl-5 text-sm card-muted space-y-1">
                     {mainReasons.length > 0 ? (
                       mainReasons.map((r, i) => (
                         <li key={i}>{r}</li>
@@ -153,19 +153,19 @@ const BurnoutWarning = () => {
             </div>
 
             {/* Strategies */}
-            <div className="glass-card p-5 border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-900/70 space-y-4">
-              <h3 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+            <div className="app-panel p-5 space-y-4">
+              <h3 className="font-bold card-title text-base flex items-center gap-2">
                 <Heart className="h-4.5 w-4.5 text-red-500 dark:text-danger-400" /> Suggested Rebalancing Steps
               </h3>
               <div className="grid gap-4 sm:grid-cols-2 text-xs">
                 {recommendations.length > 0 ? (
                   recommendations.map((rec, i) => (
-                    <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 space-y-2">
-                      <p className="text-slate-700 dark:text-gray-300 text-sm leading-relaxed">{rec}</p>
+                    <div key={i} className="p-4 rounded-xl app-soft-card space-y-2">
+                      <p className="app-readable-text text-sm leading-relaxed">{rec}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-slate-500 dark:text-slate-400">Complete more Mood Check-ins and Focus Sessions to improve recommendations.</p>
+                  <p className="card-muted">Complete more Mood Check-ins and Focus Sessions to improve recommendations.</p>
                 )}
               </div>
             </div>
