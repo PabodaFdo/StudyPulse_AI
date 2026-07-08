@@ -2224,12 +2224,12 @@ html.dark .process-step-content {
 }
 
 .page-title {
-  @apply text-white font-extrabold tracking-tight drop-shadow-[0_4px_14px_rgba(0, 0, 0, 0.55)];
+  @apply text-white font-extrabold tracking-tight drop-shadow-[0_4px_14px_rgba(0,0,0,0.55)];
   font-family: "Poppins", "Inter", system-ui, sans-serif;
 }
 
 .page-subtitle {
-  @apply text-white/90 font-semibold drop-shadow-[0_3px_10px_rgba(0, 0, 0, 0.45)];
+  @apply text-white/90 font-semibold drop-shadow-[0_3px_10px_rgba(0,0,0,0.45)];
   font-family: "Inter", system-ui, sans-serif;
 }
 

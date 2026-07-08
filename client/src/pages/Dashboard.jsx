@@ -5,7 +5,8 @@ import {
   Timer, BookOpen, Clock, Flame, LayoutDashboard,
   AlertTriangle, Play, Flower2, RefreshCw, PlusCircle,
   FileText, HelpCircle, Layers, File,
-  Target, Brain, ShieldAlert, GraduationCap
+  Target, Brain, ShieldAlert, GraduationCap,
+  Smile, Activity, Bell
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import StatCard from '../components/StatCard';
@@ -19,6 +20,10 @@ import { getQuizAttemptStats } from '../services/quizAttempt.service';
 import { getFlashcardReviewSummary } from '../services/flashcardReview.service';
 import { getSummaryReviewAnalytics } from '../services/summaryReview.service';
 import { riskService } from '../services/risk.service';
+import { moodService } from '../services/mood.service';
+import { burnoutService } from '../services/burnout.service';
+import { revisionService } from '../services/revision.service';
+import { flowerService } from '../services/flower.service';
 
 // Skeleton Component
 const DashboardSkeleton = () => (
@@ -74,6 +79,14 @@ const Dashboard = () => {
     totalTimeSeconds: 0
   });
 
+  const [wellnessData, setWellnessData] = useState({
+    moodSummary: null,
+    burnoutSummary: null,
+    revisionReminders: null,
+    flowerCollection: null,
+    loading: true
+  });
+
   const fetchDashboardData = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
@@ -123,6 +136,21 @@ const Dashboard = () => {
           totalTimeSeconds: stats.totalTimeSeconds || 0
         });
       }
+      
+      const [moodRes, burnoutRes, revisionRes, flowerRes] = await Promise.allSettled([
+        moodService.getSummary(),
+        burnoutService.getSummary(),
+        revisionService.getReminders({ status: 'Pending' }),
+        flowerService.getCollection()
+      ]);
+
+      setWellnessData({
+        moodSummary: moodRes.status === 'fulfilled' ? moodRes.value?.data || moodRes.value : null,
+        burnoutSummary: burnoutRes.status === 'fulfilled' ? burnoutRes.value?.data || burnoutRes.value : null,
+        revisionReminders: revisionRes.status === 'fulfilled' ? revisionRes.value?.data || revisionRes.value : null,
+        flowerCollection: flowerRes.status === 'fulfilled' ? flowerRes.value?.data || flowerRes.value : null,
+        loading: false
+      });
       
       setError(null);
     } catch (err) {
@@ -430,6 +458,139 @@ const Dashboard = () => {
             />
           </div>
 
+          {/* Wellness & Gamification Highlights */}
+          <div className="pt-4 pb-2 border-t border-slate-200 dark:border-slate-700/50">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
+                <Activity className="h-5 w-5 text-emerald-500" /> Wellness & Gamification
+              </h3>
+            </div>
+            
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+              {/* Mood Summary */}
+              <div 
+                className="app-card p-4 cursor-pointer hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 flex flex-col justify-between h-full"
+                onClick={() => navigate('/mood-checkin')}
+              >
+                <div>
+                  <h4 className="font-extrabold text-sm text-text-main flex items-center gap-1.5 mb-3">
+                    <Smile className="w-4 h-4 text-emerald-500" /> Mood Summary
+                  </h4>
+                  {wellnessData.loading ? (
+                    <div className="animate-pulse space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                    </div>
+                  ) : wellnessData.moodSummary ? (
+                    <div className="text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+                      <p className="flex justify-between"><span>Mood:</span> <span className="font-bold">{wellnessData.moodSummary.averageMood?.toFixed(1) || '-'} / 5</span></p>
+                      <p className="flex justify-between"><span>Energy:</span> <span className="font-bold">{wellnessData.moodSummary.averageEnergy?.toFixed(1) || '-'} / 5</span></p>
+                      <p className="flex justify-between"><span>Stress:</span> <span className="font-bold">{wellnessData.moodSummary.averageStress?.toFixed(1) || '-'} / 5</span></p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                        {wellnessData.moodSummary?.totalCheckIns ?? 0} check-ins this week
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">No mood data.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Burnout Risk */}
+              <div 
+                className="app-card p-4 cursor-pointer hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 flex flex-col justify-between h-full"
+                onClick={() => navigate('/burnout-warning')}
+              >
+                <div>
+                  <h4 className="font-extrabold text-sm text-text-main flex items-center gap-1.5 mb-3">
+                    <Flame className="w-4 h-4 text-orange-500" /> Burnout Risk
+                  </h4>
+                  {wellnessData.loading ? (
+                    <div className="animate-pulse space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                    </div>
+                  ) : wellnessData.burnoutSummary ? (
+                    <div className="text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+                      <p className="font-bold text-sm mb-1">
+                        {Math.round(wellnessData.burnoutSummary?.burnoutRisk ?? 0)}% {wellnessData.burnoutSummary?.riskLevel || 'Low'} Risk
+                      </p>
+                      <p className="text-[11px] leading-tight text-slate-600 dark:text-slate-400">
+                        {wellnessData.burnoutSummary?.recommendations?.[0] || wellnessData.burnoutSummary?.mainReasons?.[0] || 'Your study and wellness balance looks healthy.'}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">No burnout data.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Revision Reminders */}
+              <div 
+                className="app-card p-4 cursor-pointer hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 flex flex-col justify-between h-full"
+                onClick={() => navigate('/revision-reminders')}
+              >
+                <div>
+                  <h4 className="font-extrabold text-sm text-text-main flex items-center gap-1.5 mb-3">
+                    <Bell className="w-4 h-4 text-blue-500" /> Revision Reminders
+                  </h4>
+                  {wellnessData.loading ? (
+                    <div className="animate-pulse space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                    </div>
+                  ) : (
+                    <div className="text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+                      <p className="font-bold text-sm mb-1 text-blue-600 dark:text-blue-400">
+                        {(wellnessData.revisionReminders && wellnessData.revisionReminders.length) || 0} pending
+                      </p>
+                      {wellnessData.revisionReminders && wellnessData.revisionReminders.length > 0 ? (
+                        <>
+                          <p className="truncate" title={wellnessData.revisionReminders[0].title}>Next: {wellnessData.revisionReminders[0].title}</p>
+                          <p>Priority: <span className="font-bold">{wellnessData.revisionReminders[0].priority || 'Normal'}</span></p>
+                        </>
+                      ) : (
+                        <p className="text-slate-500 dark:text-slate-400 mt-2">All caught up!</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Flower Collection */}
+              <div 
+                className="app-card p-4 cursor-pointer hover:-translate-y-1 transition-all border border-slate-200 dark:border-slate-700/50 flex flex-col justify-between h-full"
+                onClick={() => navigate('/flower-collection')}
+              >
+                <div>
+                  <h4 className="font-extrabold text-sm text-text-main flex items-center gap-1.5 mb-3">
+                    <Flower2 className="w-4 h-4 text-pink-500" /> Flower Collection
+                  </h4>
+                  {wellnessData.loading ? (
+                    <div className="animate-pulse space-y-2">
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3"></div>
+                      <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                    </div>
+                  ) : wellnessData.flowerCollection ? (
+                    <div className="text-xs space-y-1.5 text-slate-700 dark:text-slate-300">
+                      <p className="font-bold text-sm mb-1 text-pink-600 dark:text-pink-400">
+                        {wellnessData.flowerCollection.unlockedCount || 0} / {wellnessData.flowerCollection.totalFlowers || 0} unlocked
+                      </p>
+                      <p>{Math.round(((wellnessData.flowerCollection?.unlockedCount || 0) / (wellnessData.flowerCollection?.totalFlowers || 1)) * 100)}% complete</p>
+                      <p className="truncate mt-2 pt-2 border-t border-slate-100 dark:border-slate-700/50 text-slate-500 dark:text-slate-400">
+                        Latest: {wellnessData.flowerCollection?.unlockedFlowers?.length > 0 
+                          ? [...wellnessData.flowerCollection.unlockedFlowers].sort((a, b) => new Date(b.unlockedAt) - new Date(a.unlockedAt))[0]?.flowerName 
+                          : 'None yet'}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">No collection data.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* My AI Library */}
           <div 
             className="app-card p-5 cursor-pointer hover:-translate-y-1 transition-all" 
@@ -702,32 +863,7 @@ const Dashboard = () => {
             </div>
           </ChartCard>
 
-          {/* Recent Activity Timeline */}
-          <div className="app-panel p-5">
-            <h3 className="font-extrabold text-sm sm:text-base text-text-main mb-4 flex items-center gap-1.5">
-              <Clock className="h-4.5 w-4.5 text-purple" /> Recent Activity
-            </h3>
-            <div className="space-y-4">
-              {recentActivity.length > 0 ? (
-                <div className="relative border-l-2 border-lavender/30 dark:border-slate-700 ml-3 space-y-5">
-                  {recentActivity.map((activity, i) => (
-                    <div key={i} className="relative pl-6">
-                      <div className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 ${activity.type === 'focus' ? 'bg-purple' : 'bg-blue'}`}></div>
-                      <p className="text-xs font-bold text-text-main dark:text-slate-200">{activity.label}</p>
-                      <p className="text-[10px] font-semibold text-text-muted mt-0.5">{activity.date.toLocaleDateString()} at {activity.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center p-6 app-soft-card rounded-xl border border-slate-200 dark:border-slate-700/50">
-                  <p className="text-xs font-bold text-text-muted">No recent activity yet.</p>
-                  <button onClick={() => navigate('/focus-timer')} className="text-purple hover:underline text-xs font-bold mt-2 inline-block">
-                    Start a focus session
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+
 
         </div>
 
@@ -948,6 +1084,32 @@ const Dashboard = () => {
             </div>
           </ChartCard>
 
+          {/* Recent Activity Timeline */}
+          <div className="app-panel p-5">
+            <h3 className="font-extrabold text-sm sm:text-base text-text-main mb-4 flex items-center gap-1.5">
+              <Clock className="h-4.5 w-4.5 text-purple" /> Recent Activity
+            </h3>
+            <div className="space-y-4">
+              {recentActivity.length > 0 ? (
+                <div className="relative border-l-2 border-lavender/30 dark:border-slate-700 ml-3 space-y-5">
+                  {recentActivity.map((activity, i) => (
+                    <div key={i} className="relative pl-6">
+                      <div className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full border-2 border-white dark:border-slate-900 ${activity.type === 'focus' ? 'bg-purple' : 'bg-blue'}`}></div>
+                      <p className="text-xs font-bold text-text-main dark:text-slate-200">{activity.label}</p>
+                      <p className="text-[10px] font-semibold text-text-muted mt-0.5">{activity.date.toLocaleDateString()} at {activity.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center p-6 app-soft-card rounded-xl border border-slate-200 dark:border-slate-700/50">
+                  <p className="text-xs font-bold text-text-muted">No recent activity yet.</p>
+                  <button onClick={() => navigate('/focus-timer')} className="text-purple hover:underline text-xs font-bold mt-2 inline-block">
+                    Start a focus session
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
         </div>
       </div>
