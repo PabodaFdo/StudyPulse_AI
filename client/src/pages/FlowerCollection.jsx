@@ -1,34 +1,143 @@
-import { Album, Sparkles, Award } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Album, RefreshCw } from 'lucide-react';
+import toast from 'react-hot-toast';
 import PageHeader from '../components/PageHeader';
+import Button from '../components/Button';
 import Badge from '../components/Badge';
 import AnimatedCharacter from '../components/AnimatedCharacter';
+import { flowerService } from '../services/flower.service';
+
+const FLOWER_ICONS = {
+  rose: '🌹',
+  sunflower: '🌻',
+  lotus: '🪷',
+  orchid: '💮',
+  cherry_blossom: '🌸',
+  lavender: '🪻'
+};
+
+const FLOWER_COLORS = {
+  rose: 'text-rose-400',
+  sunflower: 'text-amber-400',
+  lotus: 'text-indigo-400',
+  orchid: 'text-fuchsia-400',
+  cherry_blossom: 'text-pink-400',
+  lavender: 'text-violet-400'
+};
 
 const FlowerCollection = () => {
-  const collection = [
-    { name: 'Rose', rarity: 'Common', level: 3, icon: '🌹', color: 'text-rose-400', condition: 'Unlocked by finishing Calculus III baseline tasks.' },
-    { name: 'Sunflower', rarity: 'Common', level: 2, icon: '🌻', color: 'text-amber-400', condition: 'Unlocked by completing 3 focus sessions.' },
-    { name: 'Lotus', rarity: 'Rare', level: 4, icon: '🪷', color: 'text-indigo-400', condition: 'Unlocked by maintaining 90% Subject Health.' },
-    { name: 'Cherry Blossom', rarity: 'Epic', level: 1, icon: '🌸', color: 'text-pink-400', condition: 'Unlocked by completing 10 daily quests.' },
-    { name: 'Lavender', rarity: 'Rare', level: 5, icon: '🪻', color: 'text-violet-400', condition: 'Unlocked by logging mood checks for 5 days.' },
-    { name: 'Orchid', rarity: 'Legendary', level: 0, icon: '💮', color: 'text-fuchsia-400', condition: 'Unlocked only when overall subject health index reaches 95%.' },
-  ];
+  const [collection, setCollection] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchCollection = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await flowerService.getCollection();
+      setCollection(data.data);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load flower collection');
+      toast.error('Failed to load flower collection');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCollection();
+  }, []);
+
+  const handleCheckUnlocks = async () => {
+    try {
+      setChecking(true);
+      const response = await flowerService.checkUnlocks();
+      if (response.newlyUnlocked && response.newlyUnlocked.length > 0) {
+        toast.success(`Unlocked new flowers: ${response.newlyUnlocked.join(', ')}! 🌸`);
+      } else {
+        toast('No new unlocks found. Keep studying!', { icon: 'ℹ️' });
+      }
+      setCollection(response.data);
+    } catch (err) {
+      toast.error('Failed to check unlocks');
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const getRarityColor = (rarity) => {
+    switch (rarity) {
+      case 'Epic': return 'purple';
+      case 'Rare': return 'blue';
+      case 'Common': return 'green';
+      default: return 'gray';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(new Date(dateString));
+  };
+
+  const renderFlowerCard = (f, isLocked) => (
+    <div
+      key={f.flowerKey}
+      className={`app-card p-5 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 ${
+        isLocked ? 'opacity-65 bg-white/40 dark:bg-slate-900/40' : 'bg-white dark:bg-slate-900'
+      }`}
+    >
+      <div className="flex flex-col justify-between h-full">
+        <div>
+          <div className="flex justify-between items-start mb-3">
+            <span className={`text-4xl ${isLocked ? 'grayscale opacity-30' : FLOWER_COLORS[f.flowerKey] || 'text-brand-500'}`}>
+              {FLOWER_ICONS[f.flowerKey] || '🌱'}
+            </span>
+            <Badge color={getRarityColor(f.rarity)}>
+              {f.rarity}
+            </Badge>
+          </div>
+          <h3 className="font-extrabold text-slate-900 dark:text-white text-base mt-2">{f.flowerName}</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+            {isLocked ? f.unlockCondition : (f.unlockReason || f.unlockCondition)}
+          </p>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs">
+          <span className="text-slate-500 font-bold uppercase">Status</span>
+          <span className={isLocked ? 'text-slate-500/80 dark:text-slate-400/80' : 'text-brand-600 dark:text-brand-400 font-extrabold'}>
+            {isLocked ? 'Locked' : `Unlocked on ${formatDate(f.unlockedAt)}`}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-6 text-text-main">
+    <div className="space-y-6">
       <PageHeader
         title="Flower Collection"
         subtitle="Review your unlocked digital flora, rarity tiers, and achievements."
         icon={Album}
       />
 
-      {/* Mascot Achievement Summary */}
-      <div className="liquid-card p-6 bg-gradient-to-r from-purple/10 to-pink/5 mb-6">
-        <div className="liquid-card-content flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div className="app-panel p-6 bg-gradient-to-r from-brand-500/10 to-accent-500/5 mb-6 border border-slate-200 dark:border-slate-800 rounded-[32px]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-1.5 text-center sm:text-left">
-            <h3 className="text-base font-extrabold text-text-main">Unlock flowers by studying consistently</h3>
-            <p className="text-xs text-text-muted font-bold">
-              Keep completing daily focus cycles to unlock rare and exotic seedlings for your digital collection!
+            <h3 className="text-base font-extrabold text-slate-900 dark:text-white">Unlock flowers by studying consistently</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-bold max-w-md">
+              Complete quests, maintain your study garden, and focus on your revision to unlock rare and exotic seedlings for your digital collection!
             </p>
+            <div className="pt-2">
+              <Button onClick={handleCheckUnlocks} disabled={checking || loading} className="flex items-center gap-2">
+                {checking ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                Check New Unlocks
+              </Button>
+            </div>
           </div>
           <div className="flex-shrink-0">
             <AnimatedCharacter
@@ -40,49 +149,41 @@ const FlowerCollection = () => {
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {collection.map((f, i) => {
-          const isLocked = f.level === 0;
-          return (
-            <div
-              key={i}
-              className={`liquid-card p-5 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 ${
-                isLocked ? 'opacity-65 bg-white/40' : 'bg-white'
-              }`}
-            >
-              <div className="liquid-card-content flex flex-col justify-between h-full">
-                <div>
-                  <div className="flex justify-between items-start mb-3">
-                    <span className={`text-4xl ${isLocked ? 'grayscale opacity-30' : f.color}`}>{f.icon}</span>
-                    <Badge
-                      color={
-                        f.rarity === 'Legendary'
-                          ? 'purple'
-                          : f.rarity === 'Epic'
-                          ? 'red'
-                          : f.rarity === 'Rare'
-                          ? 'blue'
-                          : 'green'
-                      }
-                    >
-                      {f.rarity}
-                    </Badge>
-                  </div>
-                  <h3 className="font-extrabold text-text-main text-base mt-2">{f.name}</h3>
-                  <p className="text-xs text-text-muted mt-1 leading-relaxed">{f.condition}</p>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-lavender/10 flex items-center justify-between text-xs">
-                  <span className="text-text-muted font-bold uppercase">status</span>
-                  <span className={isLocked ? 'text-text-muted/50' : 'text-purple font-extrabold'}>
-                    {isLocked ? 'Locked' : `Level ${f.level} Active`}
-                  </span>
-                </div>
+      {loading ? (
+        <div className="text-center py-10 text-slate-500 dark:text-slate-400">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-2 text-brand-500" />
+          <p>Loading collection...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-10 text-red-500">
+          <p>{error}</p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {collection?.unlockedFlowers?.length > 0 && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Unlocked Flowers</h3>
+                <Badge color="purple">{collection.unlockedCount} / {collection.totalFlowers}</Badge>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {collection.unlockedFlowers.map(f => renderFlowerCard(f, false))}
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
+
+          {collection?.lockedFlowers?.length > 0 && (
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400">Locked Flowers</h3>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {collection.lockedFlowers.map(f => renderFlowerCard(f, true))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
