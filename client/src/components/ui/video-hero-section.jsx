@@ -1,7 +1,8 @@
-import React from 'react';
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 import studyGirlReading from '../../assets/characters/study-girl-reading.png';
 
 const innerFeatures = [
@@ -17,9 +18,13 @@ const outerFeatures = [
 ];
 
 export default function VideoHeroSection() {
+  const { theme } = useTheme();
+  const videoSrc = theme === 'dark' ? '/videos/hero-dark.mp4' : '/videos/hero-bg.mp4';
+
   return (
     <section className="relative min-h-[calc(100vh-72px)] w-full overflow-hidden bg-black flex items-center justify-center px-4 py-10">
       <video
+        key={videoSrc}
         autoPlay
         loop
         muted
@@ -27,7 +32,7 @@ export default function VideoHeroSection() {
         poster="/images/hero-poster.jpg"
         className="absolute inset-0 h-full w-full object-cover"
       >
-        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+        <source src={videoSrc} type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-black/30" />
@@ -77,9 +82,9 @@ export default function VideoHeroSection() {
         >
           <div className="relative w-full max-w-[400px]">
             {/* Bright glow behind the image to highlight the characters */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/20 rounded-full filter blur-[80px] opacity-100 z-0 animate-pulse"></div>
-            <div className="absolute -top-10 -right-10 w-64 h-64 bg-purple-400/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse"></div>
-            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-pink-400/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/20 dark:bg-blue-500/10 rounded-full filter blur-[80px] opacity-100 z-0 animate-pulse"></div>
+            <div className="absolute -top-10 -right-10 w-64 h-64 bg-purple-400/50 dark:bg-blue-500/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse"></div>
+            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-pink-400/50 dark:bg-blue-700/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse" style={{ animationDelay: '1s' }}></div>
 
             <img
               src={studyGirlReading}
@@ -91,7 +96,7 @@ export default function VideoHeroSection() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-              className="absolute top-1/2 left-1/2 w-[340px] h-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-pink-400/60 dark:border-cyan-400/60 border-dashed z-0 pointer-events-none shadow-[0_0_20px_rgba(236,72,153,0.2)] dark:shadow-[0_0_20px_rgba(34,211,238,0.2)]"
+              className="absolute top-1/2 left-1/2 w-[340px] h-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-pink-400/60 dark:border-blue-400/80 border-dashed z-0 pointer-events-none shadow-[0_0_20px_rgba(236,72,153,0.2)] dark:shadow-[0_0_30px_rgba(59,130,246,0.6)]"
             >
               {innerFeatures.map((feature, index) => {
                 const angle = (index / innerFeatures.length) * 360;
@@ -111,7 +116,7 @@ export default function VideoHeroSection() {
                     <motion.div
                       animate={{ rotate: -360 }}
                       transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-                      className="rounded-xl border border-pink-300/50 dark:border-cyan-300/50 bg-pink-500/20 dark:bg-cyan-500/20 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(236,72,153,0.4)] dark:shadow-[0_0_15px_rgba(34,211,238,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-pink-500/30 dark:hover:bg-cyan-500/30 transition-colors cursor-default"
+                      className="rounded-xl border border-pink-300/50 dark:border-blue-400/50 bg-pink-500/20 dark:bg-blue-900/50 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(236,72,153,0.4)] dark:shadow-[0_0_15px_rgba(59,130,246,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-pink-500/30 dark:hover:bg-blue-800/60 transition-colors cursor-default"
                     >
                       <div className="text-lg">{feature.icon}</div>
                       <div className="text-white text-[11px] font-bold leading-tight whitespace-nowrap">
@@ -127,7 +132,7 @@ export default function VideoHeroSection() {
             <motion.div
               animate={{ rotate: -360 }}
               transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-              className="absolute top-1/2 left-1/2 w-[520px] h-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-purple-400/60 dark:border-cyan-400/60 border-dashed z-20 pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:shadow-[0_0_20px_rgba(34,211,238,0.2)]"
+              className="absolute top-1/2 left-1/2 w-[520px] h-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-purple-400/60 dark:border-blue-400/80 border-dashed z-20 pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:shadow-[0_0_30px_rgba(59,130,246,0.6)]"
             >
               {outerFeatures.map((feature, index) => {
                 const angle = (index / outerFeatures.length) * 360;
@@ -147,7 +152,7 @@ export default function VideoHeroSection() {
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-                      className="rounded-xl border border-purple-300/50 dark:border-cyan-300/50 bg-purple-500/20 dark:bg-cyan-500/20 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.4)] dark:shadow-[0_0_15px_rgba(34,211,238,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-purple-500/30 dark:hover:bg-cyan-500/30 transition-colors cursor-default"
+                      className="rounded-xl border border-purple-300/50 dark:border-blue-400/50 bg-purple-500/20 dark:bg-blue-900/50 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.4)] dark:shadow-[0_0_15px_rgba(59,130,246,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-purple-500/30 dark:hover:bg-blue-800/60 transition-colors cursor-default"
                     >
                       <div className="text-lg">{feature.icon}</div>
                       <div className="text-white text-[11px] font-bold leading-tight whitespace-nowrap">
