@@ -23,6 +23,7 @@ const assessmentRoutes = require('./routes/assessment.routes');
 const moodRoutes = require('./routes/mood.routes');
 const burnoutRoutes = require('./routes/burnout.routes');
 const revisionRoutes = require('./routes/revision.routes');
+const flowerRoutes = require('./routes/flower.routes');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
@@ -59,6 +60,7 @@ app.use('/api/assessments', assessmentRoutes);
 app.use('/api/mood', moodRoutes);
 app.use('/api/burnout', burnoutRoutes);
 app.use('/api/revision', revisionRoutes);
+app.use('/api/flowers', flowerRoutes);
 // Error Handler
 app.use(errorHandler);
 
