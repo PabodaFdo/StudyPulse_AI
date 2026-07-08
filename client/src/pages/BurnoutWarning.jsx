@@ -58,9 +58,9 @@ const BurnoutWarning = () => {
   };
 
   const getRiskClasses = (level) => {
-    if (level === 'High') return 'border-red-500/20 bg-gradient-to-br from-red-500/5 to-slate-100 dark:to-navy-900 text-red-500 dark:text-red-400';
-    if (level === 'Medium') return 'border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-slate-100 dark:to-navy-900 text-yellow-600 dark:text-yellow-400';
-    return 'border-green-500/20 bg-gradient-to-br from-green-500/5 to-slate-100 dark:to-navy-900 text-green-600 dark:text-green-400';
+    if (level === 'High') return 'border-red-500/20 bg-gradient-to-br from-red-500/5 to-slate-100 dark:to-slate-900/80 text-red-500 dark:text-red-400';
+    if (level === 'Medium') return 'border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-slate-100 dark:to-slate-900/80 text-yellow-600 dark:text-yellow-400';
+    return 'border-green-500/20 bg-gradient-to-br from-green-500/5 to-slate-100 dark:to-slate-900/80 text-green-600 dark:text-green-400';
   };
 
   const getIconBgClass = (level) => {
