@@ -21,19 +21,19 @@ export default function VideoHeroSection() {
       <div className="absolute inset-0 bg-black/30" />
 
       <div className="relative z-10 grid w-full max-w-[1280px] min-h-[620px] md:grid-cols-2">
-            
+
         {/* Left Side - Blur only here */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex h-full flex-col justify-center items-center lg:items-start text-center lg:text-left bg-black/35 px-10 py-16 backdrop-blur-xl md:border-r md:border-white/20 lg:px-16"
+          className="flex h-full flex-col justify-center items-center lg:items-start text-center lg:text-left px-10 py-16 lg:px-16"
         >
           <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md shadow-sm">
             <Sparkles className="h-3.5 w-3.5 text-pink-300" /> Introducing StudyPulse AI 2.0
           </span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-white">
-            Study smarter,<br/>
+            Study smarter,<br />
             <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm">
               grow better
             </span>
@@ -67,32 +67,32 @@ export default function VideoHeroSection() {
             {/* Decorative soft glow behind the image (without blurring the background) */}
             <div className="absolute -top-6 -right-6 w-32 h-32 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '1s' }}></div>
-            
+
             <img
               src={studyGirlReading}
               alt="StudyPulse AI students"
               className="relative z-10 w-full drop-shadow-2xl hover:scale-[1.02] transition-transform duration-500"
             />
-            
+
             {/* Floating badges */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.8 }}
               className="absolute top-1/4 -left-10 z-20 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-md shadow-2xl flex items-center gap-3"
             >
               <div className="text-2xl">🧠</div>
-              <div className="text-white text-xs font-bold leading-tight">AI Generated<br/><span className="text-white/70 font-normal">Quizzes</span></div>
+              <div className="text-white text-xs font-bold leading-tight">AI Generated<br /><span className="text-white/70 font-normal">Quizzes</span></div>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 1 }}
               className="absolute bottom-1/4 -right-10 z-20 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-md shadow-2xl flex items-center gap-3"
             >
               <div className="text-2xl">🌱</div>
-              <div className="text-white text-xs font-bold leading-tight">Study Garden<br/><span className="text-white/70 font-normal">Level 12</span></div>
+              <div className="text-white text-xs font-bold leading-tight">Study Garden<br /><span className="text-white/70 font-normal">Level 12</span></div>
             </motion.div>
           </div>
         </motion.div>
