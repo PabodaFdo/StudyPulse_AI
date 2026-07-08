@@ -4,6 +4,18 @@ import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight } from 'lucide-react';
 import studyGirlReading from '../../assets/characters/study-girl-reading.png';
 
+const innerFeatures = [
+  { icon: '🧠', title: 'Generate Quizzes' },
+  { icon: '🗂️', title: 'Generate Flashcards' },
+  { icon: '📝', title: 'Smart Auto-Notes' },
+];
+
+const outerFeatures = [
+  { icon: '⏱️', title: 'Track Focus' },
+  { icon: '📈', title: 'Predict Risk' },
+  { icon: '🌱', title: 'Grow Garden' },
+];
+
 export default function VideoHeroSection() {
   return (
     <section className="relative min-h-[calc(100vh-72px)] w-full overflow-hidden bg-black flex items-center justify-center px-4 py-10">
@@ -64,40 +76,97 @@ export default function VideoHeroSection() {
           className="relative hidden md:flex h-full items-center justify-center bg-transparent px-8 py-10"
         >
           <div className="relative w-full max-w-[400px]">
-            {/* Decorative soft glow behind the image (without blurring the background) */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse"></div>
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse" style={{ animationDelay: '1s' }}></div>
+            {/* Bright glow behind the image to highlight the characters */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white/20 rounded-full filter blur-[80px] opacity-100 z-0 animate-pulse"></div>
+            <div className="absolute -top-10 -right-10 w-64 h-64 bg-purple-400/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse"></div>
+            <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-pink-400/50 rounded-full mix-blend-screen filter blur-[60px] opacity-80 animate-pulse" style={{ animationDelay: '1s' }}></div>
 
             <img
               src={studyGirlReading}
               alt="StudyPulse AI students"
-              className="relative z-10 w-full drop-shadow-2xl hover:scale-[1.02] transition-transform duration-500"
+              className="relative z-10 w-full drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-[1.02] transition-transform duration-500"
             />
 
-            {/* Floating badges */}
+            {/* Inner Planetary Orbit (Behind children) */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-              className="absolute top-1/4 -left-10 z-20 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-md shadow-2xl flex items-center gap-3"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+              className="absolute top-1/2 left-1/2 w-[340px] h-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-pink-400/60 dark:border-cyan-400/60 border-dashed z-0 pointer-events-none shadow-[0_0_20px_rgba(236,72,153,0.2)] dark:shadow-[0_0_20px_rgba(34,211,238,0.2)]"
             >
-              <div className="text-2xl">🧠</div>
-              <div className="text-white text-xs font-bold leading-tight">AI Generated<br /><span className="text-white/70 font-normal">Quizzes</span></div>
+              {innerFeatures.map((feature, index) => {
+                const angle = (index / innerFeatures.length) * 360;
+                const x = 50 + 50 * Math.cos((angle * Math.PI) / 180);
+                const y = 50 + 50 * Math.sin((angle * Math.PI) / 180);
+                
+                return (
+                  <div
+                    key={index}
+                    className="absolute"
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    <motion.div
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+                      className="rounded-xl border border-pink-300/50 dark:border-cyan-300/50 bg-pink-500/20 dark:bg-cyan-500/20 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(236,72,153,0.4)] dark:shadow-[0_0_15px_rgba(34,211,238,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-pink-500/30 dark:hover:bg-cyan-500/30 transition-colors cursor-default"
+                    >
+                      <div className="text-lg">{feature.icon}</div>
+                      <div className="text-white text-[11px] font-bold leading-tight whitespace-nowrap">
+                        {feature.title}
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
             </motion.div>
 
+            {/* Outer Planetary Orbit (In front of children) */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1 }}
-              className="absolute bottom-1/4 -right-10 z-20 rounded-2xl border border-white/20 bg-white/10 p-3.5 backdrop-blur-md shadow-2xl flex items-center gap-3"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+              className="absolute top-1/2 left-1/2 w-[520px] h-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] border-purple-400/60 dark:border-cyan-400/60 border-dashed z-20 pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.2)] dark:shadow-[0_0_20px_rgba(34,211,238,0.2)]"
             >
-              <div className="text-2xl">🌱</div>
-              <div className="text-white text-xs font-bold leading-tight">Study Garden<br /><span className="text-white/70 font-normal">Level 12</span></div>
+              {outerFeatures.map((feature, index) => {
+                const angle = (index / outerFeatures.length) * 360;
+                const x = 50 + 50 * Math.cos((angle * Math.PI) / 180);
+                const y = 50 + 50 * Math.sin((angle * Math.PI) / 180);
+                
+                return (
+                  <div
+                    key={index}
+                    className="absolute"
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+                      className="rounded-xl border border-purple-300/50 dark:border-cyan-300/50 bg-purple-500/20 dark:bg-cyan-500/20 px-3 py-2 backdrop-blur-md shadow-[0_0_15px_rgba(168,85,247,0.4)] dark:shadow-[0_0_15px_rgba(34,211,238,0.4)] flex items-center gap-2 pointer-events-auto hover:bg-purple-500/30 dark:hover:bg-cyan-500/30 transition-colors cursor-default"
+                    >
+                      <div className="text-lg">{feature.icon}</div>
+                      <div className="text-white text-[11px] font-bold leading-tight whitespace-nowrap">
+                        {feature.title}
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
             </motion.div>
           </div>
         </motion.div>
 
       </div>
+
+      {/* Vintage Color Mix Transition */}
+      <div className="absolute bottom-0 w-full h-48 bg-gradient-to-t from-[#c2410c]/50 via-[#ea580c]/20 to-transparent mix-blend-color pointer-events-none z-10" />
+      <div className="absolute bottom-0 w-full h-40 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none z-10" />
+      
     </section>
   );
 }
