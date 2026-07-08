@@ -82,12 +82,12 @@ const Landing = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.7 }}
-          className="relative rounded-[28px] app-card p-2"
+          className="relative rounded-[28px] bg-white/20 dark:bg-slate-950/40 backdrop-blur-md border border-white/30 dark:border-slate-700/30 p-2 shadow-2xl"
         >
           {/* Subtle gradient behind */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5 rounded-[28px] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 rounded-[28px] pointer-events-none" />
           
-          <div className="rounded-[20px] app-card p-4 sm:p-8 overflow-hidden relative z-10">
+          <div className="rounded-[20px] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 shadow-inner p-4 sm:p-8 overflow-hidden relative z-10">
             {/* Window controls mimic */}
             <div className="flex items-center justify-between border-b border-lavender/10 dark:border-white/10 pb-4 mb-8">
               <div className="flex items-center gap-2">
@@ -155,9 +155,9 @@ const Landing = () => {
       <section className="px-6 py-24 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge color="red" className="mb-4 inline-flex">Why students struggle</Badge>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-text-main tracking-tight">The Student Dilemma</h2>
-            <p className="text-text-muted mt-4 text-lg font-medium leading-relaxed">
+            <Badge color="glass" className="mb-4 inline-flex">Why students struggle</Badge>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">The Student Dilemma</h2>
+            <p className="text-white/80 mt-4 text-lg font-medium leading-relaxed">
               Traditional academic systems fail to address modern students' learning challenges.
             </p>
           </div>
@@ -186,9 +186,9 @@ const Landing = () => {
       <section className="px-6 py-24 bg-transparent relative z-10 border-t border-purple-50 dark:border-slate-800">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <Badge color="purple" className="mb-4 inline-flex">The Solution</Badge>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-text-main tracking-tight">How StudyPulse AI helps</h2>
-            <p className="text-text-muted mt-4 text-lg font-medium leading-relaxed">
+            <Badge color="glass" className="mb-4 inline-flex">The Solution</Badge>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">How StudyPulse AI helps</h2>
+            <p className="text-white/80 mt-4 text-lg font-medium leading-relaxed">
               A smart academic companion that connects notes, quizzes, focus sessions, risk prediction, and progress tracking in one place.
             </p>
           </div>
@@ -221,7 +221,7 @@ const Landing = () => {
       <section className="px-6 py-24 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-text-main tracking-tight">Your study flow, simplified</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Your study flow, simplified</h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -241,8 +241,8 @@ const Landing = () => {
                   <div className="hidden md:block absolute top-8 left-[60%] w-full h-[2px] bg-gradient-to-r from-purple-200 to-pink-200 dark:from-slate-700 dark:to-slate-600 -z-10" />
                 )}
                 <div className="mt-4 flex flex-col items-center">
-                  <span className="text-xs font-bold text-purple-600 dark:text-purple-400 mb-1 tracking-widest uppercase">Step {step.step}</span>
-                  <p className="text-sm font-bold text-text-main">{step.title}</p>
+                  <span className="text-xs font-bold text-pink-300 mb-1 tracking-widest uppercase drop-shadow-sm">Step {step.step}</span>
+                  <p className="text-sm font-bold text-white drop-shadow-md">{step.title}</p>
                 </div>
               </motion.div>
             ))}
