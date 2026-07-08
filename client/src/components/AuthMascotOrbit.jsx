@@ -23,8 +23,8 @@ const AuthMascotOrbit = ({ image, title, subtitle, icons = ["📚", "🧠", "⏱
       </div>
 
       <div className="relative z-10 text-center mt-6">
-        <h2 className="text-3xl font-black text-[#241b4b]">{title}</h2>
-        <p className="mt-2 text-[#6b6388] font-semibold">{subtitle}</p>
+        <h2 className="text-3xl font-black text-white">{title}</h2>
+        <p className="mt-2 text-white/80 font-semibold">{subtitle}</p>
       </div>
     </div>
   );
