@@ -700,43 +700,7 @@ Theme
 - Dark theme readable
 ```
 
----
 
-## 🖼️ Screenshots
-
-Add screenshots inside a folder such as:
-
-```txt
-client/public/screenshots/
-```
-
-Recommended screenshots:
-
-```txt
-Landing Page
-Dashboard
-Mood Check-in
-Burnout Warning
-Revision Reminders
-Flower Collection
-Study Garden
-Study Quests
-AI Summary Generator
-Quiz Generator
-Flashcards
-My AI Library
-```
-
-Example:
-
-```md
-![Dashboard](client/public/screenshots/dashboard.png)
-![Mood Check-in](client/public/screenshots/mood-checkin.png)
-![Burnout Warning](client/public/screenshots/burnout-warning.png)
-![Flower Collection](client/public/screenshots/flower-collection.png)
-```
-
----
 
 ## 🧭 Roadmap
 
