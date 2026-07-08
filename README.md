@@ -1,297 +1,159 @@
-# StudyPulse AI 🌱✨
+<div align="center">
 
-![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![Vite](https://img.shields.io/badge/Build-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![Express](https://img.shields.io/badge/API-Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
-![FastAPI](https://img.shields.io/badge/ML_Service-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Python](https://img.shields.io/badge/AI%2FML-Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:22c55e,50:06b6d4,100:8b5cf6&height=190&section=header&text=StudyPulse%20AI&fontSize=52&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=AI-Powered%20Student%20Productivity%20%2B%20Wellness%20Platform&descAlignY=58&descSize=17" alt="StudyPulse AI animated header" />
 
-**StudyPulse AI** is a full-stack AI-powered student productivity and academic analytics platform. It helps students manage subjects, track study behavior, create smart notes, upload study materials, generate AI summaries, quizzes, and flashcards, monitor academic risk, and improve learning consistency through personalized analytics.
+<img src="https://readme-typing-svg.demolab.com?font=Poppins&weight=700&size=24&duration=2600&pause=700&color=22C55E&center=true&vCenter=true&width=900&lines=Smart+Notes+%7C+AI+Quizzes+%7C+Flashcards;Mood+Check-in+%7C+Burnout+Warning+%7C+Revision+Reminders;Study+Garden+%7C+Flower+Collection+%7C+Dashboard+Analytics" alt="Animated StudyPulse AI feature topics" />
 
-> Study smarter. Track better. Improve with StudyPulse AI.
+<br />
 
----
+![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-API-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Python](https://img.shields.io/badge/Python-AI%2FML-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-AI_Generation-F55036?style=for-the-badge)
 
-## Table of Contents
+</div>
 
-- [Project Overview](#project-overview)
-- [Project Vision](#project-vision)
-- [Key Features](#key-features)
-- [AI and ML Features](#ai-and-ml-features)
-- [Study Engagement Score](#study-engagement-score)
-- [System Architecture](#system-architecture)
-- [Tech Stack](#tech-stack)
-- [Folder Structure](#folder-structure)
-- [Getting Started](#getting-started)
-- [Environment Variables](#environment-variables)
-- [Demo Login](#demo-login)
-- [API Overview](#api-overview)
-- [Database Highlights](#database-highlights)
-- [Screenshots](#screenshots)
-- [Testing Checklist](#testing-checklist)
-- [Example User Flow](#example-user-flow)
-- [What I Learned](#what-i-learned)
-- [Internship Value](#internship-value)
-- [Future Improvements](#future-improvements)
-- [Author](#author)
-- [License](#license)
+# 🌱 StudyPulse AI
+
+**StudyPulse AI** is a full-stack, AI-powered student productivity, wellness, and academic growth platform.
+
+It helps students manage subjects, create smart notes, track focus sessions, monitor academic performance, upload PDF study materials, generate AI summaries, create AI quizzes, generate flashcards, save AI learning content, track wellness, receive revision reminders, and unlock gamified flower rewards.
+
+> **Study smarter. Grow better. Bloom with StudyPulse AI.**
 
 ---
 
-## Project Overview
+## 📌 Table of Contents
 
-Many students struggle with scattered study materials, inconsistent revision habits, low focus, weak topic awareness, and late identification of academic risk.
+- [Project Vision](#-project-vision)
+- [Key Features](#-key-features)
+- [AI/ML Features](#-aiml-features)
+- [Wellness & Gamification Features](#-wellness--gamification-features)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Folder Structure](#-folder-structure)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [API Overview](#-api-overview)
+- [Database Models](#-database-models)
+- [Testing](#-testing)
+- [Screenshots](#-screenshots)
+- [Roadmap](#-roadmap)
+- [What I Learned](#-what-i-learned)
+- [CV Highlight](#-cv-highlight)
+- [Author](#-author)
+- [License](#-license)
 
-StudyPulse AI solves this by combining:
+---
+
+## 🎯 Project Vision
+
+Many students struggle with scattered notes, inconsistent revision habits, poor focus routines, late academic risk awareness, and unhealthy study overload.
+
+**StudyPulse AI** solves this by combining:
 
 - Study management
 - AI-powered learning support
-- Academic analytics
-- Risk prediction
-- Subject health tracking
-- Focus tracking
-- Gamified learning
-- Personalized dashboards
+- Academic performance tracking
+- Focus and productivity tracking
+- Student wellness monitoring
+- Revision reminders
+- Gamification and reward systems
+- Dashboard analytics
 
-The system is designed as a **Full-Stack + AI/ML portfolio project** to demonstrate practical skills in frontend development, backend API development, database design, authentication, AI service integration, PDF processing, and academic analytics.
-
----
-
-## Project Vision
-
-The main goal of StudyPulse AI is to help students understand their learning behavior and improve academic performance before problems become serious.
-
-Instead of only showing marks, StudyPulse AI analyzes real study activity such as:
-
-- Quiz performance
-- Focus sessions
-- Notes activity
-- Flashcard reviews
-- Summary reviews
-- Assessment marks
-- Recent study consistency
-
-Using these signals, the system provides academic risk warnings, subject health scores, weak topic insights, and AI-generated learning materials.
+The project is designed as a **Full-Stack + AI/ML portfolio project** to demonstrate practical skills in frontend development, backend API development, database design, authentication, AI service integration, PDF processing, machine-learning-style analytics, and real-world feature planning.
 
 ---
 
-## Key Features
+## ✨ Key Features
 
-### Authentication and Security
+### 🔐 Authentication & Security
 
 - User registration and login
 - JWT-based authentication
 - Protected frontend routes
-- Password hashing with bcrypt
-- Session persistence
-- Logout functionality
+- Secure password hashing with bcrypt
+- Logout with session clearing
 - User-specific data access
 
----
+### 📚 Subject & Study Management
 
-### Dashboard Analytics
+- Add, update, delete, and manage academic subjects
+- Store subject name, code, credits, target grade, and current standing
+- Connect notes, focus sessions, and academic records with subjects
 
-The dashboard gives students a quick overview of their study progress.
+### 📝 Smart Notes
 
-Includes:
-
-- Academic risk summary
-- Study statistics
-- Subject progress
-- Quiz performance
-- Flashcard activity
-- Summary activity
-- Focus overview
-- Recent activity
-- Study Garden progress
-- Suggested study quests
-- Academic records summary
-- Subject health overview
-
----
-
-### Subject Management
-
-Students can manage their academic subjects and connect learning activities to each subject.
-
-Features:
-
-- Add subjects
-- Update subject details
-- Delete subjects
-- Track subject-specific study data
-- Connect notes, quizzes, focus sessions, summaries, flashcards, and assessments to subjects
-
----
-
-### Smart Notes
-
-Students can create and manage study notes.
-
-Features:
-
-- Create notes
-- Edit notes
-- Delete notes
-- Organize notes by subject
+- Create, edit, delete, and organize notes
+- Group notes by subject
 - Mark notes as revised
-- Use notes as input for AI summaries, quizzes, and flashcards
+- Use saved notes as sources for AI summaries, quizzes, and flashcards
+
+### ⏱️ FocusFlow Timer
+
+- Track focused study sessions
+- Save focus sessions by subject
+- Monitor total study time
+- Support better study consistency through focus tracking
+
+### 📊 Academic Records
+
+- Add academic performance records
+- Store attendance, assignment marks, quiz marks, study hours, and exam marks
+- Use academic data for academic risk, subject health, burnout analytics, and revision reminder generation
+
+### 🌿 Study Garden & Quests
+
+- Gamified learning experience
+- Earn growth points through study actions
+- Complete study quests to build consistent habits
+- Track plant progress as a motivation system
+
+### 📈 Dashboard Analytics
+
+The dashboard gives students a quick overview of academic productivity, AI content, and wellness progress.
+
+It includes compact summary cards for:
+
+- Mood Summary
+- Burnout Risk
+- Revision Reminders
+- Flower Collection Progress
+
+### 🌙 Dark/Light Theme
+
+- Supports both dark and light themes
+- Responsive modern interface
+- Theme-safe UI styling for readability
 
 ---
 
-### FocusFlow Timer
+## 🤖 AI/ML Features
 
-The FocusFlow feature helps students track focused study sessions.
-
-Features:
-
-- Start focus sessions
-- Save focus time
-- Connect focus sessions to subjects
-- Track total focused study time
-- Use focus activity inside Study Engagement Score
-
----
-
-### Academic Records and Assessments
-
-Students can store academic performance data.
-
-Features:
-
-- Add quiz marks
-- Add assignment marks
-- Add exam marks
-- Track average marks
-- Connect assessments to subjects
-- Use weighted assessment marks for Subject Health
-
----
-
-### Study Garden and Quests
-
-StudyPulse AI includes gamification to encourage consistent learning.
-
-Features:
-
-- Study Garden progress
-- Growth points
-- Study quests
-- Quest completion
-- Reward claiming
-- Visual motivation for study consistency
-
----
-
-### My AI Library
-
-Generated learning content can be saved and reused later.
-
-Students can save:
-
-- AI summaries
-- AI quizzes
-- AI flashcards
-- PDF-based learning materials
-
-My AI Library allows students to review generated content without regenerating it again.
-
----
-
-### Dark and Light Theme
-
-The application supports both dark and light themes with a modern responsive UI.
-
----
-
-## AI and ML Features
-
-StudyPulse AI uses a separate **FastAPI AI/ML service** that works with the Node.js backend.
-
-The React frontend does not directly call the ML service. Instead, requests go through the Node.js backend for better security and cleaner architecture.
+StudyPulse AI includes a separate **FastAPI AI/ML service** that works together with the Node.js backend.
 
 | Feature | Method | Status |
 |---|---|---|
-| Academic Risk Prediction | FastAPI ML service / risk scoring logic | Completed |
-| Risk History | PostgreSQL + Prisma | Completed |
-| Risk Timeline | Recharts + real prediction history | Completed |
-| Subject Health Score | Rule-based academic analytics | Completed |
-| Study Engagement Score | Multi-activity scoring | Completed |
-| Weak Topic Detection | ML-service / rule-based logic | Completed |
-| PDF Text Extraction | pdfplumber | Completed |
-| AI Summary Generation | Groq API + fallback logic | Completed |
-| AI Quiz Generation | Groq API + fallback logic | Completed |
-| AI Flashcard Generation | Groq API + fallback logic | Completed |
-| Flashcard Review Tracking | PostgreSQL + Prisma | Completed |
-| Summary Review Tracking | PostgreSQL + Prisma | Completed |
-| My AI Library | Saved AI content in PostgreSQL | Completed |
+| Academic Risk Prediction | Machine learning / rule-based logic | ✅ Completed |
+| Subject Health Score | Rule-based scoring | ✅ Completed |
+| Weak Topic Detection | ML / rule-based logic | ✅ Completed |
+| PDF Text Extraction | pdfplumber | ✅ Completed |
+| Saved PDF Study Materials | PostgreSQL + Prisma | ✅ Completed |
+| AI Summary Generation | Groq API + fallback logic | ✅ Completed |
+| Smart Notes AI Summary | Groq API + fallback logic | ✅ Completed |
+| AI Quiz Generation | Groq API + fallback logic | ✅ Completed |
+| AI Flashcard Generation | Groq API + fallback logic | ✅ Completed |
+| My AI Library | Saved AI content in PostgreSQL | ✅ Completed |
 
----
+### 📄 PDF Text Extraction
 
-## Main AI Features
+Students can upload PDF study materials. The FastAPI service extracts text from the PDF using `pdfplumber`, and the extracted text is saved as a Study Material in PostgreSQL.
 
-### AI Summary Generation
-
-Students can generate structured summaries from saved PDF materials or Smart Notes.
-
-The generated summary can include:
-
-- Main summary
-- Important points
-- Key terms
-- Section-based explanation
-- Word count
-- Review tracking
-
-Students can mark summaries as reviewed. Summary review activity is used in Dashboard analytics and Study Engagement Score.
-
----
-
-### AI Quiz Generation
-
-Students can generate quizzes from PDF materials or Smart Notes.
-
-Features:
-
-- Multiple-choice questions
-- Difficulty selection
-- Correct and wrong answer feedback
-- Answer explanations
-- Score calculation
-- Quiz result tracking
-- Save quizzes to My AI Library
-
-Quiz performance is used inside Study Engagement Score and academic analytics.
-
----
-
-### AI Flashcard Generation
-
-Students can generate active recall flashcards from study materials.
-
-Features:
-
-- Front and back flashcards
-- Difficulty labels
-- Card navigation
-- Known / Need Review status
-- Review completion screen
-- Accuracy calculation
-- Save flashcard deck to My AI Library
-- Track flashcard review attempts
-
-Flashcard review attempts are used in Dashboard analytics and Study Engagement Score.
-
----
-
-### PDF Text Extraction
-
-Students can upload PDF study materials.
-
-The FastAPI service extracts text using `pdfplumber`, and the extracted content can be used for:
+Saved PDF materials can be reused for:
 
 - AI summary generation
 - AI quiz generation
@@ -299,140 +161,161 @@ The FastAPI service extracts text using `pdfplumber`, and the extracted content 
 - Study material preview
 - My AI Library
 
+### 🧠 AI Summary Generation
+
+The summary generator creates structured summaries from saved PDF materials or Smart Notes.
+
+It can return:
+
+- Main summary
+- Important points
+- Key terms
+- Section summaries
+- Word count
+
+### ❓ AI Quiz Generation
+
+The quiz generator creates interactive quizzes from saved PDF materials or Smart Notes.
+
+It supports:
+
+- Multiple-choice questions
+- Difficulty selection
+- Answer selection
+- Correct/wrong feedback
+- Answer explanations
+- Score tracking
+- Save to My AI Library
+
+### 🃏 AI Flashcard Generation
+
+The flashcard generator creates active recall flashcards from saved PDF materials or Smart Notes.
+
+It supports:
+
+- Front/back flashcards
+- Difficulty selection
+- Flip interaction
+- Navigation
+- Shuffle mode
+- Known / still learning / important status
+- Save to My AI Library
+
+### 🛡️ Fallback Support
+
+If the Groq API is unavailable, rate-limited, or fails, the system uses fallback logic for summaries, quizzes, and flashcards. This allows the app to continue working even when the external AI service is unavailable.
+
 ---
 
-### Academic Risk Prediction
+## 🌸 Wellness & Gamification Features
 
-The Risk Prediction feature estimates academic risk using student learning data.
+StudyPulse AI includes a complete wellness and gamification layer.
 
-Inputs include:
+| Feature | Description | Status |
+|---|---|---|
+| Mood Check-in | Saves daily mood, energy, stress, and journal notes | ✅ Completed |
+| Burnout Warning | Analyzes mood, stress, energy, focus sessions, and academic pressure | ✅ Completed |
+| Revision Reminders | Generates and manages real revision reminders | ✅ Completed |
+| Flower Collection | Unlocks flowers based on study progress and wellness activities | ✅ Completed |
+| Dashboard Wellness Summary | Shows compact wellness and gamification cards on the dashboard | ✅ Completed |
 
-- Study Engagement percentage
-- Assignment average
-- Quiz average
-- Study hours per week
-- Focus sessions completed
-- Previous exam mark
+### 😊 Mood Check-in
 
-The output includes:
+Mood Check-in allows students to track their daily wellness.
 
-- Risk level
-- Risk Probability
-- Risk trend
-- Key academic indicators
-- AI correction strategy
+Users can save:
 
-Risk Probability means:
+- Mood level
+- Energy level
+- Stress level
+- Optional journal note
 
-> Higher Risk Probability (%) indicates greater academic risk.
+The system also calculates a 7-day summary:
 
----
+- Average mood
+- Average energy
+- Average stress
+- Total check-ins
 
-### Risk Timeline
+### 🔥 Burnout Warning
 
-The Risk Timeline visualizes historical risk predictions over time.
+Burnout Warning is a wellness analytics feature.
 
-Features:
+It uses real StudyPulse data such as:
 
-- Subject selection
-- Latest risk level
-- Latest Risk Probability
-- Latest trend
-- Total predictions
-- Historical risk chart
-- Timeline events
-- Improving / declining / stable trend explanation
+- Mood check-ins
+- Stress level
+- Energy level
+- Mood level
+- Focus sessions
+- Weekly focus hours
+- Academic pressure data
 
----
+The system calculates:
 
-### Subject Health Score
+- Burnout risk percentage
+- Risk level: Low / Medium / High
+- Main reasons
+- Suggested rebalancing steps
 
-Subject Health analyzes the current academic condition of a selected subject.
+> Note: Burnout Warning is not a medical diagnosis. It is a study wellness indicator designed to help students identify overload early.
 
-It considers:
+### 🔔 Revision Reminders
 
-- Weighted assessment marks
-- Study Engagement Score
+Revision Reminders help students know what to revise next.
+
+The system can generate reminders from:
+
+- Academic records
 - Quiz performance
-- Focus activity
-- Notes activity
-- Flashcard activity
-- Summary activity
-- Recent learning activity
+- Assignment performance
+- Previous exam marks
+- Old notes
+- Subject progress
+
+Users can:
+
+- Generate reminders
+- Complete reminders
+- Snooze reminders
+- Delete reminders
+- Filter by priority and status
+
+### 🌺 Flower Collection Rewards
+
+Flower Collection connects gamification with real study progress.
+
+Students unlock flowers based on completed study actions.
+
+| Flower | Unlock Rule |
+|---|---|
+| Rose | Complete 1 Study Quest |
+| Sunflower | Reach 100 Study Garden growth points |
+| Lotus | Complete 5 Focus Sessions |
+| Orchid | Complete 3 Revision Reminders |
+| Cherry Blossom | Complete 5 Mood Check-ins |
+| Lavender | Reach 250 Study Garden growth points |
+
+Unlocked flowers are saved in the database and remain unlocked after refresh.
 
 ---
 
-## Study Engagement Score
+## 🛠️ Tech Stack
 
-Study Engagement Score is a 100-point score calculated from real activity inside StudyPulse AI.
+<div align="center">
 
-Current scoring breakdown:
+<img src="https://readme-typing-svg.demolab.com?font=Poppins&weight=600&size=22&duration=2400&pause=800&color=8B5CF6&center=true&vCenter=true&width=900&lines=React+%2B+Vite+%2B+Tailwind+CSS;Node.js+%2B+Express+%2B+Prisma+%2B+PostgreSQL;FastAPI+%2B+Python+%2B+Groq+AI;Git+%2B+GitHub+%2B+Postman+%2B+VS+Code" alt="Animated tools and technologies" />
 
-| Activity | Points |
-|---|---:|
-| Quiz Activity | 20 |
-| Focus Activity | 15 |
-| Notes Activity | 15 |
-| Flashcard Activity | 15 |
-| Summary Activity | 10 |
-| Assessment Activity | 15 |
-| Recent Activity | 10 |
-| **Total** | **100** |
+<br />
 
-This makes the platform more realistic because engagement is not based on one manual value. It is calculated from the student’s actual learning behavior.
+<img src="https://skillicons.dev/icons?i=react,vite,tailwind,nodejs,express,postgres,prisma,python,fastapi,git,github,vscode&theme=dark" alt="StudyPulse AI tools and technologies" />
 
-Example:
-
-```text
-Quiz Activity:        20 / 20
-Focus Activity:        4 / 15
-Notes Activity:       15 / 15
-Flashcard Activity:   14 / 15
-Summary Activity:      6 / 10
-Assessment Activity:  15 / 15
-Recent Activity:      10 / 10
-Total Score:          84 / 100
-```
-
----
-
-## System Architecture
-
-StudyPulse AI follows a multi-service architecture.
-
-```text
-React Frontend
-      ↓
-Node.js Express Backend
-      ↓
-PostgreSQL Database
-      ↓
-Prisma ORM
-```
-
-For AI and ML features:
-
-```text
-React Frontend
-      ↓
-Node.js Express Backend
-      ↓
-FastAPI AI/ML Service
-      ↓
-Groq API / ML Logic / PDF Processing
-```
-
-The frontend does not directly call the FastAPI service. The backend handles validation, authentication, API forwarding, and database operations.
-
----
-
-## Tech Stack
+</div>
 
 | Layer | Technologies |
 |---|---|
-| Frontend | React, Vite, Tailwind CSS |
-| Routing | React Router |
-| UI Libraries | Framer Motion, Lucide React, Recharts, React Hot Toast |
+| Frontend | React, Vite, Tailwind CSS, React Router |
+| UI/UX | Framer Motion, Lucide React, Recharts, React Hot Toast |
 | Backend | Node.js, Express.js |
 | Database | PostgreSQL |
 | ORM | Prisma |
@@ -447,108 +330,77 @@ The frontend does not directly call the FastAPI service. The backend handles val
 
 ---
 
-## Folder Structure
+## 🏗️ System Architecture
 
-```text
+StudyPulse AI follows a multi-service architecture:
+
+```txt
+React Frontend
+      ↓
+Node.js Express Backend
+      ↓
+PostgreSQL Database
+
+Node.js Express Backend
+      ↓
+FastAPI AI/ML Service
+      ↓
+Groq API / ML Logic / PDF Processing
+```
+
+The React frontend does not directly call the FastAPI AI/ML service.
+
+Instead:
+
+```txt
+React sends a request to the Node.js backend
+Node.js backend validates and forwards AI/ML requests to FastAPI
+FastAPI returns the AI/ML result
+Node.js backend sends the result back to React
+```
+
+This keeps the architecture cleaner and safer because API keys and AI service logic are not exposed to the frontend.
+
+---
+
+## 📁 Folder Structure
+
+```txt
 StudyPluse_AI/
-├── client/                 # React + Vite frontend
-├── server/                 # Node.js + Express backend
-├── ml-service/             # FastAPI AI/ML service
-├── notebooks/              # ML experiments and notebooks
+├── client/        # React + Vite frontend
+├── server/        # Node.js + Express backend
+├── ml-service/    # FastAPI AI/ML service
+├── notebooks/     # Experiment notebooks
 ├── README.md
 ├── LICENSE
 └── .gitignore
 ```
 
-### Frontend Structure
-
-```text
-client/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   ├── context/
-│   ├── routes/
-│   └── utils/
-└── package.json
-```
-
-Important frontend pages:
-
-```text
-Dashboard.jsx
-RiskPrediction.jsx
-RiskTimeline.jsx
-SubjectHealth.jsx
-WeakTopicRadar.jsx
-GenerateSummary.jsx
-QuizGenerator.jsx
-Flashcards.jsx
-AILibrary.jsx
-FocusTimer.jsx
-FocusAnalytics.jsx
-AcademicRecords.jsx
-Assessments.jsx
-```
-
-### Backend Structure
-
-```text
-server/
-├── prisma/
-│   ├── schema.prisma
-│   └── migrations/
-├── src/
-│   ├── controllers/
-│   ├── routes/
-│   ├── services/
-│   ├── middleware/
-│   ├── utils/
-│   ├── app.js
-│   └── server.js
-└── package.json
-```
-
-### ML Service Structure
-
-```text
-ml-service/
-├── app/
-│   ├── main.py
-│   ├── schemas.py
-│   └── services/
-├── requirements.txt
-└── .env
-```
-
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
 Install these before running the project:
 
-- Node.js 18+
-- npm
-- PostgreSQL
-- Python 3.10+
-- Git
-- Postman
+```txt
+Node.js 18+
+npm
+PostgreSQL
+Python 3.10+
+Git
+Postman
+```
 
----
-
-## 1. Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/PabodaFdo/StudyPluse_AI.git
 cd StudyPluse_AI
 ```
 
----
-
-## 2. Backend Setup
+### 2. Backend Setup
 
 ```bash
 cd server
@@ -559,25 +411,13 @@ npx prisma db seed
 npm run dev
 ```
 
-Backend runs on:
+Backend runs at:
 
-```text
+```txt
 http://localhost:5000
 ```
 
-If PowerShell blocks `npx`, use:
-
-```bash
-npx.cmd prisma generate
-npx.cmd prisma migrate dev
-npx.cmd prisma db seed
-```
-
----
-
-## 3. Frontend Setup
-
-Open a new terminal:
+### 3. Frontend Setup
 
 ```bash
 cd client
@@ -585,45 +425,65 @@ npm install
 npm run dev
 ```
 
-Frontend runs on:
+Frontend runs at:
 
-```text
+```txt
 http://localhost:5173
 ```
 
----
-
-## 4. FastAPI ML Service Setup
-
-Open a new terminal:
+### 4. FastAPI AI/ML Service Setup
 
 ```bash
 cd ml-service
 python -m venv venv
+```
+
+Activate virtual environment on Windows:
+
+```bash
 .\venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
+
+Run FastAPI:
+
+```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-FastAPI runs on:
+FastAPI runs at:
 
-```text
+```txt
 http://localhost:8000
 ```
 
 Swagger documentation:
 
-```text
+```txt
 http://localhost:8000/docs
 ```
 
 ---
 
-## Environment Variables
+## 🔑 Demo Login
 
-Create `.env` files inside the `server` and `ml-service` folders.
+```txt
+Email: demo@studypulse.ai
+Password: password123
+```
 
-### server/.env
+---
+
+## ⚙️ Environment Variables
+
+Create `.env` files inside both the `server` and `ml-service` folders.
+
+### `server/.env`
 
 ```env
 PORT=5000
@@ -634,7 +494,7 @@ CLIENT_URL="http://localhost:5173"
 ML_SERVICE_URL="http://localhost:8000"
 ```
 
-### ml-service/.env
+### `ml-service/.env`
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
@@ -645,40 +505,29 @@ GROQ_MODEL=llama-3.1-8b-instant
 
 Never commit `.env` files to GitHub.
 
-API keys must stay inside backend or ML service environment files. They should not be exposed in the React frontend.
+The Groq API key must stay inside:
 
----
-
-## Demo Login
-
-After running the seed command, you can use:
-
-```text
-Email: demo@studypulse.ai
-Password: password123
+```txt
+ml-service/.env
 ```
 
+It should never be added to the React frontend.
+
 ---
 
-## API Overview
+## 🔌 API Overview
 
-### Authentication
+### Auth
 
-```text
+```txt
 POST /api/auth/register
 POST /api/auth/login
 GET  /api/auth/me
 ```
 
-### Dashboard
-
-```text
-GET /api/dashboard/summary
-```
-
 ### Subjects
 
-```text
+```txt
 GET    /api/subjects
 POST   /api/subjects
 GET    /api/subjects/:id
@@ -688,7 +537,7 @@ DELETE /api/subjects/:id
 
 ### Notes
 
-```text
+```txt
 GET    /api/notes
 POST   /api/notes
 GET    /api/notes/:id
@@ -698,347 +547,294 @@ DELETE /api/notes/:id
 
 ### Focus Sessions
 
-```text
+```txt
 GET  /api/focus
 POST /api/focus
 ```
 
-### Academic Records / Assessments
+### Academic Records
 
-```text
-GET  /api/records
-POST /api/records
+```txt
+GET    /api/records
+POST   /api/records
+PUT    /api/records/:id
+DELETE /api/records/:id
 ```
-
-### Risk Prediction
-
-```text
-POST /api/risk/predict
-POST /api/risk/history
-GET  /api/risk/history/:subjectId
-GET  /api/risk/history/:subjectId/latest
-DELETE /api/risk/history/:id
-```
-
-### Subject Health
-
-```text
-POST /api/subject-health/calculate
-```
-
-### Weak Topic Detection
-
-```text
-POST /api/weak-topics/predict
-```
-
-### AI Summary
-
-```text
-POST /api/summary/generate
-POST /api/summaries/review-attempts
-GET  /api/summaries/review-attempts
-GET  /api/summaries/review-attempts/summary
-```
-
-### AI Quiz
-
-```text
-POST /api/quiz/generate
-```
-
-### AI Flashcards
-
-```text
-POST /api/flashcards/generate
-POST /api/flashcards/review-attempts
-GET  /api/flashcards/review-attempts
-GET  /api/flashcards/review-attempts/summary
-```
-
-### Study Materials
-
-```text
-POST   /api/study-materials
-GET    /api/study-materials
-GET    /api/study-materials/:id
-DELETE /api/study-materials/:id
-```
-
-### My AI Library
-
-```text
-POST   /api/ai-library/summaries
-GET    /api/ai-library/summaries
-GET    /api/ai-library/summaries/:id
-DELETE /api/ai-library/summaries/:id
-
-POST   /api/ai-library/quizzes
-GET    /api/ai-library/quizzes
-GET    /api/ai-library/quizzes/:id
-DELETE /api/ai-library/quizzes/:id
-
-POST   /api/ai-library/flashcards
-GET    /api/ai-library/flashcards
-GET    /api/ai-library/flashcards/:id
-DELETE /api/ai-library/flashcards/:id
-```
-
----
-
-## Database Highlights
-
-StudyPulse AI uses PostgreSQL with Prisma ORM.
-
-Important data areas include:
-
-- Users
-- Subjects
-- Notes
-- Focus sessions
-- Academic records
-- Study Garden
-- Growth activities
-- Study quests
-- Study materials
-- Saved AI summaries
-- Saved AI quizzes
-- Saved AI flashcards
-- Risk prediction history
-- Flashcard review attempts
-- Summary review attempts
-
-### Recent Analytics Models
-
-#### RiskPredictionHistory
-
-Stores historical risk predictions for each subject.
-
-Used for:
-
-- Risk Timeline
-- Trend analysis
-- Latest risk summary
-- Improving / declining / stable prediction status
-
-#### FlashcardReviewAttempt
-
-Stores flashcard review sessions.
-
-Used for:
-
-- Flashcard Activity dashboard card
-- Flashcard accuracy
-- Study Engagement Score
-- Subject Health analysis
-
-#### SummaryReviewAttempt
-
-Stores reviewed summary sessions.
-
-Used for:
-
-- Summary Activity dashboard card
-- Total review time
-- Study Engagement Score
-- Subject Health analysis
-
----
-
-## Screenshots
-
-Add your screenshots inside a `docs/screenshots/` folder and update these image paths.
 
 ### Dashboard
 
-```markdown
-![Dashboard](docs/screenshots/dashboard.png)
+```txt
+GET /api/dashboard/summary
 ```
 
-### Risk Prediction
+### Mood Check-in
 
-```markdown
-![Risk Prediction](docs/screenshots/risk-prediction.png)
+```txt
+POST   /api/mood/check-ins
+GET    /api/mood/check-ins
+GET    /api/mood/summary
+DELETE /api/mood/check-ins/:id
 ```
 
-### Risk Timeline
+### Burnout Warning
 
-```markdown
-![Risk Timeline](docs/screenshots/risk-timeline.png)
+```txt
+GET /api/burnout/summary
 ```
 
-### Subject Health
+### Revision Reminders
 
-```markdown
-![Subject Health](docs/screenshots/subject-health.png)
+```txt
+GET    /api/revision/reminders
+POST   /api/revision/reminders/generate
+PATCH  /api/revision/reminders/:id/complete
+PATCH  /api/revision/reminders/:id/snooze
+DELETE /api/revision/reminders/:id
 ```
 
-### Flashcards
+### Flower Collection
 
-```markdown
-![Flashcards](docs/screenshots/flashcards.png)
+```txt
+GET  /api/flowers/collection
+POST /api/flowers/check-unlocks
 ```
 
-### My AI Library
+### Study Garden
 
-```markdown
-![My AI Library](docs/screenshots/ai-library.png)
+```txt
+GET  /api/study-garden
+POST /api/study-garden/add-points
+```
+
+### Study Quests
+
+```txt
+GET   /api/quests
+PATCH /api/quests/:id/complete
+```
+
+### AI Generation
+
+```txt
+POST /api/summary/generate
+POST /api/quiz/generate
+POST /api/flashcards/generate
 ```
 
 ---
 
-## Testing Checklist
+## 🗄️ Database Models
 
-### Backend
+Main Prisma models include:
 
-```bash
-cd server
-npm run dev
+```txt
+User
+Subject
+Note
+FocusSession
+AcademicRecord
+StudyGarden
+GrowthActivity
+StudyQuest
+RiskPredictionHistory
+MoodCheckIn
+RevisionReminder
+FlowerCollection
 ```
-
-Check:
-
-- Server starts without errors
-- Prisma connects to PostgreSQL
-- Auth routes work
-- Protected routes require token
-- Risk routes work
-- Summary review routes work
-- Flashcard review routes work
 
 ---
 
-### Frontend
+## 🧪 Testing
 
-```bash
-cd client
-npm run dev
-```
+### Manual Testing Checklist
 
-Check:
-
+```txt
+Authentication
+- Register works
 - Login works
-- Dashboard loads
-- Theme toggle works
-- Sidebar navigation works
-- Subject Health auto-fill works
-- Risk Prediction works
-- Risk Timeline shows real data
-- Flashcard review saves
-- Summary review saves
-- AI Library opens saved items
+- Protected routes work
+- Logout works
 
----
+Dashboard
+- Summary cards load
+- Charts load
+- Wellness & Gamification cards load
 
-### ML Service
+Mood Check-in
+- Save mood check-in
+- View recent mood history
+- Summary averages update
+- Delete check-in
+- Data persists after refresh
 
-```bash
-cd ml-service
-.\venv\Scripts\activate
-uvicorn app.main:app --reload --port 8000
+Burnout Warning
+- Risk percentage loads
+- Risk level displays
+- Reasons and recommendations display
+- Uses real mood and focus data
+
+Revision Reminders
+- Generate reminders
+- Complete reminder
+- Snooze reminder
+- Delete reminder
+- Filters work
+- Data persists after refresh
+
+Flower Collection
+- Collection loads
+- Check unlocks works
+- Unlocked flowers persist
+- No duplicate flowers are created
+
+AI Features
+- Upload PDF
+- Extract text
+- Generate summary
+- Generate quiz
+- Generate flashcards
+- Save generated content to My AI Library
+
+Theme
+- Light theme readable
+- Dark theme readable
 ```
 
-Check:
-
-- FastAPI starts
-- Swagger opens at `/docs`
-- Risk prediction endpoint works
-- Subject health endpoint works
-- Weak topic endpoint works
-- PDF text extraction works
-
 ---
 
-## Example User Flow
+## 🖼️ Screenshots
 
-```text
-1. Login as demo student
-2. Add or select a subject
-3. Upload PDF study material
-4. Generate summary
-5. Mark summary as reviewed
-6. Generate flashcards
-7. Review flashcards using Known / Need Review
-8. Generate quiz and submit answers
-9. Check Dashboard activity cards
-10. Open Subject Health and Auto Fill from My Data
-11. Run Risk Prediction
-12. View Risk Timeline
+Add screenshots inside a folder such as:
+
+```txt
+client/public/screenshots/
+```
+
+Recommended screenshots:
+
+```txt
+Landing Page
+Dashboard
+Mood Check-in
+Burnout Warning
+Revision Reminders
+Flower Collection
+Study Garden
+Study Quests
+AI Summary Generator
+Quiz Generator
+Flashcards
+My AI Library
+```
+
+Example:
+
+```md
+![Dashboard](client/public/screenshots/dashboard.png)
+![Mood Check-in](client/public/screenshots/mood-checkin.png)
+![Burnout Warning](client/public/screenshots/burnout-warning.png)
+![Flower Collection](client/public/screenshots/flower-collection.png)
 ```
 
 ---
 
-## What I Learned
+## 🧭 Roadmap
 
-Through this project, I improved my knowledge in:
+### Completed
 
-- Full-stack project architecture
-- React component structure
-- Protected routing
-- REST API development
-- JWT authentication
-- PostgreSQL database design
-- Prisma schema modeling
-- Backend controller and service layers
-- FastAPI service integration
-- AI API integration
+- Authentication
+- Subject management
+- Smart Notes
+- Focus sessions
+- Academic records
+- Dashboard analytics
+- Study Garden
+- Study Quests
+- Academic Risk Prediction
+- Subject Health Score
+- Weak Topic Detection
 - PDF text extraction
-- Academic analytics logic
-- Risk scoring and trend analysis
-- Dashboard data visualization
-- Real-world feature planning
-- Git branch workflow and project cleanup
+- AI summary generation
+- AI quiz generation
+- AI flashcard generation
+- My AI Library
+- Mood Check-in
+- Burnout Warning
+- Revision Reminders
+- Flower Collection Rewards
+- Wellness & Gamification dashboard summaries
+
+### Future Improvements
+
+- Calendar-based revision schedule
+- Email or browser notification reminders
+- More advanced spaced repetition logic
+- AI chatbot for asking questions from saved materials
+- More detailed performance trend charts
+- Export study reports as PDF
+- Deployment with production database
+- Unit and integration tests
 
 ---
 
-## Internship Value
+## 📚 What I Learned
 
-This project demonstrates practical skills useful for:
+While building StudyPulse AI, I gained practical experience in developing a complete full-stack AI-powered application from planning to implementation. This project helped me understand how frontend, backend, database, and AI/ML services work together in a real-world system.
 
-- Software Engineering Intern roles
-- Full-Stack Developer Intern roles
-- AI/ML Intern roles
-- Data Science Intern roles
-- QA / Automation Intern roles
+Through this project, I practiced and improved my skills in:
 
-It shows the ability to build and connect:
+- Building a full-stack web application using React, Node.js, Express, PostgreSQL, Prisma, and FastAPI
+- Designing and organizing a scalable project structure with separate frontend, backend, and AI/ML service layers
+- Creating secure authentication using JWT and bcrypt
+- Designing relational database models with Prisma
+- Building protected REST APIs for user-specific data
+- Connecting React pages to backend APIs using Axios services
+- Handling loading states, error states, empty states, and persistent data
+- Integrating an AI/ML microservice with a Node.js backend
+- Using FastAPI for AI/ML-related endpoints
+- Extracting text from PDF files using Python and `pdfplumber`
+- Generating AI summaries, quizzes, and flashcards using Groq API with fallback logic
+- Building academic analytics features such as risk prediction, subject health score, and weak topic detection
+- Implementing wellness analytics with Mood Check-in and Burnout Warning
+- Creating practical student support features such as Revision Reminders
+- Building gamification features such as Study Garden, Study Quests, and Flower Collection Rewards
+- Creating compact dashboard analytics for academic, wellness, and gamification progress
+- Improving UI readability in both light and dark themes
+- Practicing Git branch workflow, feature branches, commits, pull requests, and merging into `dev`
+- Testing features manually through the browser, backend terminal, network tab, and API responses
+- Writing clearer documentation for project setup, features, APIs, and future improvements
 
-- A modern frontend
-- A secure backend
-- A relational database
-- An AI/ML microservice
-- Real analytics features
-- User-focused UI/UX
-- Portfolio-ready documentation
-
----
-
-## Future Improvements
-
-Possible future improvements:
-
-- Add trained ML models for risk prediction
-- Add notification reminders for weak subjects
-- Add calendar-based study scheduling
-- Add exportable academic reports
-- Add more advanced quiz analytics
-- Add personalized study plan recommendations
-- Add mobile app support
-- Add deployment with Docker
+This project also helped me understand how to turn a simple study tracking idea into a more complete productivity and wellness system for students.
 
 ---
 
-## Author
+## 📌 CV Highlight
+
+```txt
+StudyPulse AI — Full-Stack AI-Powered Student Productivity Platform
+
+Developed a full-stack AI-powered study productivity platform using React, Node.js, Express, PostgreSQL, Prisma, FastAPI, and Groq API. Implemented secure authentication, subject management, smart notes, focus tracking, academic risk prediction, PDF text extraction, AI summaries, AI quizzes, AI flashcards, wellness analytics, revision reminders, gamified Study Garden, Flower Collection rewards, and dashboard insights.
+```
+
+---
+
+## 👩‍💻 Author
 
 **Paboda Sathsarani Fernando**
 
-BSc (Hons) Information Technology Undergraduate  
-Specializing in Data Science / AI / Full-Stack Development
-
-GitHub: `PabodaFdo`
+- GitHub: [PabodaFdo](https://github.com/PabodaFdo)
+- Project Repository: [StudyPluse_AI](https://github.com/PabodaFdo/StudyPluse_AI)
 
 ---
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
+
+---
+
+## ⭐ Final Note
+
+StudyPulse AI is built to help students study smarter, stay consistent, understand academic risk early, and balance productivity with wellbeing.
+
+> Grow your knowledge. Track your progress. Bloom with StudyPulse AI.
