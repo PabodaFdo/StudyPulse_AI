@@ -98,32 +98,7 @@ const Login = () => {
               </Button>
             </form>
 
-            <div className="relative my-4 flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-lavender/30" />
-              </div>
-              <span className="relative bg-white/80 px-3 text-[10px] uppercase font-bold text-text-muted/60 rounded-full">
-                or connect with
-              </span>
-            </div>
 
-            {/* Social Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => toast.success('Google OAuth selected')}
-                className="flex items-center justify-center gap-2 rounded-full border-2 border-lavender/20 bg-white/70 hover:bg-lavender/10 px-4 py-2 text-xs font-bold text-text-main cursor-pointer transition shadow-sm"
-              >
-                🔍 Google
-              </button>
-              <button
-                type="button"
-                onClick={() => toast.success('Github OAuth selected')}
-                className="flex items-center justify-center gap-2 rounded-full border-2 border-lavender/20 bg-white/70 hover:bg-lavender/10 px-4 py-2 text-xs font-bold text-text-main cursor-pointer transition shadow-sm"
-              >
-                💻 GitHub
-              </button>
-            </div>
 
             <p className="text-center text-xs sm:text-sm text-text-muted font-medium">
               Don't have an account?{' '}
