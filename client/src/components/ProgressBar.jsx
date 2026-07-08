@@ -13,8 +13,8 @@ const ProgressBar = ({ value = 0, max = 100, color = 'purple', label, showPercen
     <div className={`flex flex-col gap-1.5 ${className}`}>
       {(label || showPercent) && (
         <div className="flex items-center justify-between text-xs">
-          {label && <span className="text-gray-400">{label}</span>}
-          {showPercent && <span className="text-gray-500">{pct}%</span>}
+          {label && <span className="text-slate-500 dark:text-slate-400 font-medium">{label}</span>}
+          {showPercent && <span className="text-slate-600 dark:text-slate-300 font-bold">{pct}%</span>}
         </div>
       )}
       <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
