@@ -5,6 +5,7 @@ const colorMap = {
   yellow: 'bg-yellow text-amber-900 border-yellow/70',
   red: 'bg-pink/30 text-danger-500 border-pink/40',
   gray: 'bg-cream text-text-muted border-lavender/25',
+  glass: 'bg-white/20 text-white border-white/30 backdrop-blur-md shadow-sm',
 };
 
 const Badge = ({ children, color = 'purple', className = '' }) => {
