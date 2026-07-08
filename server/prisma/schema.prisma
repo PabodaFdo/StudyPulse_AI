@@ -32,6 +32,7 @@ model User {
   summaryReviewAttempts   SummaryReviewAttempt[]
   moodCheckIns            MoodCheckIn[]
   revisionReminders       RevisionReminder[]
+  flowerCollection        FlowerCollection[]
 }
 
 model Subject {
@@ -318,4 +319,20 @@ model RevisionReminder {
   @@index([status])
   @@index([priority])
   @@index([dueDate])
+}
+
+model FlowerCollection {
+  id           String   @id @default(cuid())
+  userId       Int
+  flowerKey    String
+  flowerName   String
+  rarity       String
+  unlockReason String?
+  unlockedAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, flowerKey])
+  @@index([userId])
 }
