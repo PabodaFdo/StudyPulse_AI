@@ -777,6 +777,34 @@ Example:
 
 ---
 
+## 📸 Screenshots
+
+| Landing Page | Dashboard |
+| :---: | :---: |
+| ![Landing Page](./client/public/screenshots/Landing%20Page.png) | ![Dashboard](./client/public/screenshots/Dashboard.png) |
+
+| AI Summary Generator | Quiz Generator |
+| :---: | :---: |
+| ![AI Summary Generator](./client/public/screenshots/AI%20Summary%20Generator.png) | ![Quiz Generator](./client/public/screenshots/Quiz%20Generator.png) |
+
+| Flashcards | My AI Library |
+| :---: | :---: |
+| ![Flashcards](./client/public/screenshots/Flashcards.png) | ![My AI Library](./client/public/screenshots/My%20AI%20Library.png) |
+
+| Study Garden | Flower Collection |
+| :---: | :---: |
+| ![Study Garden](./client/public/screenshots/Study%20Garden.png) | ![Flower Collection](./client/public/screenshots/Flower%20Collection.png) |
+
+| Study Quests | Revision Reminders |
+| :---: | :---: |
+| ![Study Quests](./client/public/screenshots/Study%20Quests.png) | ![Revision Reminders](./client/public/screenshots/Revision%20Reminders.png) |
+
+| Mood Check-in | Burnout Warning |
+| :---: | :---: |
+| ![Mood Check-in](./client/public/screenshots/Mood%20Check-in.png) | ![Burnout Warning](./client/public/screenshots/Burnout%20Warning.png) |
+
+---
+
 ## 📚 What I Learned
 
 While building StudyPulse AI, I gained practical experience in developing a complete full-stack AI-powered application from planning to implementation. This project helped me understand how frontend, backend, database, and AI/ML services work together in a real-world system.
