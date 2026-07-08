@@ -234,11 +234,11 @@ const Landing = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="relative flex flex-col items-center text-center group"
               >
-                <div className="w-16 h-16 rounded-2xl app-soft-card shadow-md flex items-center justify-center text-2xl z-10 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-white/10 dark:bg-slate-900/40 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.1)] flex items-center justify-center text-2xl z-10 group-hover:scale-110 group-hover:bg-white/20 dark:group-hover:bg-slate-900/60 transition-all duration-300">
                   {step.icon}
                 </div>
                 {i !== journeySteps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-[2px] bg-gradient-to-r from-purple-200 to-pink-200 dark:from-slate-700 dark:to-slate-600 -z-10" />
+                  <div className="hidden md:block absolute top-8 left-[60%] w-full h-[2px] bg-gradient-to-r from-white/40 to-white/10 dark:from-white/20 dark:to-transparent -z-10" />
                 )}
                 <div className="mt-4 flex flex-col items-center">
                   <span className="text-xs font-bold text-pink-300 mb-1 tracking-widest uppercase drop-shadow-sm">Step {step.step}</span>
