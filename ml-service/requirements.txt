@@ -20,3 +20,5 @@ tzdata==2026.2
 
 groq
 python-dotenv
+fastapi
+uvicorn
