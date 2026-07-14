@@ -15,6 +15,10 @@
 ![Python](https://img.shields.io/badge/Python-AI%2FML-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Groq](https://img.shields.io/badge/Groq-AI_Generation-F55036?style=for-the-badge)
 
+<br />
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_StudyPulse_AI-22c55e?style=for-the-badge&logo=vercel&logoColor=white)](https://studypulse-ai-mu.vercel.app/)
+
 </div>
 
 # 🌱 StudyPulse AI
