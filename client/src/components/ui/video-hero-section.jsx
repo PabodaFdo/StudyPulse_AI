@@ -29,7 +29,6 @@ export default function VideoHeroSection() {
         loop
         muted
         playsInline
-        poster="/images/hero-poster.jpg"
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source src={videoSrc} type="video/mp4" />
