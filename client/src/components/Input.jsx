@@ -15,7 +15,7 @@ const Input = forwardRef(({ label, error, icon: Icon, type = 'text', className =
       )}
       <div className="relative">
         {Icon && (
-          <Icon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
+          <Icon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-600 dark:text-slate-300 z-10" />
         )}
         <input
           ref={ref}
@@ -27,8 +27,8 @@ const Input = forwardRef(({ label, error, icon: Icon, type = 'text', className =
             border border-slate-300 dark:border-slate-700
             focus:border-brand-500 dark:focus:border-brand-400
             focus:ring-brand-500/20 dark:focus:ring-brand-400/20
-            ${Icon ? 'pl-11' : ''}
-            ${isPassword ? 'pr-11' : ''}
+            ${Icon ? '!pl-12' : ''}
+            ${isPassword ? '!pr-12' : ''}
             ${error ? 'border-danger-500 focus:border-danger-500 focus:ring-danger-500/20' : ''}
             ${className}
           `}
@@ -38,10 +38,10 @@ const Input = forwardRef(({ label, error, icon: Icon, type = 'text', className =
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors focus:outline-none"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors focus:outline-none z-10"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
           </button>
         )}
       </div>
