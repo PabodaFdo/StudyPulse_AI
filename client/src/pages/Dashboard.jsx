@@ -777,7 +777,7 @@ const Dashboard = () => {
                 <h3 className="font-extrabold text-base sm:text-lg text-text-main flex items-center gap-2">
                   <FileText className="h-5 w-5 text-emerald-500" /> Summary Activity
                 </h3>
-                <Button onClick={() => navigate('/library?tab=summaries')} size="sm" variant="outline" className="text-xs py-1.5 h-auto">
+                <Button onClick={() => navigate('/ai-library?tab=summaries')} size="sm" variant="outline" className="text-xs py-1.5 h-auto">
                   Go to AI Library
                 </Button>
               </div>
