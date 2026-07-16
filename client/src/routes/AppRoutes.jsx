@@ -17,7 +17,6 @@ import Subjects from '../pages/Subjects';
 import SmartNotes from '../pages/SmartNotes';
 import UploadPDF from '../pages/UploadPDF';
 
-import AIStudyPlan from '../pages/AIStudyPlan';
 import QuizGenerator from '../pages/QuizGenerator';
 import Flashcards from '../pages/Flashcards';
 import AILibrary from '../pages/AILibrary';
@@ -60,9 +59,6 @@ const AppRoutes = () => {
 
           <Route path="/upload-pdf" element={<UploadPDF />} />
           <Route path="/generate-summary" element={<Navigate to="/smart-notes" replace />} />
-
-          <Route path="/ai-study-plan" element={<AIStudyPlan />} />
-          <Route path="/study-plan" element={<AIStudyPlan />} />
 
           <Route path="/quiz-generator" element={<QuizGenerator />} />
           <Route path="/quizzes" element={<QuizGenerator />} />

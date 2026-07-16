@@ -22,7 +22,6 @@ const sections = [
     links: [
       { to: '/smart-notes', label: 'Smart Notes', icon: FileText },
       { to: '/upload-pdf', label: 'Upload PDF', icon: Upload },
-      { to: '/ai-study-plan', label: 'AI Study Plan', icon: BrainCircuit },
       { to: '/quiz-generator', label: 'Quiz Generator', icon: HelpCircle },
       { to: '/flashcards', label: 'Flashcards', icon: Layers },
       { to: '/ai-library', label: 'My AI Library', icon: Library },
